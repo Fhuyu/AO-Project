@@ -21,7 +21,8 @@
           AVERAGE FAME PER KILL : {{ (battle.totalFame / battle.totalKills).toFixed(0)}}
         </div>
     </div>
-    <a class="waves-effect waves-light btn"><i class="material-icons left">search</i>See battleboard</a>
+    <!-- <router-link :to="/killboard/{{}}">Battleboard</router-link> -->
+    <a class="waves-effect waves-light btn" :href="killboardURL(battle.id)"><i class="material-icons left">search</i>See battleboard</a>
         <table class="striped">
         <thead>
           <tr>
@@ -102,6 +103,9 @@ export default {
       for (const guild in battle.guilds) {
         battle.guilds[guild].numbers = guildNumber[guild]
       }
+    },
+    killboardURL: function (battleID) {
+      return 'killboard/' + battleID
     }
     /* guildBestKillFame: function (guildValues) {
       if (this.bestKillFame.killfame < guildValues.killFame) {

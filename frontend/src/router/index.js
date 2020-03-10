@@ -22,10 +22,16 @@ const routes = [
     path: '/battleboard',
     name: 'Battleboard',
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/Battleboard.vue')
+  },
+  {
+    path: '/killboard/:id',
+    name: 'Killboard',
+    component: () => import(/* webpackChunkName: "killboard" */ '../views/Killboard.vue')
   }
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 

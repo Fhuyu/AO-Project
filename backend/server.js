@@ -17,7 +17,18 @@ app.get('/battles', cors(), (req, res) => {
             res.status(404).send({ success: false, message: error.message });
         });
 });
-
+app.get('/killboard/:id', cors(), (req, res) => {
+    console.log(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`)
+    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`;
+    fetch(url, { timeout: 5000 })
+        .then((res) => res.json())
+        .then((json) => {
+            res.send(json)
+        })
+        .catch((error) => {
+            res.status(404).send({ success: false, message: error.message });
+        });
+});
 
 http.createServer(app).listen(3000, function() {
     console.log(`Server running at port 3000`)
