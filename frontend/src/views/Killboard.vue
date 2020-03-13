@@ -1,8 +1,6 @@
 <template>
   <div class="container">
     BATTLE
-      <a class="waves-effect waves-light btn" v-on:click="deathStat(battle.players[0])">
-        <i class="material-icons left">search</i>See first player death</a>
       <div class="row">
 
         <table v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="col s3">
@@ -29,12 +27,10 @@
                   <td>{{player.kills}}</td>
                   <td>{{player.deaths}}</td>
                   <td>{{player.assistance}}</td>
-                  <td>{{player.damageDone}}</td>
+                  <td v-if="showStats">{{player.damageDone}}</td>
                   <td>{{player.healingDone}}</td>
                   <td v-if="showStats">{{player.itempower}}</td>
-                  <td v-if="showStats">{{player.weapon}}</td>
-                  <td v-else> Loading </td>
-
+                  <td v-if="showStats && player.weapon">{{player.weapon.Type}}</td>
                 </tr>
               <!-- </tr> -->
 
@@ -83,19 +79,19 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`)
+      const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
       return response
     },
 
     async playerDead (playerId) {
-      await axios.get(`http://localhost:3000/player/${playerId}`)
+      await axios.get(`http://localhost:3000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
-          const eventdeath = response.data
+          const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
               this.battle.players[playerId].eventDeath = eventDeath
 
-              this.refreshStats.push(playerId)
+              this.refreshStats.push(playerId) // KEEP
 
               // Show weapons when completly loaded
               console.log(`${Object.keys(this.refreshStats).length} = ${this.battle.totalKills}`)
@@ -106,7 +102,7 @@ export default {
     },
     getPlayerDeath (playerId) {
       for (const player in this.battle.players) {
-        if (this.battle.players[player].deaths > 0 && this.refreshStats.includes(player)) {
+        if (this.battle.players[player].deaths > 0 && this.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
           this.refreshStats.push(player)
           console.log('ELSE IF DEJA PRESENT' + this.refreshStats)
           // Else if player died more than once, put his name in array for final count line 101
@@ -119,11 +115,11 @@ export default {
   mounted () {
     this.fetchData()
       .then(res => {
-        this.battle = res.data[0]
+        this.battle = res.data[0] // EVENT NOT USEFULL
         this.events = res.data[1]
         for (const player in this.battle.players) {
-          this.battle.players[player].damageDone = 0
-          this.battle.players[player].healingDone = 0
+          this.battle.players[player].damageDone = []
+          this.battle.players[player].healingDone = []
           this.battle.players[player].assistance = 0
           this.battle.players[player].weapon = ''
           this.battle.players[player].itempower = null
@@ -133,31 +129,37 @@ export default {
   },
   watch: {
     showWeapon: function () {
+      console.log(this.refreshStats)
       this.refreshStats.forEach(playerID => {
+        console.log('PLAYER DEAD ID : ', playerID)
         // ------- VICTIM ITEM
-        this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
-        console.log(this.battle.players[playerID].weapon)
+        this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
+        console.log('WEAPON JOUEUR MORT : ', this.battle.players[playerID].weapon)
 
         // ------- VICTIM IP
         this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
-        console.log(this.battle.players[playerID].itempower)
+        console.log('IP JOUEUR MORT : ', this.battle.players[playerID].itempower)
 
         // ------- PARTICIPANT WEAPON
-        console.log(this.battle.players[playerID].eventDeath)
+        // console.log(this.battle.players[playerID].eventDeath)
         for (const participant in this.battle.players[playerID].eventDeath.Participants) {
           // console.log(this.battle.players[playerID].eventDeath.Participants[participant])
           const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
           console.log(participantId)
-          console.log('ID : ', this.battle.players[playerID])
           console.log('PARTICIPANT : ', this.battle.players[playerID].eventDeath.Participants[participant])
+
           if (this.battle.players[participantId]) {
+            console.log('PLAYER EXIST')
+            this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
+            this.battle.players[participantId].healingDone.push(this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone)
             if (this.battle.players[participantId].weapon) {
               console.log('ALREADY WEAPON -- CANCEL', this.battle.players[participantId].weapon)
             } else {
-              console.log('AVANT WEAPON : ', this.battle.players[participantId].weapon)
-              this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
+              // console.log('AVANT WEAPON : ', this.battle.players[participantId].weapon)
+              this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
+              this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
               console.log('NEW WEAPON : ', this.battle.players[participantId].weapon)
-              console.log('APRES WEAPON : ', this.battle.players[participantId])
+              // console.log('APRES WEAPON : ', this.battle.players[participantId])
             }
             // if (typeof this.battle.players[participantId].weapon !== 'undefined') {
           }

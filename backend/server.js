@@ -36,7 +36,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
       ])
       .then( data => res.send(data))
 })
-app.get('/player/:id', cors(), (req, res) => {
+app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
     fetch(url, { timeout: 10000 })
         .then((res) => res.json())
