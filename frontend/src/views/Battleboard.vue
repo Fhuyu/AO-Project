@@ -89,6 +89,7 @@ export default {
         const killfame = kdaratio[''].reduce((accumulator, item) => accumulator + item, 0)
         const kills = killsratio[''].reduce((accumulator, item) => accumulator + item, 0)
         const deaths = deathsratio[''].reduce((accumulator, item) => accumulator + item, 0)
+        // battle.alliances.missingAlliance = { name: 'No Alliance', killFame: killfame, kills: kills, deaths: deaths } TODO
         battle.guilds.missingguild = { name: 'No Guild', killFame: killfame, kills: kills, deaths: deaths }
       }
     },

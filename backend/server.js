@@ -6,7 +6,7 @@ const app = express()
 
 
 app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=20&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ';
+    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ';
     fetch(url, { timeout: 5000 })
         .then((res) => res.json())
         .then((json) => {

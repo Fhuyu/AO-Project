@@ -1,11 +1,11 @@
 <template>
-  <div class="home">
+  <div class="container">
     BATTLE
       <a class="waves-effect waves-light btn" v-on:click="deathStat(battle.players[0])">
         <i class="material-icons left">search</i>See first player death</a>
       <div class="row">
 
-        <table v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="col s4">
+        <table v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="col s3">
           <thead>
           <tr>
               <td>Alliance</td>
@@ -16,6 +16,7 @@
               <td>Assistance</td>
               <td>Damages</td>
               <td>Heal</td>
+              <td> Item Power </td>
               <td>Weapon</td>
           </tr>
         </thead>
@@ -30,8 +31,9 @@
                   <td>{{player.assistance}}</td>
                   <td>{{player.damageDone}}</td>
                   <td>{{player.healingDone}}</td>
+                  <!-- <td v-if="showWeapon">{{player.itempower}}</td>
                   <td v-if="showWeapon">{{player.weapon}}</td>
-                  <td v-else> Loading </td>
+                  <td v-else> Loading </td> -->
 
                 </tr>
               <!-- </tr> -->
@@ -83,6 +85,7 @@ export default {
       const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`)
       return response
     },
+
     async playerDead (playerId) {
       await axios.get(`http://localhost:3000/player/${playerId}`)
         .then(response => {
@@ -90,12 +93,7 @@ export default {
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
               this.battle.players[playerId].eventDeath = eventDeath
-              console.log(this.battle.players[playerId].eventDeath)
-              // this.battle.players[playerId].weapon = eventDeath.Victim.Equipment.MainHand.Type
-              // console.log(this.battle.players[playerId].weapon + playerId)
 
-              // Add 1 to refreshstat dictionnary. Make a simple array later when healing
-              // this.refreshStats[playerId] = this.battle.players[playerId].weapon
               this.refreshStats.push(playerId)
 
               // Show weapons when completly loaded
@@ -106,7 +104,6 @@ export default {
         })
     },
     getPlayerDeath (playerId) {
-      console.log('IN GET PLAYER DEATH')
       for (const player in this.battle.players) {
         if (this.battle.players[player].deaths > 0 && this.refreshStats.includes(player)) {
           this.refreshStats.push(player)
@@ -128,6 +125,7 @@ export default {
           this.battle.players[player].healingDone = 0
           this.battle.players[player].assistance = 0
           this.battle.players[player].weapon = ''
+          this.battle.players[player].itempower = null
         }
         this.getPlayerDeath()
       })
@@ -135,10 +133,24 @@ export default {
   watch: {
     showWeapon: function () {
       this.refreshStats.forEach(playerID => {
+        // ------- VICTIM ITEM
         this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
         console.log(this.battle.players[playerID].weapon)
+        // ------- VICTIM IP
+        this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
+        console.log(this.battle.players[playerID].itempower)
+        // ------- PARTICIPANT WEAPON
+        for (const participant in this.battle.players[playerID].eventDeath.Participants) {
+          console.log(this.battle.players[playerID].eventDeath.Participants[participant])
+          const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
+          console.log(participantId)
+          this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
+          console.log(this.battle.players[participantId].weapon)
+        }
+        console.log('WEAPON DONE')
+
+        // https://gameinfo.albiononline.com/api/gameinfo/items/T6_MAIN_HOLYSTAFF_MORGANA@1
       })
-      // [playerId] = this.battle.players[playerId].weapon
     }
   }
 }
