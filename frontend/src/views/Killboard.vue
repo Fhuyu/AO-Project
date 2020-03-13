@@ -131,21 +131,15 @@ export default {
         }
         this.getPlayerDeath()
       })
-  }
-  // watch: {
-  //   refreshStats: function () {
-  //     console.log('WATCHER ON')
-  // CHECK REFRESH STAT POUR SAVOIR SI ON A FINI POUR AFFICHER
-  // TABLEAU REFRESH STATS
-  // PUSH PLAYER DANS TABLEAU
-  // SI PLAYER DANS TABLEAU SEULEMENT UNE FOIS
-  // FONCTION PLAYERDEAD
-  //   }
-  // },
-  /*  computed: {
-    refreshPlayerStat: function () {
-      return this.refreshStats
+  },
+  watch: {
+    showWeapon: function () {
+      this.refreshStats.forEach(playerID => {
+        this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
+        console.log(this.battle.players[playerID].weapon)
+      })
+      // [playerId] = this.battle.players[playerId].weapon
     }
-  } */
+  }
 }
 </script>
