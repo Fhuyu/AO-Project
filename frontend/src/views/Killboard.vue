@@ -31,9 +31,9 @@
                   <td>{{player.assistance}}</td>
                   <td>{{player.damageDone}}</td>
                   <td>{{player.healingDone}}</td>
-                  <!-- <td v-if="showWeapon">{{player.itempower}}</td>
-                  <td v-if="showWeapon">{{player.weapon}}</td>
-                  <td v-else> Loading </td> -->
+                  <td v-if="showStats">{{player.itempower}}</td>
+                  <td v-if="showStats">{{player.weapon}}</td>
+                  <td v-else> Loading </td>
 
                 </tr>
               <!-- </tr> -->
@@ -75,7 +75,8 @@ export default {
       battle: [],
       events: [],
       refreshStats: [],
-      showWeapon: false
+      showWeapon: false,
+      showStats: false
     }
   },
   components: {
@@ -136,21 +137,36 @@ export default {
         // ------- VICTIM ITEM
         this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
         console.log(this.battle.players[playerID].weapon)
+
         // ------- VICTIM IP
         this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
         console.log(this.battle.players[playerID].itempower)
+
         // ------- PARTICIPANT WEAPON
+        console.log(this.battle.players[playerID].eventDeath)
         for (const participant in this.battle.players[playerID].eventDeath.Participants) {
-          console.log(this.battle.players[playerID].eventDeath.Participants[participant])
+          // console.log(this.battle.players[playerID].eventDeath.Participants[participant])
           const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
           console.log(participantId)
-          this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
-          console.log(this.battle.players[participantId].weapon)
+          console.log('ID : ', this.battle.players[playerID])
+          console.log('PARTICIPANT : ', this.battle.players[playerID].eventDeath.Participants[participant])
+          if (this.battle.players[participantId]) {
+            if (this.battle.players[participantId].weapon) {
+              console.log('ALREADY WEAPON -- CANCEL', this.battle.players[participantId].weapon)
+            } else {
+              console.log('AVANT WEAPON : ', this.battle.players[participantId].weapon)
+              this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
+              console.log('NEW WEAPON : ', this.battle.players[participantId].weapon)
+              console.log('APRES WEAPON : ', this.battle.players[participantId])
+            }
+            // if (typeof this.battle.players[participantId].weapon !== 'undefined') {
+          }
         }
-        console.log('WEAPON DONE')
 
         // https://gameinfo.albiononline.com/api/gameinfo/items/T6_MAIN_HOLYSTAFF_MORGANA@1
       })
+      console.log('WEAPON DONE')
+      this.showStats = true
     }
   }
 }
