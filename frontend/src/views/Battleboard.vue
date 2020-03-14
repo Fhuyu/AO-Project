@@ -11,13 +11,16 @@
         <div class="col s6">
           <i class="material-icons ">timer</i>DURATION {{battle.startTime}}
         </div>
-        <div class="col s4">
+        <div class="col s3">
           <i class="material-icons ">supervisor_account</i> TOTAL KILL : {{ battle.totalKills}}
         </div>
-        <div class="col s4">
+        <div class="col s3">
           <i class="material-icons ">star</i> TOTAL FAME : {{ battle.totalFame}}
         </div>
-        <div class="col s4">
+        <div class="col s3">
+          <i class="material-icons ">star</i> NB JOUEURS : {{ Object.keys(battle.players).length }}
+        </div>
+        <div class="col s3">
           AVERAGE FAME PER KILL : {{ (battle.totalFame / battle.totalKills).toFixed(0)}}
         </div>
     </div>
@@ -27,23 +30,44 @@
         <thead>
           <tr>
               <th>ALLIANCE</th>
+              <th></th>
               <th>GUILD</th>
               <th>KILLS/DEATHS</th>
               <th>KDA</th>
               <th>KILLFAME</th>
           </tr>
         </thead>
-        <tbody  v-for="(guild, index) in battle.guilds" :key="index">
+        <tbody v-for="(guild, index) in battle.guilds" :key="index">
           <tr>
             <td>{{ guild.alliance }}</td>
+            <td><span v-if="guild.id === battle.bestGuildFame.id" class="new badge orange" data-badge-caption="BEST KILLFAME"></span></td>
             <td>{{ guild.name }} ( {{guild.numbers}} )</td>
             <td>{{guild.kills}}/{{guild.deaths}}</td>
             <td>{{(guild.deaths ? guild.kills/guild.deaths : guild.kills)}}</td>
             <td>{{ guild.killFame }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
+
           </tr>
         </tbody>
       </table>
       </div>
+      <div class="container">
+      <div class="row">
+          <div class="col s12 m8">
+            <div class="card-panel grey lighten-5 z-depth-1">
+              <div class="row valign-wrapper">
+                <div class="col s4 m2">
+                  <img src="images/yuna.jpg" alt="" class="circle responsive-img valign">
+                </div>
+                <div class="col s8 m10">
+                  <span class="black-text">
+                    This is a square image. Add the "circle" class to it to make it appear circular.
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
   </div>
 </template>
 
@@ -54,8 +78,7 @@ export default {
   name: 'battles',
   data: function () {
     return {
-      battles: [],
-      bestKillFame: { name: '', killfame: 0 }
+      battles: []
     }
   },
   computed: {
@@ -121,12 +144,16 @@ export default {
         this.battles = res.data
         this.battles.map(this.missGuild)
         this.battles.map(this.guildsNumber)
-        /* this.battles.forEach(battle => {
+        // --- BEST KILL FAME MEDAL
+        this.battles.forEach(battle => {
+          battle.bestGuildFame = { id: 0, killfame: 0 }
           for (const guild in battle.guilds) {
-            console.log(battle.guilds[guild])
-            battle.bestkdaaa = this.guildBestKillFame(battle.guilds[guild])
+            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
+              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
+              battle.bestGuildFame.id = battle.guilds[guild].id
+            }
           }
-        }) */
+        })
       })
   }
 }

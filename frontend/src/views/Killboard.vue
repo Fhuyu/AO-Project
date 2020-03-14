@@ -141,15 +141,14 @@ export default {
         console.log('IP JOUEUR MORT : ', this.battle.players[playerID].itempower)
 
         // ------- PARTICIPANT WEAPON
-        // console.log(this.battle.players[playerID].eventDeath)
         for (const participant in this.battle.players[playerID].eventDeath.Participants) {
-          // console.log(this.battle.players[playerID].eventDeath.Participants[participant])
           const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
           console.log(participantId)
           console.log('PARTICIPANT : ', this.battle.players[playerID].eventDeath.Participants[participant])
 
           if (this.battle.players[participantId]) {
             console.log('PLAYER EXIST')
+            this.battle.players[participantId].assistance += 1
             this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
             this.battle.players[participantId].healingDone.push(this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone)
             if (this.battle.players[participantId].weapon) {
