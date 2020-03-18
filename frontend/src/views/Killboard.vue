@@ -1,56 +1,94 @@
 <template>
-  <div class="container">
+  <div class="containercustom">
     BATTLE
       <div class="row">
-
-        <table v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="col s3">
+        <table v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="col s3" style="position:relative;margin:10px">
+          <div style="position:absolute;top:-20px"> {{ alliance.name }} |  {{ alliance.kills }} / {{ alliance.deaths }}</div>
           <thead>
           <tr>
-              <td>Alliance</td>
+              <td></td> <!-- Badge -->
               <td>Guild</td>
+              <td></td>
               <td>Name</td>
               <td>Kills</td>
               <td>Deaths</td>
-              <td>Assistance</td>
+              <td>Assist</td>
               <td>Damages</td>
               <td>Heal</td>
               <td> Item Power </td>
-              <td>Weapon</td>
+              <td> Kill Fame </td>
           </tr>
         </thead>
         <tbody v-for="player in battle.players" :key="player.id">
-              <!-- <tr v-for="player in battle.players" :key="player.id"> -->
                 <tr v-if="player.allianceId === alliance.id">
-                  <td>{{ alliance.name }}</td>
+                  <td>
+                    <span v-if="player.id === bestPlayerKillfame.id" class="new badge orange" data-badge-caption="KILLFAME"></span>
+                    <span v-if="player.id === bestPlayerKill.id" class="new badge red" data-badge-caption="TOP KILL"></span>
+                  </td>
                   <td>{{player.guildName}}</td>
+                  <td v-if="showStats && player.weapon">
+                    <img style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
+                  </td>
+                  <td v-else></td>
                   <td>{{player.name}}</td>
                   <td>{{player.kills}}</td>
                   <td>{{player.deaths}}</td>
                   <td>{{player.assistance}}</td>
                   <td v-if="showStats">{{player.damageDone}}</td>
+                  <td v-else></td>
                   <td>{{player.healingDone}}</td>
                   <td v-if="showStats">{{player.itempower}}</td>
-                  <td v-if="showStats && player.weapon">{{player.weapon.Type}}</td>
+                  <td v-else></td>
+                  <td> {{player.killFame}} </td>
+
                 </tr>
               <!-- </tr> -->
 
               </tbody>
-<!--                <tbody v-for="player in battle.players" :key="player.id">
-              <tr v-if="player.allianceId === ''">
-                  <td>{{ alliance.name }}</td>
-                  <td>{{player.guildName}}</td>
-                  <td>{{player.name}}</td>
-                  <td>{{player.kills}}</td>
-                  <td>{{player.deaths}}</td>
-                  <td>{{player.assistance}}</td>
-                  <td>{{player.damageDone}}</td>
-                  <td>{{player.healingDone}}</td>
-                  <td v-if="showWeapon">{{player.weapon}}</td>
-                  <td v-else> Loading </td>
-
+             </table>
+              <div v-for="(guild, indexg) in battle.guilds" :key="indexg">
+              <table v-if="!guild.allianceId" class="col s3" style="position:relative;margin:10px" :class="guild.name">
+                <div style="position:absolute;top:-20px"> {{ guild.name }} | {{guild.kills}}/{{guild.deaths}} | AverageIP : {{guild.averageIP}}</div>
+                <thead>
+                <tr>
+                    <td></td>
+                    <td>Guild</td>
+                    <td></td>
+                    <td>Name</td>
+                    <td>Kills</td>
+                    <td>Deaths</td>
+                    <td>Assist</td>
+                    <td>Damages</td>
+                    <td>Heal</td>
+                    <td> Item Power </td>
+                    <td> Kill Fame </td>
                 </tr>
-                </tbody> -->
-        </table>
+              </thead>
+               <tbody v-for="player in battle.players" :key="player.id">
+                  <tr v-if="guild.id === player.guildId">
+                    <td>
+                      <span v-if="player.id === bestPlayerKillfame.id" class="new badge orange" data-badge-caption="KILLFAME"></span>
+                      <span v-if="player.id === bestPlayerKill.id" class="new badge red" data-badge-caption="TOP KILL"></span>
+                    </td>
+                    <td>{{player.guildName}}</td>
+                    <td v-if="showStats && player.weapon">
+                      <img style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
+                    </td>
+                    <td v-else></td>
+                    <td>{{player.name}}</td>
+                    <td>{{player.kills}}</td>
+                    <td>{{player.deaths}}</td>
+                    <td>{{player.assistance}}</td>
+                    <td v-if="showStats">{{player.damageDone}}</td>
+                    <td v-else></td>
+                    <td>{{player.healingDone}}</td>
+                    <td v-if="showStats">{{player.itempower}}</td>
+                    <td v-else></td>
+                    <td> {{player.killFame}} </td>
+                  </tr>
+                </tbody>
+             </table>
+             </div>
 
 <!--         PAS DALLIANCE
         <div v-for="player in battle.players" :key="player.id">
@@ -71,6 +109,10 @@ export default {
       battle: [],
       events: [],
       refreshStats: [],
+      alliances: [],
+      bestPlayerKillfame: { id: '', killfame: 0 },
+      bestPlayerKill: { id: '', kill: 0 },
+      // averageIpGuild: [],
       showWeapon: false,
       showStats: false
     }
@@ -110,6 +152,15 @@ export default {
           this.playerDead(player)
         }
       }
+    },
+    imageWeaponUri (weaponType) {
+      return `https://gameinfo.albiononline.com/api/gameinfo/items/${weaponType}`
+    },
+    arrondirIP (ip) {
+      return ip.toFixed(0)
+    },
+    averageIP (guild) {
+
     }
   },
   mounted () {
@@ -117,12 +168,24 @@ export default {
       .then(res => {
         this.battle = res.data[0] // EVENT NOT USEFULL
         this.events = res.data[1]
+        for (const guild in this.battle.guilds) {
+          this.battle.guilds[guild].averageIP = []
+        }
         for (const player in this.battle.players) {
           this.battle.players[player].damageDone = []
           this.battle.players[player].healingDone = []
           this.battle.players[player].assistance = 0
           this.battle.players[player].weapon = ''
           this.battle.players[player].itempower = null
+          // --- BEST KILL FAME MEDAL
+          if (this.battle.players[player].killFame > this.bestPlayerKillfame.killfame) {
+            this.bestPlayerKillfame.killfame = this.battle.players[player].killFame
+            this.bestPlayerKillfame.id = this.battle.players[player].id
+          }
+          if (this.battle.players[player].kills > this.bestPlayerKill.kill) {
+            this.bestPlayerKill.kill = this.battle.players[player].kills
+            this.bestPlayerKill.id = this.battle.players[player].id
+          }
         }
         this.getPlayerDeath()
       })
@@ -138,6 +201,9 @@ export default {
 
         // ------- VICTIM IP
         this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
+        this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
+        // ADD IP IN GUILD STAT TO CALCUL AVERAGE GUILD IP
+        this.battle.guilds[this.battle.players[playerID].guildId].averageIP.push(this.battle.players[playerID].itempower)
         console.log('IP JOUEUR MORT : ', this.battle.players[playerID].itempower)
 
         // ------- PARTICIPANT WEAPON
@@ -154,17 +220,15 @@ export default {
             if (this.battle.players[participantId].weapon) {
               console.log('ALREADY WEAPON -- CANCEL', this.battle.players[participantId].weapon)
             } else {
-              // console.log('AVANT WEAPON : ', this.battle.players[participantId].weapon)
               this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
               this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
+              this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
+              // ADD IP IN GUILD STAT TO CALCUL AVERAGE GUILD IP
+              this.battle.guilds[this.battle.players[participantId].guildId].averageIP.push(this.battle.players[participantId].itempower)
               console.log('NEW WEAPON : ', this.battle.players[participantId].weapon)
-              // console.log('APRES WEAPON : ', this.battle.players[participantId])
             }
-            // if (typeof this.battle.players[participantId].weapon !== 'undefined') {
           }
         }
-
-        // https://gameinfo.albiononline.com/api/gameinfo/items/T6_MAIN_HOLYSTAFF_MORGANA@1
       })
       console.log('WEAPON DONE')
       this.showStats = true
@@ -172,3 +236,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@import './../assets/css/killboard.css';
+</style>

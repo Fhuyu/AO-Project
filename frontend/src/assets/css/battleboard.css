@@ -1,0 +1,14 @@
+.container {
+    position: relative;
+}
+th {
+    padding:0;
+}
+td {
+    padding: 5px 5px;
+}
+.killboardbtn {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+}

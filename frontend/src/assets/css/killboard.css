@@ -1,0 +1,17 @@
+.containercustom {
+    width: 90%;
+    margin: auto;
+}
+
+thead tr {
+    font-size:12px;
+}
+td {
+    padding: 2px;
+    font-size: 13px;
+    line-height: 1;
+}
+/* tbody:nth-child(even) {
+    background-color: #f2f2f2;
+  } */
+  
