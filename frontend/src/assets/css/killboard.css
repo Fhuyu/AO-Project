@@ -1,17 +1,18 @@
-.containercustom {
-    width: 90%;
-    margin: auto;
-}
 
 thead tr {
     font-size:12px;
 }
-td {
+.uk-table td  {
     padding: 2px;
     font-size: 13px;
     line-height: 1;
 }
-/* tbody:nth-child(even) {
-    background-color: #f2f2f2;
-  } */
-  
+.uk-accordion>:nth-child(n+2) {
+    margin-top: 0;
+}
+.uk-grid-medium>* {
+    padding-left: 0px;
+}
+li + .noguild {
+    visibility: hidden;
+}

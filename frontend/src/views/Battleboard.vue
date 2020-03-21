@@ -23,7 +23,7 @@
           AVERAGE FAME PER KILL : {{ (battle.totalFame / battle.totalKills).toFixed(0)}}
         </div>
     </div>
-    <a class="btn-floating pulse cyan killboardbtn" :href="killboardURL(battle.id)"><i class="material-icons left">remove_red_eye</i></a>
+    <a class="uk-button uk-button-primary" :href="killboardURL(battle.id)">GO TO KILLBOARD</a>
         <table class="striped">
         <thead>
           <tr>
