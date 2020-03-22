@@ -1,6 +1,17 @@
 <template>
-  <div class="uk-container-xlarge uk-margin-auto">
-     <div class="uk-button-group">
+<div class="uk-container-xlarge uk-margin-auto">
+  <div class="">
+    <form class="uk-search uk-search-default" v-on:submit.prevent>
+          <span uk-search-icon></span>
+          <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Search player">  
+    </form>
+    <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
+    <button v-else class="uk-button uk-button-primary" disabled> GO</button>
+  </div>
+    <!-- // -------------------------- ORDER -->
+  <div class="orderby uk-margin">
+    <h5> ORDER BY </h5>
+    <div class="uk-button-group">
         <button @click="sort('guildName')" class="uk-button uk-button-secondary">GUILDNAME
             <span v-if="currentSort === 'guildName' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
             <span v-if="currentSort === 'guildName' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
@@ -9,65 +20,77 @@
             <span v-if="currentSort === 'name' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
             <span v-if="currentSort === 'name' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
-        <button @click="sort('itempower')" class="uk-button uk-button-secondary">ITEM POWER
+        <button v-if="showStats" @click="sort('itempower')" class="uk-button uk-button-secondary">ITEM POWER
             <span v-if="currentSort === 'itempower' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
             <span v-if="currentSort === 'itempower' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
+        <button v-else class="uk-button uk-button-secondary" disabled>ITEM POWER</button>
         <button @click="sort('killFame')" class="uk-button uk-button-secondary">KILLFAME
             <span v-if="currentSort === 'killFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
             <span v-if="currentSort === 'killFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
+        <button @click="sort('kills')" class="uk-button uk-button-secondary">KILLS
+            <span v-if="currentSort === 'kills' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'kills' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-if="showStats" @click="sort('assistance')" class="uk-button uk-button-secondary">ASSISTANCE
+            <span v-if="currentSort === 'assistance' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'assistance' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
     </div>
-<ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
-    <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" v-for="(alliance, indexa) in battle.alliances" :key="indexa">
-        <a class="uk-accordion-title" href="#">{{ alliance.name }} | KDA : {{ alliance.kills }} / {{ alliance.deaths }} | KILLFAME : {{ alliance.killFame }}
-          <span v-if="showStats && alliance.listItemPower.length > 0">IP Moyen : {{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</span>  <!-- / alliance.listItemPower.length -->
-        </a>
-        <div class="uk-accordion-content">
-            <table class="uk-table uk-table-divider uk-table-striped" style="position:relative;margin:10px">
-          <thead>
-          <tr>
-              <td></td> <!-- Badge -->
-              <td>Guild</td>
-              <td></td>
-              <td>Name</td>
-              <td>Kills</td>
-              <td>Deaths</td>
-              <td>Assist</td>
-              <td>Damages</td>
-              <td>Heal</td>
-              <td> Item Power </td>
-              <td> Kill Fame </td>
-          </tr>
-        </thead>
-        <tbody>
-                <tr v-for="player in alliance.players" :key="player.id">
-                  <td style="max-width: 80px;position: absolute;left: -90px;">
-                    <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
-                    <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
-                  </td>
-                  <td>{{player.guildName}}</td>
-                  <td v-if="showStats && player.weapon">
-                    <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
-                  </td>
-                  <td v-else></td>
-                  <td>{{player.name}}</td>
-                  <td>{{player.kills}}</td>
-                  <td>{{player.deaths}}</td>
-                  <td>{{player.assistance}}</td>
-                  <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
-                  <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
-                  <td v-if="showStats">{{player.itempower}}</td> <td v-else><div uk-spinner></div></td>
-                  <td> {{player.killFame}} </td>
+  </div>
+    <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
+        <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" v-for="(alliance, indexa) in battle.alliances" :key="indexa">
+            <a class="uk-accordion-title" href="#">{{ alliance.name }} | KDA : {{ alliance.kills }} / {{ alliance.deaths }} | KILLFAME : {{ alliance.killFame }}
+              <span v-if="showStats && alliance.listItemPower.length > 0">IP Moyen : {{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</span>  <!-- / alliance.listItemPower.length -->
+            </a>
+            <div class="uk-accordion-content">
+                <table class="uk-table uk-table-divider uk-table-striped" style="position:relative;margin:10px">
+              <thead>
+              <tr>
+                  <td></td> <!-- Badge -->
+                  <td>Guild</td>
+                  <td></td>
+                  <td>Name</td>
+                  <td>Kills</td>
+                  <td>Deaths</td>
+                  <td>Assist</td>
+                  <td>Damages</td>
+                  <td>Heal</td>
+                  <td> Item Power </td>
+                  <td> Kill Fame </td>
+              </tr>
+            </thead>
+            <tbody>
+                    <tr v-for="player in alliance.players" :key="player.id" :id="player.name" :style="resortir(player)">
+                      <td style="max-width: 80px;position: absolute;left: -90px;">
+                        <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
+                        <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
+                      </td>
+                      <td>{{player.guildName}}</td>
+                      <td v-if="showStats && player.weapon">
+                        <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
+                      </td>
+                      <td v-else></td>
+                      <td>{{player.name}}</td>
+                      <td>{{player.kills}}</td>
+                      <td>{{player.deaths}}</td>
+                      <td>{{player.assistance}}</td>
+                      <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td>
+                      <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
+                      <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
+                      <td> {{player.killFame}} </td>
 
-                </tr>
+                    </tr>
 
-              </tbody>
-              <!-- <tbody v-else><div uk-spinner></div></tbody> -->
-             </table>
-        </div>
-    </li>
-</ul>
+                  </tbody>
+                  <!-- <tbody v-else><div uk-spinner></div></tbody> -->
+                </table>
+            </div>
+        </li>
+    </ul>
+<a href="#" uk-totop uk-scroll></a>
   </div>
 </template>
 
@@ -90,9 +113,15 @@ export default {
       currentSort: 'killFame',
       currentSortDir: 'desc',
       reload: 0,
+      searchPlayerName: null
     }
   },
-  components: {
+  computed: {
+    searchPlayerAnchor : function () {
+      if (this.searchPlayerName) {
+        return `#${this.searchPlayerName}`
+      }
+    }
   },
   methods: {
     async fetchData () {
@@ -148,6 +177,9 @@ export default {
       this.currentSort = column
       this.reload += 1
       console.log(this.currentSort)
+    },
+    resortir (player) {
+      if (player.name === this.searchPlayerName) return "background: lightblue;"
     }
 
   },
@@ -167,12 +199,12 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
-        console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID])
+        // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID])
         if (this.battle.players[playerID].allianceId) {
-          console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID].allianceId)
+          // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID].allianceId)
           const playerAlliance = this.battle.players[playerID].allianceId
           this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
-          console.log('ALLIANCE DU JOUEUR UPDATED: ', this.battle.alliances[playerAlliance])
+          // console.log('ALLIANCE DU JOUEUR UPDATED: ', this.battle.alliances[playerAlliance])
         }
       }
       this.reload += 1

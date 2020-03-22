@@ -10,6 +10,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/Battleboard.vue')
   },
   {
+    path: '/:guildName',
+    name: 'Guild Battleboard',
+    component: () => import(/* webpackChunkName: "battleboard" */ '../views/Battleboard.vue')
+  },
+  {
     path: '/killboard/:id',
     name: 'Killboard',
     component: () => import(/* webpackChunkName: "killboard" */ '../views/Killboard.vue')

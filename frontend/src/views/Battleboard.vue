@@ -1,11 +1,11 @@
 <template>
 <div class="battleboard uk-container">
   <div class="uk-margin">
-    <form class="uk-search uk-search-default" >
+    <!-- <form class="uk-search uk-search-default" >
         <a href="" class="uk-search-icon-flip" uk-search-icon></a>
         <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
-        <button type="button" class="btn btn-primary" v-on:click="save"> Valider</button>
-    </form>
+        <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
+    </form> -->
   </div>
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
@@ -72,15 +72,23 @@ export default {
   data: function () {
     return {
       battles: [],
-      searchGuildName: null
+      searchGuildName: null,
+      guildBattleNeeded: false
     }
   },
   components: {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get('http://localhost:3000/battles')
-      // const response = await axios.get('http://localhost:3000/battles')
+      let response = null
+      if (this.searchGuildName) {
+        console.log('searching guildname')
+        response = await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+      } else {
+        console.log('searching global')
+        response = await axios.get('http://localhost:3000/battles')
+      }
+      this.guildBattleNeeded = false
       return response
     },
     async save() {
@@ -123,6 +131,10 @@ export default {
       for (const guild in battle.guilds) {
         battle.guilds[guild].numbers = guildNumber[guild]
       }
+    },
+    guildBattleboardURL: function (guildName) {
+      this.guildBattleNeeded = true
+      return '/' + guildName
     },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
