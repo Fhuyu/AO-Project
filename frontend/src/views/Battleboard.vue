@@ -1,11 +1,6 @@
 <template>
 <div class="battleboard uk-container">
   <div class="uk-margin">
-    <!-- <form class="uk-search uk-search-default" >
-        <a href="" class="uk-search-icon-flip" uk-search-icon></a>
-        <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
-        <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
-    </form> -->
   </div>
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
@@ -80,19 +75,11 @@ export default {
   },
   methods: {
     async fetchData () {
-      let response = null
-      if (this.searchGuildName) {
-        console.log('searching guildname')
-        response = await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
-      } else {
-        console.log('searching global')
-        response = await axios.get('http://localhost:3000/battles')
-      }
-      this.guildBattleNeeded = false
+      const response = await axios.get('https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
       return response
     },
     async save() {
-      await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+      await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
     },
     missGuild: function (battle) {
       const kdaratio = {}
@@ -113,7 +100,6 @@ export default {
         const killfame = kdaratio[''].reduce((accumulator, item) => accumulator + item, 0)
         const kills = killsratio[''].reduce((accumulator, item) => accumulator + item, 0)
         const deaths = deathsratio[''].reduce((accumulator, item) => accumulator + item, 0)
-        // battle.alliances.missingAlliance = { name: 'No Alliance', killFame: killfame, kills: kills, deaths: deaths } TODO
         battle.guilds.missingguild = { name: 'No Guild', killFame: killfame, kills: kills, deaths: deaths }
       }
     },

@@ -125,12 +125,12 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`https://routeicpieo5c-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
+      const response = await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
       return response
     },
 
     async playerDead (playerId) {
-      await axios.get(`https://routeicpieo5c-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+      await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
           const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {
@@ -140,7 +140,6 @@ export default {
               this.refreshStats.push(playerId) // KEEP
 
               // Show weapons when completly loaded
-              console.log(`${Object.keys(this.refreshStats).length} = ${this.battle.totalKills}`)
               if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
                 this.reload += 1
                 this.showWeapon = true
@@ -169,14 +168,11 @@ export default {
       return array.reduce((accumulator, item) => accumulator + item, 0)
     },
     sort: function (column) {
-      console.log(this.currentSort)
-      console.log('clicked', column)
       if (column === this.currentSort) {
         this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc'
       }
       this.currentSort = column
       this.reload += 1
-      console.log(this.currentSort)
     },
     resortir (player) {
       if (player.name === this.searchPlayerName) return "background: lightblue;"
@@ -199,12 +195,9 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
-        // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID])
         if (this.battle.players[playerID].allianceId) {
-          // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID].allianceId)
           const playerAlliance = this.battle.players[playerID].allianceId
           this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
-          // console.log('ALLIANCE DU JOUEUR UPDATED: ', this.battle.alliances[playerAlliance])
         }
       }
       this.reload += 1
@@ -254,7 +247,6 @@ export default {
     },
     reload: function () {
         for (const alliance in this.battle.alliances) {
-            console.log
             this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
                 let modifier = 1
                 if (this.currentSortDir === 'desc') {
