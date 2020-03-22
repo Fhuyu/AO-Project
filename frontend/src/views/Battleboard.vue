@@ -1,5 +1,12 @@
 <template>
 <div class="battleboard uk-container">
+  <div class="uk-margin">
+    <form class="uk-search uk-search-default" >
+        <a href="" class="uk-search-icon-flip" uk-search-icon></a>
+        <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
+        <button type="button" class="btn btn-primary" v-on:click="save"> Valider</button>
+    </form>
+  </div>
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
@@ -46,7 +53,7 @@
                 <td>{{ guild.name }}</td>
                 <td>{{guild.numbers}}</td>
                 <td>{{guild.kills}}/{{guild.deaths}}</td>
-                <td>{{(guild.deaths ? guild.kills/guild.deaths : guild.kills)}}</td>
+                <td>{{(guild.deaths ? (guild.kills/guild.deaths).toFixed(1) : guild.kills)}}</td>
                 <td>{{ guild.killFame }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
               </tr>
             </tbody>
@@ -64,7 +71,8 @@ export default {
   name: 'battles',
   data: function () {
     return {
-      battles: []
+      battles: [],
+      searchGuildName: null
     }
   },
   components: {
@@ -75,9 +83,9 @@ export default {
       // const response = await axios.get('http://localhost:3000/battles')
       return response
     },
-    /*     stringDate: function (date) {
-      return date.toLocaleString('en-GB', { timeZone: 'UTC' })
-    }, */
+    async save() {
+      await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+    },
     missGuild: function (battle) {
       const kdaratio = {}
       const killsratio = {}

@@ -6,6 +6,7 @@ thead tr {
     padding: 2px;
     font-size: 13px;
     line-height: 1;
+    vertical-align: middle;
 }
 .uk-accordion>:nth-child(n+2) {
     margin-top: 0;
@@ -17,5 +18,5 @@ li + .noguild {
     visibility: hidden;
 }
 li:last-child:nth-child(odd) {
-    margin-left: 5%!important;
+    margin-left: 5%!important; 
 }

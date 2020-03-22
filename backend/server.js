@@ -6,10 +6,22 @@ const app = express()
 
 
 app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
     fetch(url, { timeout: 5000 })
         .then((res) => res.json())
         .then((json) => {
+            res.send(json)
+        })
+        .catch((error) => {
+            res.status(404).send({ success: false, message: error.message });
+        });
+});
+app.get('/battles/:guildName', cors(), (req, res) => {
+    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildName=${req.params.guildName}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    fetch(url, { timeout: 5000 })
+        .then((res) => res.json())
+        .then((json) => {
+            console.log(req.params.guildName)
             res.send(json)
         })
         .catch((error) => {
@@ -50,7 +62,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
 })
 app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
-    fetch(url, { timeout: 10000 })
+    fetch(url, { timeout: 6000 })
         .then((res) => res.json())
         .then((json) => {
             res.send(json)
