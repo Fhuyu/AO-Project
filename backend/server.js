@@ -6,7 +6,7 @@ const app = express()
 
 
 app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=20&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ';
+    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
     fetch(url, { timeout: 5000 })
         .then((res) => res.json())
         .then((json) => {
@@ -16,28 +16,10 @@ app.get('/battles', cors(), (req, res) => {
             res.status(404).send({ success: false, message: error.message });
         });
 });
-/* app.get('/killboard/:id', cors(), (req, res) => {
-    console.log(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`)
-    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`
-
-    fetch(url, { timeout: 5000 })
-        .then((res) => res.json())
-        .then((json) => {
-            res.send(json)
-        })
-        .catch((error) => {
-            res.status(404).send({ success: false, message: error.message });
-        });
-}); */
 app.get('/killboard/:id', cors(), (req, res) => {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 5000 })
         .then((res) => res.json())
-        // .then((json) => {
-        //     res.send(json)
-        // })
         .then( battle => {
-            const refreshStats = []
-
             for (const guild in battle.guilds) {
                 if (!battle.guilds[guild].allianceId) {
                     battle.alliances[guild] = battle.guilds[guild]
@@ -46,6 +28,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
             }
             for (const alliance in battle.alliances) {
                 battle.alliances[alliance].players = []
+                battle.alliances[alliance].listItemPower = []
             }
 
             for (const player in battle.players) {
@@ -58,9 +41,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
                 if (!battle.players[player].allianceId) {
                     battle.players[player].allianceId = battle.players[player].guildId
                 }
-                // battle.alliances[playerAlliance].players.push("Hello") //{[player]: battle.players[player]}
             }
-
             res.send(battle)
         })
         .catch((error) => {

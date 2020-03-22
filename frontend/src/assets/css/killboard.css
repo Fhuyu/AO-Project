@@ -16,3 +16,6 @@ thead tr {
 li + .noguild {
     visibility: hidden;
 }
+li:last-child:nth-child(odd) {
+    margin-left: 5%!important;
+}
