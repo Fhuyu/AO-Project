@@ -1,77 +1,67 @@
 <template>
-  <div class="battleboard">
-    <h1>Final Order Battles</h1>
-    <div class="container" v-for="(battle, index) in battles" :key="index">
-
-    <div class="row">
-        <div class="col s6 ">
-          <span><i class="material-icons ">format_list_numbered</i>ID {{battle.id}}</span>
-        </div>
-        <div class="col s6">
-          <i class="material-icons ">timer</i>DURATION {{new Date(battle.startTime)}}
-        </div>
-        <div class="col s3">
-          <i class="material-icons ">supervisor_account</i> TOTAL KILL : {{ battle.totalKills}}
-        </div>
-        <div class="col s3">
-          <i class="material-icons ">star</i> TOTAL FAME : {{ battle.totalFame}}
-        </div>
-        <div class="col s3">
-          <i class="material-icons ">star</i> NB JOUEURS : {{ Object.keys(battle.players).length }}
-        </div>
-        <div class="col s3">
-          AVERAGE FAME PER KILL : {{ (battle.totalFame / battle.totalKills).toFixed(0)}}
-        </div>
-    </div>
-    <a class="btn-floating pulse cyan killboardbtn" :href="killboardURL(battle.id)"><i class="material-icons left">remove_red_eye</i></a>
-        <table class="striped">
-        <thead>
-          <tr>
-              <th>ALLIANCE</th>
-              <th></th>
-              <th>GUILD</th>
-              <th>PLAYERS</th>
-              <th>KILLS/DEATHS</th>
-              <th>KDA</th>
-              <th>KILLFAME</th>
-          </tr>
-        </thead>
-        <tbody v-for="(guild, index) in battle.guilds" :key="index">
-          <tr>
-            <td>{{ guild.alliance }}</td>
-            <td>
-              <span v-if="guild.id === battle.bestGuildFame.id" class="new badge orange" data-badge-caption="TOP KILLFAME"></span>
-              <span v-if="guild.id === battle.bestGuildKill.id" class="new badge red" data-badge-caption="TOP KILL"></span>
-            </td>
-            <td>{{ guild.name }}</td>
-            <td>{{guild.numbers}}</td>
-            <td>{{guild.kills}}/{{guild.deaths}}</td>
-            <td>{{(guild.deaths ? guild.kills/guild.deaths : guild.kills)}}</td>
-            <td>{{ guild.killFame }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
-
-          </tr>
-        </tbody>
-      </table>
-      </div>
-      <div class="container">
-      <div class="row">
-          <div class="col s12 m8">
-            <div class="card-panel grey lighten-5 z-depth-1">
-              <div class="row valign-wrapper">
-                <div class="col s4 m2">
-                  <img src="images/yuna.jpg" alt="" class="circle responsive-img valign">
-                </div>
-                <div class="col s8 m10">
-                  <span class="black-text">
-                    This is a square image. Add the "circle" class to it to make it appear circular.
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
+<div class="battleboard uk-container">
+  <div class="uk-margin">
+    <!-- <form class="uk-search uk-search-default" >
+        <a href="" class="uk-search-icon-flip" uk-search-icon></a>
+        <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
+        <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
+    </form> -->
   </div>
+  <div uk-accordion="multiple: true">
+    <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
+        <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
+          <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
+            <thead>
+              <th>DATE</th>
+              <th>PLAYERS</th>
+              <th>KILLS</th>
+              <th>FAME</th>
+              <th>AVERAGE FAME/KILL</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{readableDate(battle.startTime)}}</td>
+                <td>{{ Object.keys(battle.players).length }}</td>
+                <td>{{ battle.totalKills}}</td>
+                <td>{{ battle.totalFame}}</td>
+                <td>{{ (battle.totalFame / battle.totalKills).toFixed(0)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </a>
+        <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a>
+        <div class="uk-accordion-content">
+          <table class="uk-table uk-table-divider uk-table-striped">
+            <thead>
+              <tr>
+                  <th></th>
+                  <th>ALLIANCE</th>
+                  <th>GUILD</th>
+                  <th>PLAYERS</th>
+                  <th>KILLS/DEATHS</th>
+                  <th>KDA</th>
+                  <th>KILLFAME</th>
+              </tr>
+            </thead>
+            <tbody v-for="(guild, index) in battle.guilds" :key="index">
+              <tr>
+                <td>
+                  <span v-if="guild.id === battle.bestGuildFame.id" class="uk-label uk-label-warning">KILLFAME</span>
+                  <span v-if="guild.id === battle.bestGuildKill.id" class="uk-label uk-label-danger">KILLS</span>
+                </td>
+                <td>{{ guild.alliance }}</td>
+                <td>{{ guild.name }}</td>
+                <td>{{guild.numbers}}</td>
+                <td>{{guild.kills}}/{{guild.deaths}}</td>
+                <td>{{(guild.deaths ? (guild.kills/guild.deaths).toFixed(1) : guild.kills)}}</td>
+                <td>{{ guild.killFame }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </li>
+  </div>
+</div>
 </template>
 
 <script>
@@ -81,21 +71,28 @@ export default {
   name: 'battles',
   data: function () {
     return {
-      battles: []
+      battles: [],
+      searchGuildName: null,
+      guildBattleNeeded: false
     }
-  },
-  computed: {
   },
   components: {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get('https://routeicpieo5c-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
-      // const response = await axios.get('http://localhost:3000/battles')
+      let response = null
+      if (this.searchGuildName) {
+        console.log('searching guildname')
+        response = await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+      } else {
+        console.log('searching global')
+        response = await axios.get('http://localhost:3000/battles')
+      }
+      this.guildBattleNeeded = false
       return response
     },
-    stringDate: function (date) {
-      return date.toLocaleString('en-GB', { timeZone: 'UTC' })
+    async save() {
+      await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
     },
     missGuild: function (battle) {
       const kdaratio = {}
@@ -135,8 +132,15 @@ export default {
         battle.guilds[guild].numbers = guildNumber[guild]
       }
     },
+    guildBattleboardURL: function (guildName) {
+      this.guildBattleNeeded = true
+      return '/' + guildName
+    },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
+    },
+    readableDate: function (date) {
+      return `${date.slice(0, 10)} ${date.slice(11, 19)}`
     }
 
   },
