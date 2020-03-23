@@ -40,33 +40,57 @@
         <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
     </div>
   </div>
-  <div v-if="error404">
+  <!-- <div v-if="error404">
     <h1> OOPS ! An error occured. </h1> 
     <h3>Please refresh this page </h3>
       <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link>
-  </div>
+  </div> -->
     <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
         <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" v-for="(alliance, indexa) in battle.alliances" :key="indexa">
-            <a class="uk-accordion-title" href="#">{{ alliance.name }} | KDA : {{ alliance.kills }} / {{ alliance.deaths }} | KILLFAME : {{ alliance.killFame }}
-              <span v-if="showStats && alliance.listItemPower.length > 0">IP Moyen : {{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</span>  <!-- / alliance.listItemPower.length -->
+            <a class="uk-accordion-title" href="#">
+            <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
+            <thead>
+              <th>ALLIANCE</th>
+              <th>GUILDS</th>
+              <th>PLAYERS</th>
+              <th>KDA</th>
+              <th>KILLFAME</th>
+              <th>AVERAGE IP</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ alliance.name }}</td>
+                <td>
+                  <span v-for="(guild, indexg) in alliance.guilds" :key="indexg">
+                    {{guild}} <br />
+                  </span>
+                </td>
+                <td> {{ alliance.players.length }} </td>
+                <td>{{ alliance.kills }} / {{ alliance.deaths }}</td>
+                <td>{{ formatNumber(alliance.killFame) }}</td>
+                <td v-if="showStats && alliance.listItemPower.length">{{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</td>
+              </tr>
+            </tbody>
+          </table>
+            
             </a>
             <div class="uk-accordion-content">
                 <table class="uk-table uk-table-divider uk-table-striped" style="position:relative;margin:10px">
               <thead>
-              <tr>
-                  <td></td> <!-- Badge -->
-                  <td>Guild</td>
-                  <td></td>
-                  <td>Name</td>
-                  <td>Kills</td>
-                  <td>Deaths</td>bestPlayerKill
-                  <td>Assist</td>
-                  <!-- <td>Damages</td> -->
-                  <td>Assistance Healing</td>
-                  <td> Item Power </td>
-                  <td> Kill Fame </td>
-              </tr>
-            </thead>
+                <tr>
+                    <td></td> <!-- Badge -->
+                    <td>Guild</td>
+                    <td></td>
+                    <td>Name</td>
+                    <td>Kills</td>
+                    <td>Deaths</td>
+                    <td>Assist</td>
+                    <!-- <td>Damages</td> -->
+                    <td>Assistance Healing</td>
+                    <td> Item Power </td>
+                    <td> Kill Fame </td>
+                </tr>
+              </thead>
             <tbody>
                     <tr v-for="player in alliance.players" :key="player.id" :id="player.name" :style="resortir(player)">
                       <td style="max-width: 80px;position: absolute;left: -90px;">
@@ -86,7 +110,7 @@
                       <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
                       <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
                       <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
-                      <td> {{player.killFame}} </td>
+                      <td> {{formatNumber(player.killFame)}} </td>
 
                     </tr>
 
@@ -195,6 +219,9 @@ export default {
       if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
       if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
       if (player.id === this.bestPlayerAssistance.id) return "background: #a6e0bd;"
+    },
+    formatNumber (num) {
+      return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     }
 
   },

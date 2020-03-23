@@ -6,3 +6,6 @@
 .uk-table td {
     padding: 0;
 }
+.uk-table thead tr {
+    font-weight: 600;
+}
