@@ -24,7 +24,7 @@
             </tbody>
           </table>
         </a>
-        <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a>
+        <router-link :to="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard></router-link>
         <div class="uk-accordion-content">
           <table class="uk-table uk-table-divider uk-table-striped">
             <thead>
@@ -75,11 +75,11 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get('https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
+      const response = await axios.get('https://route8apuwqz5-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
       return response
     },
     async save() {
-      await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
+      await axios.get(`https://route8apuwqz5-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
     },
     missGuild: function (battle) {
       const kdaratio = {}

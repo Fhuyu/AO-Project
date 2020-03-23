@@ -125,12 +125,12 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
+      const response = await axios.get(`https://route8apuwqz5-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
       return response
     },
 
     async playerDead (playerId) {
-      await axios.get(`https://routexugyjksk-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+      await axios.get(`https://route8apuwqz5-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
           const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {
