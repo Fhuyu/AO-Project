@@ -40,6 +40,11 @@
         <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
     </div>
   </div>
+  <div v-if="error404">
+    <h1> OOPS ! An error occured. </h1> 
+    <h3>Please refresh this page </h3>
+      <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link>
+  </div>
     <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
         <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" v-for="(alliance, indexa) in battle.alliances" :key="indexa">
             <a class="uk-accordion-title" href="#">{{ alliance.name }} | KDA : {{ alliance.kills }} / {{ alliance.deaths }} | KILLFAME : {{ alliance.killFame }}
@@ -54,10 +59,10 @@
                   <td></td>
                   <td>Name</td>
                   <td>Kills</td>
-                  <td>Deaths</td>
+                  <td>Deaths</td>bestPlayerKill
                   <td>Assist</td>
-                  <td>Damages</td>
-                  <td>Heal</td>
+                  <!-- <td>Damages</td> -->
+                  <td>Assistance Healing</td>
                   <td> Item Power </td>
                   <td> Kill Fame </td>
               </tr>
@@ -67,6 +72,7 @@
                       <td style="max-width: 80px;position: absolute;left: -90px;">
                         <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
                         <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
+                        <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSISTANCE</span>
                       </td>
                       <td>{{player.guildName}}</td>
                       <td v-if="showStats && player.weapon">
@@ -77,7 +83,7 @@
                       <td>{{player.kills}}</td>
                       <td>{{player.deaths}}</td>
                       <td>{{player.assistance}}</td>
-                      <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td>
+                      <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
                       <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
                       <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
                       <td> {{player.killFame}} </td>
@@ -107,13 +113,15 @@ export default {
       refreshStats: [],
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
+      bestPlayerAssistance: { id: '', assistance: 0 },
       showWeapon: false,
       showStats: false,
       // SORT TABLE
       currentSort: 'killFame',
       currentSortDir: 'desc',
       reload: 0,
-      searchPlayerName: null
+      searchPlayerName: null,
+      error404: false
     }
   },
   computed: {
@@ -126,6 +134,9 @@ export default {
   methods: {
     async fetchData () {
       const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`)
+        .catch((error) => {
+          this.error404 = true
+        });
       return response
     },
 
@@ -149,6 +160,7 @@ export default {
           })
         })
         .catch((error) => {
+          this.error404 = true
             this.refreshStats.push(playerId)
         });
     },
@@ -180,6 +192,9 @@ export default {
     },
     resortir (player) {
       if (player.name === this.searchPlayerName) return "background: lightblue;"
+      if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
+      if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
+      if (player.id === this.bestPlayerAssistance.id) return "background: #a6e0bd;"
     }
 
   },
@@ -226,7 +241,7 @@ export default {
 
           if (this.battle.players[participantId]) {
             this.battle.players[participantId].assistance += 1
-            this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
+            // this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
             this.battle.players[participantId].healingDone.push(this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone)
             if (this.battle.players[participantId].weapon) {
             } else {
@@ -235,6 +250,11 @@ export default {
               this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
             }
           }
+        }
+        const killerId = this.battle.players[playerID].eventDeath.Killer.Id
+        if (!this.battle.players[killerId].weapon) {
+          this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand
+          this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
         }
       })
       // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
@@ -249,6 +269,11 @@ export default {
             this.battle.alliances[playerAlliance].listItemPower.push(parseInt(this.battle.players[playerID].itempower))
           }
         }
+        // --- BEST ASSITANCE MEDAL
+        if (this.battle.players[playerID].assistance > this.bestPlayerAssistance.assistance) {
+          this.bestPlayerAssistance.assistance = this.battle.players[playerID].assistance
+          this.bestPlayerAssistance.id = this.battle.players[playerID].id
+        } 
       }
       this.showStats = true
     },
