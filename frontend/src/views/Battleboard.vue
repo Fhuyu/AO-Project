@@ -94,8 +94,6 @@ export default {
       guildBattleNeeded: false // ?
     }
   },
-  components: {
-  },
   methods: {
     async fetchData () {
       let response = null
