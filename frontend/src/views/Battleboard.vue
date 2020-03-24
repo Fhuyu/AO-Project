@@ -7,6 +7,9 @@
         <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
     </form> -->
   </div>
+  <RequestFailed v-if="error404"
+    >
+  </RequestFailed>
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
@@ -29,7 +32,8 @@
             </tbody>
           </table>
         </a>
-        <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a>
+        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</button></router-link>
+        <!-- <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a> -->
         <div class="uk-accordion-content">
           <table class="uk-table uk-table-divider uk-table-striped">
             <thead>
@@ -66,14 +70,19 @@
 
 <script>
 import axios from 'axios'
+import RequestFailed from "@/components/RequestFailed"
 
 export default {
   name: 'battles',
+  components: {
+    RequestFailed,
+  },
   data: function () {
     return {
       battles: [],
       searchGuildName: null,
-      guildBattleNeeded: false
+      error404: false,
+      guildBattleNeeded: false // ?
     }
   },
   components: {
@@ -84,15 +93,24 @@ export default {
       if (this.searchGuildName) {
         console.log('searching guildname')
         response = await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+        .catch((error) => {
+          this.error404 = true
+        });
       } else {
         console.log('searching global')
         response = await axios.get('http://localhost:3000/battles')
+        .catch((error) => {
+          this.error404 = true
+        });
       }
       this.guildBattleNeeded = false
       return response
     },
     async save() {
       await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+      .catch((error) => {
+          this.error404 = true
+        });
     },
     missGuild: function (battle) {
       const kdaratio = {}

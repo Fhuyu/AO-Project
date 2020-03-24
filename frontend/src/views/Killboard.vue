@@ -8,45 +8,17 @@
     <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
     <button v-else class="uk-button uk-button-primary" disabled> GO</button>
   </div>
-    <!-- // -------------------------- ORDER -->
-  <div class="orderby uk-margin">
-    <h5> ORDER BY </h5>
-    <div class="uk-button-group">
-        <button @click="sort('guildName')" class="uk-button uk-button-secondary">GUILDNAME
-            <span v-if="currentSort === 'guildName' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'guildName' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button @click="sort('name')" class="uk-button uk-button-secondary">NAME
-            <span v-if="currentSort === 'name' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'name' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-if="showStats" @click="sort('itempower')" class="uk-button uk-button-secondary">ITEM POWER
-            <span v-if="currentSort === 'itempower' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'itempower' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-else class="uk-button uk-button-secondary" disabled>ITEM POWER</button>
-        <button @click="sort('killFame')" class="uk-button uk-button-secondary">KILLFAME
-            <span v-if="currentSort === 'killFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'killFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button @click="sort('kills')" class="uk-button uk-button-secondary">KILLS
-            <span v-if="currentSort === 'kills' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'kills' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-if="showStats" @click="sort('assistance')" class="uk-button uk-button-secondary">ASSISTANCE
-            <span v-if="currentSort === 'assistance' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'assistance' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
-    </div>
-  </div>
-  <!-- <div v-if="error404">
-    <h1> OOPS ! An error occured. </h1> 
-    <h3>Please refresh this page </h3>
-      <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link>
-  </div> -->
+
+  <RequestFailed v-if="error404"
+    :killboardID="battle.id">
+  </RequestFailed>
+  <KillboardOrderBy
+    :showStats="showStats"
+    @clicked="onClickOrderBy">
+  </KillboardOrderBy>
     <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
-        <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" v-for="(alliance, indexa) in battle.alliances" :key="indexa">
+        <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" 
+          v-for="(alliance, indexa) in battle.alliances" :key="indexa">
             <a class="uk-accordion-title" href="#">
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
@@ -92,30 +64,17 @@
                 </tr>
               </thead>
             <tbody>
-                    <tr v-for="player in alliance.players" :key="player.id" :id="player.name" :style="resortir(player)">
-                      <td style="max-width: 80px;position: absolute;left: -90px;">
-                        <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
-                        <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
-                        <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSISTANCE</span>
-                      </td>
-                      <td>{{player.guildName}}</td>
-                      <td v-if="showStats && player.weapon">
-                        <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
-                      </td>
-                      <td v-else></td>
-                      <td>{{player.name}}</td>
-                      <td>{{player.kills}}</td>
-                      <td>{{player.deaths}}</td>
-                      <td>{{player.assistance}}</td>
-                      <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
-                      <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
-                      <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
-                      <td> {{formatNumber(player.killFame)}} </td>
-
-                    </tr>
+              <KillboardPlayersList
+                v-for="player in alliance.players"
+                :key="player.id"
+                :showStats="showStats"
+                :bestPlayerKillfame="bestPlayerKillfame"
+                :bestPlayerKill="bestPlayerKill"
+                :bestPlayerAssistance="bestPlayerAssistance"
+                :player="player">
+              </KillboardPlayersList>
 
                   </tbody>
-                  <!-- <tbody v-else><div uk-spinner></div></tbody> -->
                 </table>
             </div>
         </li>
@@ -126,8 +85,9 @@
 
 <script>
 import axios from 'axios'
-
-/*   */
+import RequestFailed from "@/components/RequestFailed"
+import KillboardOrderBy from "@/components/KillboardOrderBy"
+import KillboardPlayersList from "@/components/KillboardPlayersList"
 
 export default {
   name: 'Battle',
@@ -140,13 +100,14 @@ export default {
       bestPlayerAssistance: { id: '', assistance: 0 },
       showWeapon: false,
       showStats: false,
-      // SORT TABLE
-      currentSort: 'killFame',
-      currentSortDir: 'desc',
-      reload: 0,
       searchPlayerName: null,
       error404: false
     }
+  },
+  components: {
+    RequestFailed,
+    KillboardOrderBy,
+    KillboardPlayersList,
   },
   computed: {
     searchPlayerAnchor : function () {
@@ -177,7 +138,6 @@ export default {
               // Show weapons when completly loaded
               console.log(`${Object.keys(this.refreshStats).length} = ${this.battle.totalKills}`)
               if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-                this.reload += 1
                 this.showWeapon = true
               }
             }
@@ -198,32 +158,25 @@ export default {
         }
       }
     },
-    imageWeaponUri (weaponType) {
-      return `https://gameinfo.albiononline.com/api/gameinfo/items/${weaponType}`
-    },
     sumArray (array) {
       return array.reduce((accumulator, item) => accumulator + item, 0)
     },
-    sort: function (column) {
-      console.log(this.currentSort)
-      console.log('clicked', column)
-      if (column === this.currentSort) {
-        this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc'
-      }
-      this.currentSort = column
-      this.reload += 1
-      console.log(this.currentSort)
-    },
-    resortir (player) {
-      if (player.name === this.searchPlayerName) return "background: lightblue;"
-      if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
-      if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
-      if (player.id === this.bestPlayerAssistance.id) return "background: #a6e0bd;"
-    },
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
+    },
+    onClickOrderBy (currentSortName, currentSortDir) {
+      for (const alliance in this.battle.alliances) {
+          this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
+              let modifier = 1
+              if (currentSortDir === 'desc') {
+                  modifier = -1
+              }
+              if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+              if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+              return 0
+          })
+      } 
     }
-
   },
   mounted () {
     this.fetchData()
@@ -241,15 +194,11 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
-        // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID])
-        if (this.battle.players[playerID].allianceId) {
-          // console.log('ALLIANCE DU JOUEUR : ', this.battle.players[playerID].allianceId)
-          const playerAlliance = this.battle.players[playerID].allianceId
-          this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
-          // console.log('ALLIANCE DU JOUEUR UPDATED: ', this.battle.alliances[playerAlliance])
+          if (this.battle.players[playerID].allianceId) {
+            const playerAlliance = this.battle.players[playerID].allianceId
+            this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
+          }
         }
-      }
-      this.reload += 1
         this.getPlayerDeath()
       })
   },
@@ -304,21 +253,7 @@ export default {
       }
       this.showStats = true
     },
-    reload: function () {
-        for (const alliance in this.battle.alliances) {
-            console.log
-            this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
-                let modifier = 1
-                if (this.currentSortDir === 'desc') {
-                    modifier = -1
-                }
-                if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier
-                if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier
-                return 0
-            })
-        } 
-    }
-  }
+  },
 }
 // DANS LE TABLEAU DES GUILDES, POUR CHAQUE GUILDES (TABLEAU) AVOIR TOUS SES JOUEURS (OBJ)
 </script>
