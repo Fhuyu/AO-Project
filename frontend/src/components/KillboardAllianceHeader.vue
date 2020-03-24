@@ -1,19 +1,14 @@
 <template>
-  <div class="errormessage">
-    <h1> OOPS ! An error occured. </h1> 
-    <h3>Please refresh this page </h3>
-    <!-- <router-link :to="killboardURL()"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link> -->
+  <div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'RequestFailed',
-  // props: [killboardID],
+  props: [],
   methods: {
-    killboardURL () {
-      // return `killboard/${killboardID}`
-    }
+
   }
 }
 </script>

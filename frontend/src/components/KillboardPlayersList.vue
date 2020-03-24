@@ -1,5 +1,5 @@
 <template>
-    <tr :style="resortir(player)">
+    <tr :style="highlight(player)">
         <td style="max-width: 80px;position: absolute;left: -90px;">
             <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
             <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
@@ -40,7 +40,7 @@ export default {
     sumArray (array) {
       return array.reduce((accumulator, item) => accumulator + item, 0)
     },
-    resortir (player) {
+    highlight (player) {
       if (player.name === this.searchPlayerName) return "background: lightblue;"
       if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
       if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
