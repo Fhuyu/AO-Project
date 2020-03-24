@@ -6,7 +6,7 @@ const app = express()
 
 
 app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildName=LKYQ8b0mTvaPk0LxVny5UQ'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
     fetch(url, { timeout: 5000 })
         .then((res) => res.json())
         .then((battles) => {
@@ -34,17 +34,6 @@ app.get('/battles/:guildName', cors(), (req, res) => {
             });
         })
     })
-
-    /* let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildName=${req.params.guildName}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-    fetch(url, { timeout: 5000 })
-        .then((res) => res.json())
-        .then((json) => {
-            console.log(req.params.guildName)
-            res.send(json)
-        })
-        .catch((error) => {
-            res.status(404).send({ success: false, message: error.message });
-        }); */
 app.get('/killboard/:id', cors(), (req, res) => {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 5000 })
         .then((res) => res.json())
@@ -58,7 +47,12 @@ app.get('/killboard/:id', cors(), (req, res) => {
             for (const alliance in battle.alliances) {
                 battle.alliances[alliance].players = []
                 battle.alliances[alliance].listItemPower = []
+                battle.alliances[alliance].guilds = []
             }
+            for (const guild in battle.guilds) {
+                const allianceOfGuild = battle.alliances[battle.guilds[guild].allianceId]
+                allianceOfGuild.guilds.push( battle.guilds[guild].name ) // ONLY NAME : TODO OBJECT
+            } 
 
             for (const player in battle.players) {
                 battle.players[player].damageDone = []

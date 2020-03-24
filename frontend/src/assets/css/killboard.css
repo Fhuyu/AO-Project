@@ -1,6 +1,10 @@
 
+thead th {
+    text-align: center!important;
+}
 thead tr {
     font-size:12px;
+    font-weight: 600;
 }
 .uk-table td  {
     padding: 2px;
