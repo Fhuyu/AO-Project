@@ -221,16 +221,10 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
-<<<<<<< HEAD
-        if (this.battle.players[playerID].allianceId) {
-          const playerAlliance = this.battle.players[playerID].allianceId
-          this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
-=======
           if (this.battle.players[playerID].allianceId) {
             const playerAlliance = this.battle.players[playerID].allianceId
             this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
           }
->>>>>>> master
         }
         this.onClickOrderBy('killFame', 'desc')
         this.getPlayerDeath()
