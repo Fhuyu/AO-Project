@@ -12,10 +12,12 @@
   <RequestFailed v-if="error404"
     :killboardID="battle.id">
   </RequestFailed>
+
   <KillboardOrderBy
     :showStats="showStats"
     @clicked="onClickOrderBy">
   </KillboardOrderBy>
+  
     <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
         <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" 
           v-for="(alliance, indexa) in battle.alliances" :key="indexa">
@@ -65,7 +67,7 @@
               </thead>
             <tbody>
               <KillboardPlayersList
-                v-for="player in alliance.players"
+                v-for="player in alliance.sortedPlayers"
                 :key="player.id"
                 :showStats="showStats"
                 :bestPlayerKillfame="bestPlayerKillfame"
@@ -182,6 +184,7 @@ export default {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
+        
         for (const player in this.battle.players) {
           // --- BEST KILLFAME MEDAL
           if (this.battle.players[player].killFame > this.bestPlayerKillfame.killfame) {
@@ -199,8 +202,10 @@ export default {
             this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID])
           }
         }
+        this.onClickOrderBy('killFame', 'desc')
         this.getPlayerDeath()
       })
+      
   },
   watch: {
     showWeapon: function () {

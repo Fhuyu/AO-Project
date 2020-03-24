@@ -7,12 +7,20 @@
         <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
     </form> -->
   </div>
-  <RequestFailed v-if="error404"
-    >
+  <RequestFailed v-if="error404">
   </RequestFailed>
+
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
+          <table class="result">
+            <tr>
+              <td class="winner">{{battle.sortedGuilds[0].name}}</td>
+              <td>VS</td>
+              <td class="loser">{{battle.sortedGuilds[1].name}}</td>
+              <td class="other" v-if="battle.sortedGuilds[2]"> {{battle.sortedGuilds[2].name}} </td>
+            </tr>
+          </table>
           <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
               <th>DATE</th>
@@ -31,6 +39,7 @@
               </tr>
             </tbody>
           </table>
+
         </a>
         <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</button></router-link>
         <!-- <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a> -->
@@ -47,7 +56,7 @@
                   <th>KILLFAME</th>
               </tr>
             </thead>
-            <tbody v-for="(guild, index) in battle.guilds" :key="index">
+            <tbody v-for="(guild, index) in battle.sortedGuilds" :key="index">
               <tr>
                 <td>
                   <span v-if="guild.id === battle.bestGuildFame.id" class="uk-label uk-label-warning">KILLFAME</span>
@@ -159,7 +168,19 @@ export default {
     },
     readableDate: function (date) {
       return `${date.slice(0, 10)} ${date.slice(11, 19)}`
-    }
+    },
+    OrderBy (battle, currentSortName, currentSortDir) {
+          let x = battle.sortedGuilds.sort((a, b) => {
+              let modifier = 1
+              if (currentSortDir === 'desc') {
+                  modifier = -1
+              }
+              if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+              if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+              return 0
+          })
+          console.log(x)
+      } 
 
   },
   mounted () {
@@ -172,8 +193,11 @@ export default {
         this.battles.forEach(battle => {
           battle.bestGuildFame = { id: '', killfame: 0 }
           battle.bestGuildKill = { id: '', kills: 0 }
+          battle.sortedGuilds = []
+
           for (const guild in battle.guilds) {
-            // --- BEST KILL FAME MEDAL
+            battle.sortedGuilds.push(battle.guilds[guild])
+            // --- BEST KILL FAME MEDALbattle.guilds[guild]
             if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
               battle.bestGuildFame.killfame = battle.guilds[guild].killFame
               battle.bestGuildFame.id = battle.guilds[guild].id
@@ -183,6 +207,7 @@ export default {
               battle.bestGuildKill.id = battle.guilds[guild].id
             }
           }
+          this.OrderBy(battle, 'killFame', 'desc')
         })
       })
   }
