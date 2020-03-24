@@ -88,8 +88,6 @@ export default {
       guildBattleNeeded: false // ?
     }
   },
-  components: {
-  },
   methods: {
     async fetchData () {
       const response = await axios.get('https://routeymqad0mx-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')

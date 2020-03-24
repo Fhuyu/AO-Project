@@ -1,5 +1,30 @@
 <template>
 <div class="uk-container-xlarge uk-margin-auto">
+  <!-- GLOBAL STATS -->
+  <div class="uk-grid-column-small uk-grid-row-large uk-child-width-1-3@s uk-text-center" uk-grid>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+          PLAYERS <br/>
+          {{ Object.keys(battle.players).length}}
+          <div class="container">
+  <div class="skills html">90%</div>
+</div>
+        </div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+          TOTAL KILLS<br/>
+          {{ battle.totalKills }}
+        </div>
+    </div>
+    <div>
+        <div class="uk-card uk-card-default uk-card-body">
+          TOTAL KILLFAME<br/>
+          {{ formatNumber(battle.totalFame) }}
+        </div>
+    </div>
+  </div>
+  <!-- PLAYER SEARCH -->
   <div class="">
     <form class="uk-search uk-search-default" v-on:submit.prevent>
           <span uk-search-icon></span>
