@@ -1,11 +1,35 @@
 <template>
-  <div id="app">
-    <div id="nav" class="">
-      <router-link to="/"><span uk-icon="list"></span><h3>Battleboard</h3></router-link>
+  <div id="app" :class="viewMode">
+    <div id="nav" uk-grid>
+      <router-link class="uk-width-1-2" to="/"><h3>Battleboard</h3></router-link>
+    <NightMode class="uk-width-1-2" @clicked="onClickSwitchMode"></NightMode>
+
     </div>
     <router-view/>
+
   </div>
 </template>
+
+<script>
+import NightMode from "@/components/NightMode"
+export default {
+  data: function () {
+      return {
+          viewMode: 'night',
+      }
+  },
+  components: {
+    NightMode
+  },
+  methods : {
+    onClickSwitchMode : function (mode) {
+      this.viewMode = mode
+      console.log('APP SWITCHED MODE', mode)
+    }
+  }
+  
+}
+</script>
 
 <style>
 #app {

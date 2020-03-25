@@ -24,3 +24,14 @@
 .uk-table thead tr {
     font-weight: 600;
 }
+
+/* ---------- NIGHT MODE ------------ */
+.night {
+    background: #121212;
+}
+.night li {
+    background: #1d1d1d;
+}
+.night td {
+    color: #dddddd;
+}

@@ -24,3 +24,6 @@ li + .noguild {
 li:last-child:nth-child(odd) {
     margin-left: 5%!important; 
 }
+.stat {
+    display: inline-block;
+}

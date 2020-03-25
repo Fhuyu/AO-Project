@@ -2,27 +2,28 @@
 <div class="uk-container-xlarge uk-margin-auto">
   <!-- GLOBAL STATS -->
   <div class="uk-grid-column-small uk-grid-row-large uk-child-width-1-3@s uk-text-center" uk-grid>
-    <div>
-        <div class="uk-card uk-card-default uk-card-body">
+      <div class="uk-card uk-card-default uk-card-body">
           PLAYERS <br/>
-          {{ totalPlayer }}
-          <div class="container">
-            <div v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="">{{alliance.name}}{{ alliance.players.length }} {{ (alliance.players.length *100 / totalPlayer).toFixed(1)}}</div>
-</div>
-        </div>
-    </div>
-    <div>
-        <div class="uk-card uk-card-default uk-card-body">
+          {{ totalPlayer }} <br />
+          <div 
+              :style="'width:' + (alliance.players.length *100 / totalPlayer).toFixed(1) + '%' " 
+              v-for="(alliance, indexa) in battle.alliances" 
+              :key="indexa"
+              :uk-tooltip="alliance.players.length"
+              class="stat player"
+              :class="alliance.id">
+                {{alliance.name}}{{ alliance.players.length }} {{ (alliance.players.length *100 / totalPlayer).toFixed(1)}}
+            </div>
+            
+      </div>
+      <div class="uk-card uk-card-default uk-card-body">
           TOTAL KILLS<br/>
           {{ battle.totalKills }}
-        </div>
-    </div>
-    <div>
+      </div>
         <div class="uk-card uk-card-default uk-card-body">
           TOTAL KILLFAME<br/>
           {{ formatNumber(battle.totalFame) }}
         </div>
-    </div>
   </div>
   <!-- PLAYER SEARCH -->
   <div class="">
