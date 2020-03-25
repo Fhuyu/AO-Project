@@ -5,9 +5,9 @@
     <div>
         <div class="uk-card uk-card-default uk-card-body">
           PLAYERS <br/>
-          {{ Object.keys(battle.players).length}}
+          {{ totalPlayer }}
           <div class="container">
-  <div class="skills html">90%</div>
+            <div v-for="(alliance, indexa) in battle.alliances" :key="indexa" class="">{{alliance.name}}{{ alliance.players.length }} {{ (alliance.players.length *100 / totalPlayer).toFixed(1)}}</div>
 </div>
         </div>
     </div>
@@ -121,6 +121,7 @@ export default {
   data: function () {
     return {
       battle: [],
+      totalPlayer: 0,
       refreshStats: [],
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
@@ -209,6 +210,7 @@ export default {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
+        this.totalPlayer = Object.keys(this.battle.players).length
         
         for (const player in this.battle.players) {
           // --- BEST KILLFAME MEDAL
