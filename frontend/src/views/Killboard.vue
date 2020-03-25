@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`)
+      const response = await axios.get(`https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/killboard/${this.$route.params.id}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -153,7 +153,7 @@ export default {
     },
 
     async playerDead (playerId) {
-      await axios.get(`https://routeymqad0mx-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+      await axios.get(`https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
           const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {

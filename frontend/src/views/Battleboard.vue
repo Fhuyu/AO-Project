@@ -90,11 +90,11 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get('https://routeymqad0mx-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
+      const response = await axios.get('https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
       return response
     },
     async save() {
-      await axios.get(`https://routeymqad0mx-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
+      await axios.get(`https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
     },
     missGuild: function (battle) {
       const kdaratio = {}
