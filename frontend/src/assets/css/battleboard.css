@@ -26,12 +26,9 @@
 }
 
 /* ---------- NIGHT MODE ------------ */
-.night {
-    background: #121212;
+.night .detail tr:nth-child(2n) {
+    background: #474747;
 }
-.night li {
-    background: #1d1d1d;
-}
-.night td {
-    color: #dddddd;
+.night .battleboard li:nth-child(2n) {
+    background: #3d3d3d;
 }

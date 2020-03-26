@@ -24,7 +24,7 @@ export default {
 }
 </script>
 <style scoped>
-/* Estilo iOS */
+
 .switch__container {
   margin: 30px auto;
   width: 120px;

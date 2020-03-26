@@ -44,7 +44,7 @@
         <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</button></router-link>
         <!-- <a :href="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard</a> -->
         <div class="uk-accordion-content">
-          <table class="uk-table uk-table-divider uk-table-striped">
+          <table class="uk-table uk-table-divider detail">
             <thead>
               <tr>
                   <th></th>
@@ -56,8 +56,8 @@
                   <th>KILLFAME</th>
               </tr>
             </thead>
-            <tbody v-for="(guild, index) in battle.sortedGuilds" :key="index">
-              <tr>
+            <tbody>
+              <tr v-for="(guild, index) in battle.sortedGuilds" :key="index">
                 <td>
                   <span v-if="guild.id === battle.bestGuildFame.id" class="uk-label uk-label-warning">KILLFAME</span>
                   <span v-if="guild.id === battle.bestGuildKill.id" class="uk-label uk-label-danger">KILLS</span>

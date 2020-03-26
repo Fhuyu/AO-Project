@@ -1,5 +1,5 @@
 <template>
-    <tr :style="highlight(player)">
+    <tr :class="highlight(player)">
         <td style="max-width: 80px;position: absolute;left: -90px;">
             <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
             <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
@@ -41,10 +41,10 @@ export default {
       return array.reduce((accumulator, item) => accumulator + item, 0)
     },
     highlight (player) {
-      if (player.name === this.searchPlayerName) return "background: lightblue;"
-      if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
-      if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
-      if (player.id === this.bestPlayerAssistance.id) return "background: #a6e0bd;"
+      if (player.name === this.searchPlayerName) return "highlighted"
+      if (player.id === this.bestPlayerKillfame.id) return "bestKillfame"
+      if (player.id === this.bestPlayerKill.id) return "bestKill"
+      if (player.id === this.bestPlayerAssistance.id) return "bestAssistance"
     },
   }
 }

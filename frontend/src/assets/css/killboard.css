@@ -27,3 +27,30 @@ li:last-child:nth-child(odd) {
 .stat {
     display: inline-block;
 }
+/* ---- HIGHTLIGHTS --- */
+.night .bestKillfame {
+    background: #af731f!important;
+}
+.bestKillfame {
+    background: orange!important;
+}
+.night .bestKill {
+    background: #af6679!important;
+}
+.bestKill {
+    background: lightcoral!important;
+}
+.bestAssistance {
+    background: #a6e0bd!important;
+}
+.night .bestAssistance {
+    background: #72a084!important;
+}
+.highlighted {
+    background: lightblue!important;
+}
+.night .uk-table-striped tbody tr:nth-of-type(odd), .night .uk-table-striped>tr:nth-of-type(odd) {
+    background: #474747;
+    border-top: 1px solid #969696;
+    border-bottom: 1px solid #969696;
+}
