@@ -15,7 +15,7 @@
         <td>{{player.deaths}}</td>
         <td>{{player.assistance}}</td>
         <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
-        <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
+        <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0))}}</td> <td v-else><div uk-spinner></div></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
 

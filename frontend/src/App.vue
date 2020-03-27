@@ -48,4 +48,7 @@ body {
 .night .uk-button-primary {
     background: #0d7377;
 }
+.night .uk-button-secondary {
+  background: #3066BE;
+}
 </style>

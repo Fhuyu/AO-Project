@@ -57,7 +57,7 @@
               </div>
             </div>
           </div>
-            <span>{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
+            <span v-if="refreshStats">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
       </div>
       <div>
           <div class="uk-padding"></div>
@@ -325,7 +325,7 @@ export default {
         }
         this.battle.alliances = this.battle.sortedalliances
         // LAUNCH ALLIANCES ORDER BY KILLFAME
-        this.allianceOrderBy(this.battle, 'killFame', 'desc')
+        this.allianceOrderBy(this.battle, 'players', 'desc')
       this.showStats = true
     },
   },
