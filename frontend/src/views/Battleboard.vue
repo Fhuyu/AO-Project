@@ -168,7 +168,7 @@ export default {
       return `${date.slice(0, 10)} ${date.slice(11, 19)}`
     },
     OrderBy (battle, currentSortName, currentSortDir) {
-          let x = battle.sortedGuilds.sort((a, b) => {
+          battle.sortedGuilds.sort((a, b) => {
               let modifier = 1
               if (currentSortDir === 'desc') {
                   modifier = -1
@@ -177,7 +177,6 @@ export default {
               if (a[currentSortName] > b[currentSortName]) return 1 * modifier
               return 0
           })
-          console.log(x)
       } 
 
   },
@@ -194,7 +193,7 @@ export default {
           battle.sortedGuilds = []
 
           for (const guild in battle.guilds) {
-            battle.sortedGuilds.push(battle.guilds[guild])
+            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
             // --- BEST KILL FAME MEDALbattle.guilds[guild]
             if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
               battle.bestGuildFame.killfame = battle.guilds[guild].killFame
