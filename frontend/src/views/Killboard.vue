@@ -106,7 +106,7 @@
                     <td>Deaths</td>
                     <td>Assist</td>
                     <!-- <td>Damages</td> -->
-                    <td>Assistance Healing</td>
+                    <td>Heal on assistance</td>
                     <td> Item Power </td>
                     <td> Kill Fame </td>
                 </tr>
@@ -119,6 +119,7 @@
                 :bestPlayerKillfame="bestPlayerKillfame"
                 :bestPlayerKill="bestPlayerKill"
                 :bestPlayerAssistance="bestPlayerAssistance"
+                :bestPlayerIP="bestPlayerIP"
                 :player="player">
               </KillboardPlayersList>
 
@@ -147,6 +148,7 @@ export default {
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
       bestPlayerAssistance: { id: '', assistance: 0 },
+      bestPlayerIP: { id: '', itempower: 0 },
       showWeapon: false,
       showStats: false,
       searchPlayerName: null,
@@ -291,6 +293,7 @@ export default {
               this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
               this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
               this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
+              // this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.padStart(4, '0')
             }
           }
         }
@@ -317,6 +320,14 @@ export default {
           this.bestPlayerAssistance.assistance = this.battle.players[playerID].assistance
           this.bestPlayerAssistance.id = this.battle.players[playerID].id
         } 
+        // --- BEST IP MEDAL
+        if (this.battle.players[playerID].itempower > 999) {
+          if (this.battle.players[playerID].itempower > this.bestPlayerIP.itempower) {
+            this.bestPlayerIP.itempower = this.battle.players[playerID].itempower
+            this.bestPlayerIP.id = this.battle.players[playerID].id
+          } 
+        }
+        
       }
         // -----------------------INIT SORTED ALLIANCES PER KILLFAME
         this.battle.sortedalliances = []

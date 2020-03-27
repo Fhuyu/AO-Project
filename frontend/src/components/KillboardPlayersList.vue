@@ -3,7 +3,8 @@
         <td style="max-width: 80px;position: absolute;left: -90px;">
             <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
             <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
-            <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSISTANCE</span>
+            <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSIST</span>
+            <span v-if="player.id === bestPlayerIP.id" class="uk-label bestIp">IP</span>
         </td>
         <td>{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
@@ -25,7 +26,7 @@
 <script>
 export default {
   name: 'PlayersList',
-  props: ['player', 'showStats', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance'],
+  props: ['player', 'showStats', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance', 'bestPlayerIP'],
   data: function () {
     return {
     }
@@ -45,6 +46,7 @@ export default {
       if (player.id === this.bestPlayerKillfame.id) return "bestKillfame"
       if (player.id === this.bestPlayerKill.id) return "bestKill"
       if (player.id === this.bestPlayerAssistance.id) return "bestAssistance"
+      if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
   }
 }

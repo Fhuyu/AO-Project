@@ -49,6 +49,12 @@ div.stat.player[class*='alliance-']{
 .night .bestAssistance {
     background: #72a084!important;
 }
+.bestIp {
+    background: #fcc349!important;
+}
+.night .bestIp {
+    background: #a57e29!important;
+}
 .highlighted {
     background: lightblue!important;
 }
