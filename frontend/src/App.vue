@@ -35,6 +35,9 @@ export default {
 body {
     height: 100%;
 }
+.night h3 {
+  color:white;
+}
 .night, .night .battleboard {
     background: #1d1d1d;
     transition: 0.5s ease-in-out;
