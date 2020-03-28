@@ -15,7 +15,7 @@ import NightMode from "@/components/NightMode"
 export default {
   data: function () {
       return {
-          viewMode: 'day', //night
+          viewMode: 'night', //night
       }
   },
   components: {
@@ -34,6 +34,9 @@ export default {
 <style>
 body {
     height: 100%;
+}
+.night h3 {
+  color:white;
 }
 .night, .night .battleboard {
     background: #1d1d1d;

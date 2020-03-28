@@ -1,6 +1,8 @@
 <template>
 <div class="orderby uk-margin">
     <h5> ORDER BY </h5>
+    <div v-if="treeColumn" class="switchColumn"><button class="uk-button uk-button-primary" @click="changeColumn()">PASS TO 2 COLUMNS </button></div>
+    <div v-else class="switchColumn"><button class="uk-button uk-button-primary" @click="changeColumn()">PASS TO 3 COLUMNS </button></div>
     <div class="uk-button-group">
         <button @click="sort('guildName')" class="uk-button uk-button-secondary">GUILDNAME
             <span v-if="currentSort === 'guildName' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
@@ -28,6 +30,11 @@
             <span v-if="currentSort === 'assistance' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
         <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
+        <button v-if="showStats" @click="sort('deathFame')" class="uk-button uk-button-secondary">DEATHFAME
+            <span v-if="currentSort === 'deathFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'deathFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-else class="uk-button uk-button-secondary" disabled>DEATHFAME</button>
     </div>
   </div>
 </template>
@@ -40,6 +47,7 @@ export default {
     return {
       currentSort: 'killFame',
       currentSortDir: 'desc',
+      treeColumn: false,
     }
   },
   methods: {
@@ -50,6 +58,18 @@ export default {
       this.currentSort = column
       this.$emit('clicked', this.currentSort, this.currentSortDir)
     },
+      changeColumn: function () {
+    this.treeColumn = this.treeColumn ? false : true
+      this.$emit('changecolumn')
+      this.$emit('clicked', this.currentSort, this.currentSortDir)
+
+  },
+  },
+
+  watch: {
+    treeColumn: function () {
+      
+    }
   }
 }
 </script>

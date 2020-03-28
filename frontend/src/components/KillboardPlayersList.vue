@@ -1,17 +1,17 @@
 <template>
-    <tr :class="highlight(player)">
-        <td style="max-width: 80px;position: absolute;left: -90px;">
+    <tr :class="highlight(player)" :id="player.name">
+        <td style="max-width: 80px;position: absolute;left: -30px;">
             <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
             <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
             <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSIST</span>
             <span v-if="player.id === bestPlayerIP.id" class="uk-label bestIp">IP</span>
         </td>
-        <td>{{player.guildName}}</td>
+        <td style="font-size:11px;">{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
             <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
         </td>
-        <td v-else></td>
-        <td>{{player.name}}</td>
+        <td style="height:30px;" v-else></td>
+        <td style="text-align:left;">{{player.name}}</td>
         <td>{{player.kills}}</td>
         <td>{{player.deaths}}</td>
         <td>{{player.assistance}}</td>
@@ -19,6 +19,7 @@
         <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0))}}</td> <td v-else><div uk-spinner></div></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
+        <td v-if="showDeathFame"> {{formatNumber(player.deathFame)}} </td>
 
     </tr>
 </template>
@@ -26,7 +27,7 @@
 <script>
 export default {
   name: 'PlayersList',
-  props: ['player', 'showStats', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance', 'bestPlayerIP'],
+  props: ['player', 'showStats', 'showDeathFame', 'searchPlayerName', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance', 'bestPlayerIP'],
   data: function () {
     return {
     }
