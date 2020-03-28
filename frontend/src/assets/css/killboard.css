@@ -24,3 +24,61 @@ li + .noguild {
 li:last-child:nth-child(odd) {
     margin-left: 5%!important; 
 }
+.stat {
+    display: inline-block;
+}
+div.stat.player[class*='alliance-']{
+    background-color: red;
+}
+/* ---- HIGHTLIGHTS --- */
+.night .bestKillfame {
+    background: #af731f!important;
+}
+.bestKillfame {
+    background: orange!important;
+}
+.night .bestKill {
+    background: #af6679!important;
+}
+.bestKill {
+    background: lightcoral!important;
+}
+.bestAssistance {
+    background: #a6e0bd!important;
+}
+.night .bestAssistance {
+    background: #72a084!important;
+}
+.bestIp {
+    background: #fcc349!important;
+}
+.night .bestIp {
+    background: #a57e29!important;
+}
+.highlighted {
+    background: lightblue!important;
+}
+.night .uk-table-striped tbody tr:nth-of-type(odd), .night .uk-table-striped>tr:nth-of-type(odd) {
+    background: #474747;
+    border-top: 1px solid #969696;
+    border-bottom: 1px solid #969696;
+}
+
+/* LOADGIN BAR */
+.loading_bar, .percent_bar {
+    height:10px;
+    border-radius: 4px;
+
+}
+.night .loading_bar {
+    background: rgba(255,255,255,0.5);
+}
+.night .percent_bar {
+    background: white;
+}
+.loading_bar {
+    background: rgba(0,0,0,0.2);
+}
+.percent_bar {
+    background: black;
+}

@@ -1,9 +1,10 @@
 <template>
-    <tr :style="highlight(player)">
+    <tr :class="highlight(player)">
         <td style="max-width: 80px;position: absolute;left: -90px;">
             <span v-if="player.id === bestPlayerKillfame.id" class="uk-label uk-label-warning">KILLFAME</span>
             <span v-if="player.id === bestPlayerKill.id" class="uk-label uk-label-danger">KILLS</span>
-            <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSISTANCE</span>
+            <span v-if="player.id === bestPlayerAssistance.id" class="uk-label uk-label-success">ASSIST</span>
+            <span v-if="player.id === bestPlayerIP.id" class="uk-label bestIp">IP</span>
         </td>
         <td>{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
@@ -15,7 +16,7 @@
         <td>{{player.deaths}}</td>
         <td>{{player.assistance}}</td>
         <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
-        <td v-if="showStats">{{sumArray(player.healingDone).toFixed(0)}}</td> <td v-else><div uk-spinner></div></td>
+        <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0))}}</td> <td v-else><div uk-spinner></div></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
 
@@ -25,7 +26,7 @@
 <script>
 export default {
   name: 'PlayersList',
-  props: ['player', 'showStats', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance'],
+  props: ['player', 'showStats', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance', 'bestPlayerIP'],
   data: function () {
     return {
     }
@@ -41,10 +42,11 @@ export default {
       return array.reduce((accumulator, item) => accumulator + item, 0)
     },
     highlight (player) {
-      if (player.name === this.searchPlayerName) return "background: lightblue;"
-      if (player.id === this.bestPlayerKillfame.id) return "background: orange;"
-      if (player.id === this.bestPlayerKill.id) return "background: lightcoral;"
-      if (player.id === this.bestPlayerAssistance.id) return "background: #a6e0bd;"
+      if (player.name === this.searchPlayerName) return "highlighted"
+      if (player.id === this.bestPlayerKillfame.id) return "bestKillfame"
+      if (player.id === this.bestPlayerKill.id) return "bestKill"
+      if (player.id === this.bestPlayerAssistance.id) return "bestAssistance"
+      if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
   }
 }

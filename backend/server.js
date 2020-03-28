@@ -6,8 +6,8 @@ const app = express()
 
 
 app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-    fetch(url, { timeout: 5000 })
+    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    fetch(url, { timeout: 10000 })
         .then((res) => res.json())
         .then((battles) => {
             res.send(battles)
@@ -16,7 +16,7 @@ app.get('/battles', cors(), (req, res) => {
             res.status(404).send({ success: false, message: error.message });
         });
 });
-app.get('/battles/:guildName', cors(), (req, res) => {
+/* app.get('/battles/:guildName', cors(), (req, res) => {
     console.log(req.params.guildName)
     fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 5000 })
     .then((res) => res.json())
@@ -24,7 +24,7 @@ app.get('/battles/:guildName', cors(), (req, res) => {
         let guildId = json.guilds[0].Id
         console.log(guildId)
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-        fetch(url, { timeout: 5000 })
+        fetch(url, { timeout: 10000 })
             .then((res) => res.json())
             .then((battles) => {
                 res.send(battles)
@@ -33,9 +33,9 @@ app.get('/battles/:guildName', cors(), (req, res) => {
                 res.status(404).send({ success: false, message: error.message });
             });
         })
-    })
+    }) */
 app.get('/killboard/:id', cors(), (req, res) => {
-      fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 5000 })
+      fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 10000 })
         .then((res) => res.json())
         .then( battle => {
             for (const guild in battle.guilds) {

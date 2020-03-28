@@ -1,31 +1,54 @@
 <template>
-  <div id="app">
-    <div id="nav" class="">
-      <router-link to="/"><h3>Battleboard</h3></router-link>
+  <div id="app" :class="viewMode">
+    <div id="nav" uk-grid>
+      <router-link class="uk-width-1-2" to="/"><h3>Battleboard</h3></router-link>
+    <NightMode class="uk-width-1-2" @clicked="onClickSwitchMode"></NightMode>
+
     </div>
     <router-view/>
+
   </div>
 </template>
 
+<script>
+import NightMode from "@/components/NightMode"
+export default {
+  data: function () {
+      return {
+          viewMode: 'day', //night
+      }
+  },
+  components: {
+    NightMode
+  },
+  methods : {
+    onClickSwitchMode : function (mode) {
+      this.viewMode = mode
+      console.log('APP SWITCHED MODE', mode)
+    }
+  }
+  
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+body {
+    height: 100%;
 }
-
-#nav {
-  padding: 30px;
+.night, .night .battleboard {
+    background: #1d1d1d;
+    transition: 0.5s ease-in-out;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.night li {
+    background: #323232;
 }
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.night td {
+    color: #dddddd;
+}
+.night .uk-button-primary {
+    background: #0d7377;
+}
+.night .uk-button-secondary {
+  background: #3066BE;
 }
 </style>

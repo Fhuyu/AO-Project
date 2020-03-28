@@ -38,7 +38,7 @@
         </a>
         <router-link :to="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard></router-link>
         <div class="uk-accordion-content">
-          <table class="uk-table uk-table-divider uk-table-striped">
+          <table class="uk-table uk-table-divider detail">
             <thead>
               <tr>
                   <th></th>
@@ -50,8 +50,8 @@
                   <th>KILLFAME</th>
               </tr>
             </thead>
-            <tbody v-for="(guild, index) in battle.sortedGuilds" :key="index">
-              <tr>
+            <tbody>
+              <tr v-for="(guild, index) in battle.sortedGuilds" :key="index">
                 <td>
                   <span v-if="guild.id === battle.bestGuildFame.id" class="uk-label uk-label-warning">KILLFAME</span>
                   <span v-if="guild.id === battle.bestGuildKill.id" class="uk-label uk-label-danger">KILLS</span>
@@ -90,11 +90,11 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get('https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
+      const response = await axios.get('https://routemqn2h6hb-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles')
       return response
     },
     async save() {
-      await axios.get(`https://routeism2qvqq-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
+      await axios.get(`https://routemqn2h6hb-fuyuh-che.b542.starter-us-east-2a.openshiftapps.com/battles/${this.searchGuildName}`)
     },
     missGuild: function (battle) {
       const kdaratio = {}
@@ -144,7 +144,7 @@ export default {
       return `${date.slice(0, 10)} ${date.slice(11, 19)}`
     },
     OrderBy (battle, currentSortName, currentSortDir) {
-          let x = battle.sortedGuilds.sort((a, b) => {
+          battle.sortedGuilds.sort((a, b) => {
               let modifier = 1
               if (currentSortDir === 'desc') {
                   modifier = -1
@@ -153,7 +153,6 @@ export default {
               if (a[currentSortName] > b[currentSortName]) return 1 * modifier
               return 0
           })
-          console.log(x)
       } 
 
   },
@@ -170,7 +169,7 @@ export default {
           battle.sortedGuilds = []
 
           for (const guild in battle.guilds) {
-            battle.sortedGuilds.push(battle.guilds[guild])
+            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
             // --- BEST KILL FAME MEDALbattle.guilds[guild]
             if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
               battle.bestGuildFame.killfame = battle.guilds[guild].killFame

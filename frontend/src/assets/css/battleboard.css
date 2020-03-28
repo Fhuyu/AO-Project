@@ -24,3 +24,11 @@
 .uk-table thead tr {
     font-weight: 600;
 }
+
+/* ---------- NIGHT MODE ------------ */
+.night .detail tr:nth-child(2n) {
+    background: #474747;
+}
+.night .battleboard li:nth-child(2n) {
+    background: #3d3d3d;
+}
