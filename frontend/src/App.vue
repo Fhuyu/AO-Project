@@ -15,7 +15,7 @@ import NightMode from "@/components/NightMode"
 export default {
   data: function () {
       return {
-          viewMode: 'day', //night
+          viewMode: 'night', //night
       }
   },
   components: {

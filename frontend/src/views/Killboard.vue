@@ -1,5 +1,6 @@
 <template>
-<div class="uk-container-xlarge uk-margin-auto">
+<div>
+  <div  class="uk-container-xlarge uk-margin-auto">
   <div class="uk-grid-large uk-child-width-expand@s uk-text-center" uk-grid>
     <div>
         <div class="uk-card uk-card-default uk-card-body">PLAYERS <br/>
@@ -29,7 +30,7 @@
   <div class="uk-margin">
     <form class="uk-search uk-search-default" v-on:submit.prevent>
           <span uk-search-icon></span>
-          <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Search player">  
+          <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Highlight player">  
     </form>
     <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
     <button v-else class="uk-button uk-button-primary" disabled> GO</button>
@@ -42,7 +43,8 @@
   <KillboardOrderBy
     style="text-align: center;"
     :showStats="showStats"
-    @clicked="onClickOrderBy">
+    @clicked="onClickOrderBy"
+    @changecolumn="onChangeColumn">
   </KillboardOrderBy>
 
 
@@ -53,19 +55,21 @@
       <div>
           <div class="uk-padding-small uk-light">
             <div class="loading_bar">
-              <div class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' " >
+              <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' " >
               </div>
             </div>
           </div>
-            <span v-if="refreshStats">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
+            <span v-if="refreshStats.length">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
       </div>
       <div>
           <div class="uk-padding"></div>
       </div>
   </div>
 
-    <ul uk-grid="masonry: true" uk-accordion="multiple: true" class="uk-grid-collapse">
-        <li style="padding-right:20px;" class="uk-margin-auto uk-open uk-width-2-5 uk-card uk-card-default uk-margin-small-bottom" 
+  </div>
+
+    <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">
+        <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.alliances" :key="indexa">
             <a class="uk-accordion-title" href="#">
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
@@ -106,9 +110,10 @@
                     <td>Deaths</td>
                     <td>Assist</td>
                     <!-- <td>Damages</td> -->
-                    <td>Heal on assistance</td>
+                    <td uk-tooltip="Heal applied on assistance">Heal*</td>
                     <td> Item Power </td>
                     <td> Kill Fame </td>
+                    <td v-if="showDeathFame"> Death Fame </td>
                 </tr>
               </thead>
             <tbody>
@@ -116,6 +121,8 @@
                 v-for="player in alliance.sortedPlayers"
                 :key="player.id"
                 :showStats="showStats"
+                :showDeathFame="showDeathFame"
+                :searchPlayerName="searchPlayerName"
                 :bestPlayerKillfame="bestPlayerKillfame"
                 :bestPlayerKill="bestPlayerKill"
                 :bestPlayerAssistance="bestPlayerAssistance"
@@ -151,6 +158,9 @@ export default {
       bestPlayerIP: { id: '', itempower: 0 },
       showWeapon: false,
       showStats: false,
+      showDeathFame: false,
+      columnClass: false,
+      isCollapse: false,
       searchPlayerName: null,
       error404: false,
     }
@@ -216,6 +226,8 @@ export default {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
     onClickOrderBy (currentSortName, currentSortDir) {
+      this.showDeathFame = currentSortName === 'deathFame' ? true : false
+
       for (const alliance in this.battle.alliances) {
           this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
               let modifier = 1
@@ -229,16 +241,23 @@ export default {
       } 
     },
     allianceOrderBy (battle, currentSortName, currentSortDir) {
-          battle.sortedalliances.sort((a, b) => {
-              let modifier = 1
-              if (currentSortDir === 'desc') {
-                  modifier = -1
-              }
-              if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-              if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-              return 0
-          })
-      } 
+        battle.sortedalliances.sort((a, b) => {
+            let modifier = 1
+            if (currentSortDir === 'desc') {
+                modifier = -1
+            }
+            if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+            if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+            return 0
+        })
+    } ,
+    onChangeColumn () {
+      this.columnClass = !this.columnClass
+      this.isCollapse = this.isCollapse ? '' : 'collapsible'
+    },
+    NbColumn () {
+      return this.columnClass ? "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s" : "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn"
+    },
   },
   mounted () {
     this.fetchData()
@@ -279,6 +298,8 @@ export default {
         // ------- VICTIM IP
         this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
         this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
+        // ------- Death IP
+        this.battle.players[playerID].deathFame = this.battle.players[playerID].eventDeath.Victim.DeathFame
 
         // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
         for (const participant in this.battle.players[playerID].eventDeath.Participants) {

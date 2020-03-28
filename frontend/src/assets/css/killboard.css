@@ -7,10 +7,11 @@ thead tr {
     font-weight: 600;
 }
 .uk-table td  {
-    padding: 2px;
-    font-size: 13px;
+    padding: 1px;
+    font-size: 12px;
     line-height: 1;
     vertical-align: middle;
+    text-align: center;
 }
 .uk-accordion>:nth-child(n+2) {
     margin-top: 0;
@@ -21,7 +22,7 @@ thead tr {
 li + .noguild {
     visibility: hidden;
 }
-li:last-child:nth-child(odd) {
+li.twocolumn:last-child:nth-child(odd) {
     margin-left: 5%!important; 
 }
 .stat {
@@ -56,7 +57,10 @@ div.stat.player[class*='alliance-']{
     background: #a57e29!important;
 }
 .highlighted {
-    background: lightblue!important;
+    background: rgb(170, 213, 228)!important;
+}
+.night .highlighted {
+    background: #86adba!important;
 }
 .night .uk-table-striped tbody tr:nth-of-type(odd), .night .uk-table-striped>tr:nth-of-type(odd) {
     background: #474747;
@@ -81,4 +85,17 @@ div.stat.player[class*='alliance-']{
 }
 .percent_bar {
     background: black;
+}
+/* SWITCH COLUMN BUTTON */
+@media (max-width: 1200px) {
+    .switchColumn {
+        display:none;
+    }
+}
+/* KILLBOARD GUILDES (UL )*/
+@media (min-width: 960px) {
+    .killboard_guilds .uk-width-1-3\@l {
+        width: calc(98% * 1 / 3.001);
+        margin: 5px;
+    }
 }

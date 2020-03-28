@@ -58,6 +58,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
                 battle.players[player].damageDone = []
                 battle.players[player].healingDone = []
                 battle.players[player].assistance = 0
+                battle.players[player].deathFame = ''
                 battle.players[player].weapon = ''
                 battle.players[player].itempower = null
 
