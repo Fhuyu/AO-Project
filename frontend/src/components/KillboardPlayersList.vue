@@ -19,7 +19,7 @@
         <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0))}}</td> <td v-else><div uk-spinner></div></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
-        <td v-if="showDeathFame"> {{formatNumber(player.deathFame)}} </td>
+        <td v-if="showDeathFame"> <a v-if="player.eventDeath" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId -->
 
     </tr>
 </template>

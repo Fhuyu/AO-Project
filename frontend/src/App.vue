@@ -32,14 +32,17 @@ export default {
 </script>
 
 <style>
-body {
-    height: 100%;
+.night#app {
+    height: 100vh;
+    background-color: #1d1d1d;
+    transition: 0.5s ease-in-out;
+
 }
 .night h3 {
   color:white;
 }
 .night, .night .battleboard {
-    background: #1d1d1d;
+    /* background: #1d1d1d; */
     transition: 0.5s ease-in-out;
 }
 .night li {
