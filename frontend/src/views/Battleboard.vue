@@ -2,11 +2,11 @@
 <div class="battleboard" uk-grid>
   <div class="uk-width-4-5@m uk-margin-auto">
   <div class="uk-margin">
-    <!-- <form class="uk-search uk-search-default" >
-        <a href="" class="uk-search-icon-flip" uk-search-icon></a>
+    <!-- <form class="uk-search uk-search-default" > -->
+        <!-- <a href="" class="uk-search-icon-flip" uk-search-icon></a> -->
         <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
-        <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
-    </form> -->
+        <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
+    <!-- </form> -->
   </div>
   <div class="uk-margin">
     <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
@@ -102,6 +102,7 @@ export default {
       error404: false,
       currentOffset: null,
       offsetLoading: false,
+      onClickSearchGuild: false,
       guildBattleNeeded: false // ?
     }
   },
@@ -110,7 +111,7 @@ export default {
       let response = null
       if (this.searchGuildName) {
         console.log('searching guildname')
-        response = await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
+        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}/${this.searchGuildName}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -168,9 +169,9 @@ export default {
         battle.guilds[guild].numbers = guildNumber[guild]
       }
     },
-    guildBattleboardURL: function (guildName) {
-      this.guildBattleNeeded = true
-      return '/' + guildName
+    launchGuildSearch: function (guildName) {
+      console.log("guild search")
+      this.onClickSearchGuild = true
     },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
@@ -203,6 +204,7 @@ export default {
   },
   watch: {
     currentOffset: function () {
+      console.log('fetching')
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -229,6 +231,38 @@ export default {
           }
           this.OrderBy(battle, 'killFame', 'desc')
           this.offsetLoading = false
+        })
+      })
+    },
+    onClickSearchGuild: function () {
+      console.log('fetching')
+      this.offsetLoading = true
+      this.fetchData()
+      .then(res => {
+        this.battles = res.data
+        this.battles.map(this.missGuild)
+        this.battles.map(this.guildsNumber)
+
+        this.battles.forEach(battle => {
+          battle.bestGuildFame = { id: '', killfame: 0 }
+          battle.bestGuildKill = { id: '', kills: 0 }
+          battle.sortedGuilds = []
+
+          for (const guild in battle.guilds) {
+            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
+            // --- BEST KILL FAME MEDALbattle.guilds[guild]
+            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
+              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
+              battle.bestGuildFame.id = battle.guilds[guild].id
+            } // --- BEST KILL MEDAL
+            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
+              battle.bestGuildKill.kills = battle.guilds[guild].kills
+              battle.bestGuildKill.id = battle.guilds[guild].id
+            }
+          }
+          this.OrderBy(battle, 'killFame', 'desc')
+          this.offsetLoading = false
+          this.onClickSearchGuild = false
         })
       })
     }
