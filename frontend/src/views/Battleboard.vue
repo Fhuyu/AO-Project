@@ -1,5 +1,6 @@
 <template>
-<div class="battleboard uk-container">
+<div class="battleboard" uk-grid>
+  <div class="uk-width-4-5@m uk-margin-auto">
   <div class="uk-margin">
     <!-- <form class="uk-search uk-search-default" >
         <a href="" class="uk-search-icon-flip" uk-search-icon></a>
@@ -11,6 +12,8 @@
     <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
     Actual battles : {{currentOffset}} - {{ currentOffset +50}}
     <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
+  <div v-if="offsetLoading" uk-spinner></div>
+
   </div>
   <RequestFailed v-if="error404">
   </RequestFailed>
@@ -79,6 +82,7 @@
         </div>
       </li>
   </div>
+  </div>
 </div>
 </template>
 
@@ -97,6 +101,7 @@ export default {
       searchGuildName: null,
       error404: false,
       currentOffset: null,
+      offsetLoading: false,
       guildBattleNeeded: false // ?
     }
   },
@@ -113,7 +118,7 @@ export default {
         console.log('searching global')
         response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}`)
         .catch((error) => {
-          this.error404 = true
+          // this.error404 = true
         });
       }
       this.guildBattleNeeded = false
@@ -198,6 +203,7 @@ export default {
   },
   watch: {
     currentOffset: function () {
+      this.offsetLoading = true
       this.fetchData()
       .then(res => {
         this.battles = res.data
@@ -222,6 +228,7 @@ export default {
             }
           }
           this.OrderBy(battle, 'killFame', 'desc')
+          this.offsetLoading = false
         })
       })
     }

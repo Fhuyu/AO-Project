@@ -42,7 +42,7 @@ export default {
   color:white;
 }
 .night, .night .battleboard {
-    /* background: #1d1d1d; */
+    background: #1d1d1d;
     transition: 0.5s ease-in-out;
 }
 .night li {
