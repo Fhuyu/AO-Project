@@ -7,6 +7,11 @@
         <a type="button" class="btn btn-primary" :href="guildBattleboardURL(searchGuildName)">Valider</a>
     </form> -->
   </div>
+  <div class="uk-margin">
+    <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
+    Actual battles : {{currentOffset}} - {{ currentOffset +50}}
+    <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
+  </div>
   <RequestFailed v-if="error404">
   </RequestFailed>
 
@@ -91,6 +96,7 @@ export default {
       battles: [],
       searchGuildName: null,
       error404: false,
+      currentOffset: null,
       guildBattleNeeded: false // ?
     }
   },
@@ -105,7 +111,7 @@ export default {
         });
       } else {
         console.log('searching global')
-        response = await axios.get('http://localhost:3000/battles')
+        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -113,12 +119,12 @@ export default {
       this.guildBattleNeeded = false
       return response
     },
-    async save() {
+    /* async save() {
       await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
       .catch((error) => {
           this.error404 = true
         });
-    },
+    }, */
     missGuild: function (battle) {
       const kdaratio = {}
       const killsratio = {}
@@ -177,11 +183,22 @@ export default {
               if (a[currentSortName] > b[currentSortName]) return 1 * modifier
               return 0
           })
-      } 
+      },
+      changeOffset (step) {
+        this.currentOffset += step === 'next' ? 50 : -50
+        // this.currentOffset += 50
+        console.log(this.currentOffset)
+        this.fetchData()
+      }
 
   },
   mounted () {
-    this.fetchData()
+    this.currentOffset = 0
+    
+  },
+  watch: {
+    currentOffset: function () {
+      this.fetchData()
       .then(res => {
         this.battles = res.data
         this.battles.map(this.missGuild)
@@ -207,6 +224,7 @@ export default {
           this.OrderBy(battle, 'killFame', 'desc')
         })
       })
+    }
   }
 }
 
