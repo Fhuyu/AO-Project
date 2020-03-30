@@ -103,7 +103,6 @@ export default {
       currentOffset: null,
       offsetLoading: false,
       onClickSearchGuild: false,
-      guildBattleNeeded: false // ?
     }
   },
   methods: {
@@ -122,15 +121,8 @@ export default {
           // this.error404 = true
         });
       }
-      this.guildBattleNeeded = false
       return response
     },
-    /* async save() {
-      await axios.get(`http://localhost:3000/battles/${this.searchGuildName}`)
-      .catch((error) => {
-          this.error404 = true
-        });
-    }, */
     missGuild: function (battle) {
       const kdaratio = {}
       const killsratio = {}
@@ -204,7 +196,7 @@ export default {
   },
   watch: {
     currentOffset: function () {
-      console.log('fetching')
+      console.log('fetching offset')
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -235,7 +227,7 @@ export default {
       })
     },
     onClickSearchGuild: function () {
-      console.log('fetching')
+      console.log('fetching guidsearch')
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -262,7 +254,7 @@ export default {
           }
           this.OrderBy(battle, 'killFame', 'desc')
           this.offsetLoading = false
-          this.onClickSearchGuild = false
+          this.onClickSearchGuild = false // LOOP ON HIMSELF
         })
       })
     }

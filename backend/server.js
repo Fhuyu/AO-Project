@@ -5,9 +5,11 @@ const cors = require('cors') // https://github.com/expressjs/cors
 const app = express()
 
 
-app.get('/battles', cors(), (req, res) => {
-    let url = 'https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=LKYQ8b0mTvaPk0LxVny5UQ'; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-    fetch(url, { timeout: 10000 })
+app.get('/battles/:offset', cors(), (req, res) => {
+    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    // &offset=0 / 50 / 100
+    console.log(req.params)
+    fetch(url, { timeout: 15000 })
         .then((res) => res.json())
         .then((battles) => {
             res.send(battles)
@@ -16,14 +18,14 @@ app.get('/battles', cors(), (req, res) => {
             res.status(404).send({ success: false, message: error.message });
         });
 });
-/* app.get('/battles/:guildName', cors(), (req, res) => {
+app.get('/battles/:offset/:guildName', cors(), (req, res) => {
     console.log(req.params.guildName)
-    fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 5000 })
+    fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 15000 })
     .then((res) => res.json())
     .then( json => {
         let guildId = json.guilds[0].Id
         console.log(guildId)
-        let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+        let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 10000 })
             .then((res) => res.json())
             .then((battles) => {
@@ -33,9 +35,12 @@ app.get('/battles', cors(), (req, res) => {
                 res.status(404).send({ success: false, message: error.message });
             });
         })
-    }) */
+    .catch((error) => {
+        res.status(404).send({ success: false, message: error.message });
+    });
+    })
 app.get('/killboard/:id', cors(), (req, res) => {
-      fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 10000 })
+      fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 15000 })
         .then((res) => res.json())
         .then( battle => {
             for (const guild in battle.guilds) {
@@ -60,6 +65,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
                 battle.players[player].assistance = 0
                 battle.players[player].deathFame = ''
                 battle.players[player].weapon = ''
+                battle.players[player].mount = ''
                 battle.players[player].itempower = null
 
                 if (!battle.players[player].allianceId) {
@@ -74,7 +80,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
 })
 app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
-    fetch(url, { timeout: 10000 })
+    fetch(url, { timeout: 15000 })
         .then((res) => res.json())
         .then((json) => {
             res.send(json)
