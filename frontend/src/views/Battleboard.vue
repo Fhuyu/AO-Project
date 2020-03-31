@@ -110,13 +110,13 @@ export default {
       let response = null
       if (this.searchGuildName) {
         console.log('searching guildname')
-        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}/${this.searchGuildName}`)
+        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}/${this.searchGuildName}`)
         .catch((error) => {
           this.error404 = true
         });
       } else {
         console.log('searching global')
-        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}`)
+        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}`)
         .catch((error) => {
           // this.error404 = true
         });

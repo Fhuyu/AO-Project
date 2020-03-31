@@ -5,6 +5,7 @@ const cors = require('cors') // https://github.com/expressjs/cors
 const app = express()
 
 
+
 app.get('/battles/:offset', cors(), (req, res) => {
     let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
     // &offset=0 / 50 / 100
@@ -90,6 +91,8 @@ app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR F
         });
 })
 
-http.createServer(app).listen(3000, function() {
-    console.log(`Server running at port 3000`)
-})
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
+app.listen(port);
