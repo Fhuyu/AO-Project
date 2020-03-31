@@ -25,7 +25,7 @@
             <tr>
               <td class="winner">{{battle.sortedGuilds[0].name}}</td>
               <td>VS</td>
-              <td class="loser">{{battle.sortedGuilds[1].name}}</td>
+              <td class="loser" v-if="battle.sortedGuilds[1]">{{battle.sortedGuilds[1].name}}</td>
               <td class="other" v-if="battle.sortedGuilds[2]"> {{battle.sortedGuilds[2].name}} </td>
             </tr>
           </table>
