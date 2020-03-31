@@ -8,7 +8,15 @@
         </td>
         <td style="font-size:11px;">{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
-            <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.weapon.Type)">
+          <!-- T8_MOUNT_MAMMOTH_BATTLE@1
+          T6_MOUNT_SIEGE_BALLISTA
+          UNIQUE_MOUNT_BEETLE_GOLD 
+          UNIQUE_MOUNT_BEETLE_SILVER
+          UNIQUE_MOUNT_BEETLE_CRYSTAL
+          UNIQUE_MOUNT_ARMORED_EAGLE_GOLD
+          UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL
+          UNIQUE_MOUNT_ARMORED_EAGLE_SILVER-->
+            <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(showWeaponOrMount(player))">
         </td>
         <td style="height:30px;" v-else></td>
         <td style="text-align:left;">{{player.name}}</td>
@@ -19,7 +27,7 @@
         <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0))}}</td> <td v-else><div uk-spinner></div></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
-        <td v-if="showDeathFame"> {{formatNumber(player.deathFame)}} </td>
+        <td v-if="showDeathFame"> <a v-if="player.eventDeath" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId -->
 
     </tr>
 </template>
@@ -49,6 +57,20 @@ export default {
       if (player.id === this.bestPlayerAssistance.id) return "bestAssistance"
       if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
+    showWeaponOrMount (player) {
+      if (player.mount.Type === 'T8_MOUNT_MAMMOTH_BATTLE@1' ||
+        player.mount.Type === 'T6_MOUNT_SIEGE_BALLISTA' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_GOLD' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_SILVER' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_CRYSTAL' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_GOLD' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_SILVER') {
+          return player.mount.Type
+      } else {
+        return player.weapon.Type
+      }
+    }
   }
 }
 </script>

@@ -32,3 +32,6 @@
 .night .battleboard li:nth-child(2n) {
     background: #3d3d3d;
 }
+.night svg { /* Spinner */
+    color: white;
+}
