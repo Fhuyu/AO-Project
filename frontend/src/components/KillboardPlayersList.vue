@@ -16,7 +16,7 @@
           UNIQUE_MOUNT_ARMORED_EAGLE_GOLD
           UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL
           UNIQUE_MOUNT_ARMORED_EAGLE_SILVER-->
-            <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(player.mount.Type)">
+            <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(showWeaponOrMount(player))">
         </td>
         <td style="height:30px;" v-else></td>
         <td style="text-align:left;">{{player.name}}</td>
@@ -57,6 +57,20 @@ export default {
       if (player.id === this.bestPlayerAssistance.id) return "bestAssistance"
       if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
+    showWeaponOrMount (player) {
+      if (player.mount.Type === 'T8_MOUNT_MAMMOTH_BATTLE@1' ||
+        player.mount.Type === 'T6_MOUNT_SIEGE_BALLISTA' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_GOLD' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_SILVER' ||
+        player.mount.Type === 'UNIQUE_MOUNT_BEETLE_CRYSTAL' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_GOLD' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL' ||
+        player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_SILVER') {
+          return player.mount.Type
+      } else {
+        return player.weapon.Type
+      }
+    }
   }
 }
 </script>
