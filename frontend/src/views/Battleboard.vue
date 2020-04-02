@@ -4,7 +4,7 @@
   <div class="uk-margin">
     <!-- <form class="uk-search uk-search-default" > -->
         <!-- <a href="" class="uk-search-icon-flip" uk-search-icon></a> -->
-        <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild">
+        <input class="uk-input search guild" type="search" v-model="searchGuildName" placeholder="Search guild">
         <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
     <!-- </form> -->
   </div>

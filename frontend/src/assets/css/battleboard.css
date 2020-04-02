@@ -1,3 +1,9 @@
+/* ---------------- SEARCH INPUT ---------------- */
+.search.guild {
+    width: 20%;
+    margin-right: 10px;
+}
+
 .result {
     margin:auto;
 }
