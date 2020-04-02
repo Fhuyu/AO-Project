@@ -2,7 +2,7 @@
     <div class="switch__container">
         <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
         <label @click="switchMode()" for="switch-shadow"></label>
-        {{currentMode}}
+        {{currentMode}} mode
     </div>
 </template>
 <script>

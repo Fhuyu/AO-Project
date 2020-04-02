@@ -8,14 +8,6 @@
         </td>
         <td style="font-size:11px;">{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
-          <!-- T8_MOUNT_MAMMOTH_BATTLE@1
-          T6_MOUNT_SIEGE_BALLISTA
-          UNIQUE_MOUNT_BEETLE_GOLD 
-          UNIQUE_MOUNT_BEETLE_SILVER
-          UNIQUE_MOUNT_BEETLE_CRYSTAL
-          UNIQUE_MOUNT_ARMORED_EAGLE_GOLD
-          UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL
-          UNIQUE_MOUNT_ARMORED_EAGLE_SILVER-->
             <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(showWeaponOrMount(player))">
         </td>
         <td style="height:30px;" v-else></td>

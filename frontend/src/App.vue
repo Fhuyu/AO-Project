@@ -1,10 +1,25 @@
 <template>
   <div id="app" :class="viewMode">
-    <div id="nav" uk-grid>
-      <router-link class="uk-width-1-2" to="/"><h3>Battleboard</h3></router-link>
+    <div id="header">
+      <h1 >HANDHOLDREPORT</h1>
+      <p>Beta version - 0.1.0 - Under Development</p>
+
+      <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button>
+      <div id="modal-close-default" uk-modal>
+          <div class="uk-modal-dialog uk-modal-body">
+              <button class="uk-modal-close-default" type="button" uk-close></button>
+              <h2 class="uk-modal-title">Incoming</h2>
+                  Global Battleboard : Battles Design visual <br />
+                  Global Battleboard : Search by player<br />
+                  Killboard : Player / Killfame / Kills percent per guild<br />
+              <h2 class="uk-modal-title">Done</h2>
+                  Killboard : See battlemount over weapon (PopHover weapon available)<br />
+          </div>
+      </div>
     <NightMode class="uk-width-1-2" @clicked="onClickSwitchMode"></NightMode>
 
     </div>
+
     <router-view/>
 
   </div>
@@ -32,6 +47,12 @@ export default {
 </script>
 
 <style>
+#header {
+  text-align: center;
+}
+.night #header h1, .night #header p, .night #header button{
+  color:white;
+}
 .night#app {
     height: 100vh;
     background-color: #1d1d1d;

@@ -1,7 +1,8 @@
 <template>
 <div>
   <div  class="uk-container-xlarge uk-margin-auto">
-  <div class="uk-grid-large uk-child-width-expand@s uk-text-center" uk-grid>
+      <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
+  <!-- <div class="uk-grid-large uk-child-width-expand@s uk-text-center" uk-grid>
     <div>
         <div class="uk-card uk-card-default uk-card-body">PLAYERS <br/>
           {{ totalPlayer }} <br />
@@ -12,7 +13,7 @@
               :uk-tooltip="`${alliance.name} ${alliance.players.length}`"
               class="stat player"
               :class="`alliance-${alliance.id}`">
-                <!-- {{alliance.name}} -->{{ alliance.players.length }} <!-- {{ (alliance.players.length *100 / totalPlayer).toFixed(1)}} -->
+                {{ alliance.players.length }}{{ (alliance.players.length *100 / totalPlayer).toFixed(1)}}
           </div>  </div>
     </div>
     <div>
@@ -23,7 +24,7 @@
         <div class="uk-card uk-card-default uk-card-body">TOTAL KILLFAME<br/>
           {{ formatNumber(battle.totalFame) }}</div>
     </div>
-</div>
+  </div> -->
   
 
   <!-- PLAYER SEARCH -->
@@ -191,16 +192,21 @@ export default {
         .then(response => {
           const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {
+            // console.log(eventDeath)
             if (eventDeath.BattleId === this.battle.id) {
-              this.battle.players[playerId].eventDeath = eventDeath
-
-              this.refreshStats.push(playerId) // KEEP
-
-              // Show weapons when completly loaded
-              if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-                this.showWeapon = true
+                this.battle.players[playerId].eventDeath = eventDeath
+                console.log(this.refreshStats.length)
+                this.refreshStats.push(playerId)
+                 // KEEP
+            } /* else {
+                console.log('player died too much')
+                this.refreshStats.push(playerId) // KEEP
+                console.log(this.refreshStats.length) // KEEP
+            } */
+                // Show weapons when completly loaded
+                if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
+                  this.showWeapon = true
               }
-            }
           })
         })
         .catch((error) => {
