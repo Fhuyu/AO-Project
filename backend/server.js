@@ -1,23 +1,63 @@
 const http = require("http");
 const fetch = require('node-fetch')
 const express = require('express')
+// const axios = require('axios')
 const cors = require('cors') // https://github.com/expressjs/cors
 const app = express()
 
-
+class DataCache {
+    constructor(fetchFunction, minutesToLive = 10) {
+      this.millisecondsToLive = minutesToLive * 60 * 1000;
+      this.fetchFunction = fetchFunction;
+      this.cache = null;
+      this.getData = this.getData.bind(this);
+      this.resetCache = this.resetCache.bind(this);
+      this.isCacheExpired = this.isCacheExpired.bind(this);
+      this.fetchDate = new Date(0);
+    }
+    isCacheExpired() {
+      return (this.fetchDate.getTime() + this.millisecondsToLive) < new Date().getTime();
+    }
+    getData() {
+        // console.log(this.cache)
+        // console.log(this.fetchDate)
+        // console.log(this.isCacheExpired())
+        // console.log(this.millisecondsToLive)
+      if (!this.cache || this.isCacheExpired()) {
+        console.log('expired - fetching new data');
+        return this.fetchFunction()
+          .then((data) => {
+            this.cache = data;
+            this.fetchDate = new Date();
+            return data;
+        });
+      } else {
+        console.log('cache hit');
+        return Promise.resolve(this.cache);
+      }
+    }
+    resetCache() {
+     this.fetchDate = new Date(0);
+    }
+  }
 
 app.get('/battles/:offset', cors(), (req, res) => {
-    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+    let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`;
     // &offset=0 / 50 / 100
     console.log(req.params)
-    fetch(url, { timeout: 15000 })
+    const getBattles = () => {
+     return fetch(url, { timeout: 15000 })
         .then((res) => res.json())
-        .then((battles) => {
-            res.send(battles)
-        })
-        .catch((error) => {
-            res.status(404).send({ success: false, message: error.message });
-        });
+    }
+    const battlesCache = new DataCache(getBattles, .5);
+
+    battlesCache.getData()
+    .then((battles) => {
+        res.send(battles)
+    })
+    .catch((error) => {
+        res.status(404).send({ success: false, message: error.message });
+    });
 });
 app.get('/battles/:offset/:guildName', cors(), (req, res) => {
     console.log(req.params.guildName)
