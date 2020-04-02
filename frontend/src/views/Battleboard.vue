@@ -8,48 +8,49 @@
         <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
     <!-- </form> -->
   </div>
+
   <div class="uk-margin">
     <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
     Actual battles : {{currentOffset}} - {{ currentOffset +50}}
     <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
-  <div v-if="offsetLoading" uk-spinner></div>
-
+    <div v-if="offsetLoading" uk-spinner></div>
   </div>
+
   <RequestFailed v-if="error404">
   </RequestFailed>
+  <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
+    <thead>
+      <th width="180">DATE</th>
+      <th width="80">PLAYERS</th>
+      <th width="70">KILLS</th>
+      <th width="220">WINNING GUILD</th>
+      <th width="220">LOSING GUILD</th>
+      <th width="220">OTHER GUILDS</th>
+      <th width="180">KILL FAME</th>
+      <th></th>
+    </thead>
+  </table>
 
   <div uk-accordion="multiple: true">
     <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
-          <table class="result">
-            <tr>
-              <td class="winner">{{battle.sortedGuilds[0].name}}</td>
-              <td>VS</td>
-              <td class="loser" v-if="battle.sortedGuilds[1]">{{battle.sortedGuilds[1].name}}</td>
-              <td class="other" v-if="battle.sortedGuilds[2]"> {{battle.sortedGuilds[2].name}} </td>
-            </tr>
-          </table>
-          <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
-            <thead>
-              <th>DATE</th>
-              <th>PLAYERS</th>
-              <th>KILLS</th>
-              <th>FAME</th>
-              <th>AVERAGE FAME/KILL</th>
-            </thead>
+          <table class="uk-table result" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <tbody>
               <tr>
-                <td>{{readableDate(battle.startTime)}}</td>
-                <td>{{ Object.keys(battle.players).length }}</td>
-                <td>{{ battle.totalKills}}</td>
-                <td>{{ battle.totalFame}}</td>
-                <td>{{ (battle.totalFame / battle.totalKills).toFixed(0)}}</td>
+                <td width="180">{{readableDate(battle.startTime)}}</td>
+                <td width="80">{{ Object.keys(battle.players).length }}</td>
+                <td width="70">{{ battle.totalKills}}</td>
+                <td width="220" class="winner">{{battle.sortedGuilds[0].name}}</td>
+                <td width="220" class="loser" v-if="battle.sortedGuilds[1]">{{battle.sortedGuilds[1].name}}</td>
+                <td width="220" class="other" v-if="battle.sortedGuilds[2]"> {{battle.sortedGuilds[2].name}} </td>
+                <td v-else width="220"></td>
+                <td width="180">{{ formatNumber(battle.totalFame)}}</td>
               </tr>
             </tbody>
           </table>
 
         </a>
-        <router-link :to="killboardURL(battle.id)" class="uk-button uk-button-primary" style="top: 10px;right: 20px;position: absolute;">See killboard></router-link>
+        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="top: 2px;right: 2px;position: absolute;">See killboard</button></router-link>
         <div class="uk-accordion-content">
           <table class="uk-table uk-table-divider detail">
             <thead>
@@ -59,12 +60,12 @@
                   <th>GUILD</th>
                   <th>PLAYERS</th>
                   <th>KILLS/DEATHS</th>
-                  <th>KDA</th>
+                  <th>KD RATIO</th>
                   <th>KILLFAME</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(guild, index) in battle.sortedGuilds" :key="index">
+              <tr class="guilds" v-for="(guild, index) in battle.sortedGuilds" :key="index">
                 <td>
                   <span v-if="guild.id === battle.bestGuildFame.id" class="uk-label uk-label-warning">KILLFAME</span>
                   <span v-if="guild.id === battle.bestGuildKill.id" class="uk-label uk-label-danger">KILLS</span>
@@ -72,14 +73,20 @@
                 <td>{{ guild.alliance }}</td>
                 <td>{{ guild.name }}</td>
                 <td>{{guild.numbers}}</td>
-                <td>{{guild.kills}}/{{guild.deaths}}</td>
+                <td>{{guild.kills}} / {{guild.deaths}}</td>
                 <td>{{(guild.deaths ? (guild.kills/guild.deaths).toFixed(1) : guild.kills)}}</td>
-                <td>{{ guild.killFame }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
+                <td>{{formatNumber(guild.killFame) }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
               </tr>
             </tbody>
           </table>
         </div>
       </li>
+  </div>
+  <div class="uk-margin">
+    <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
+    Actual battles : {{currentOffset}} - {{ currentOffset +50}}
+    <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
+    <div v-if="offsetLoading" uk-spinner></div>
   </div>
   </div>
 </div>
@@ -167,21 +174,23 @@ export default {
       return `${date.slice(0, 10)} ${date.slice(11, 19)}`
     },
     OrderBy (battle, currentSortName, currentSortDir) {
-          battle.sortedGuilds.sort((a, b) => {
-              let modifier = 1
-              if (currentSortDir === 'desc') {
-                  modifier = -1
-              }
-              if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-              if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-              return 0
-          })
-      },
-      changeOffset (step) {
-        this.currentOffset += step === 'next' ? 50 : -50
-        // this.currentOffset += 50
-        this.fetchData()
-      }
+        battle.sortedGuilds.sort((a, b) => {
+            let modifier = 1
+            if (currentSortDir === 'desc') {
+                modifier = -1
+            }
+            if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+            if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+            return 0
+        })
+    },
+    changeOffset (step) {
+      this.currentOffset += step === 'next' ? 50 : -50
+      this.fetchData()
+    },
+    formatNumber (num) {
+      return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
+    },
 
   },
   mounted () {
