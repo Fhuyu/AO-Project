@@ -1,19 +1,18 @@
 .result {
     margin:auto;
 }
-.result td{
-    min-width:200px;
+.result td {
+    text-align: center;
 }
 .result .winner {
-    background: #a8d6a7;
+    color: #1aba5c;
 }
 .result .loser {
-    background: #d68080;
+    color: red;
 }
 .result .other {
-    background: #c6c6c6;
+    color: #c6c6c6;
 }
-
 .uk-table th {
     padding: 0;
     text-align: center;
@@ -23,6 +22,16 @@
 }
 .uk-table thead tr {
     font-weight: 600;
+}
+/* -------------- TABLE DETAIL ---------------- */
+.detail .guilds {
+    text-align: center;
+}
+.detail .guilds:first-child {
+    background: green;
+}
+.detail .guilds:nth-child(2) {
+    background: red;
 }
 
 /* ---------- NIGHT MODE ------------ */
