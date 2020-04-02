@@ -28,10 +28,13 @@
     text-align: center;
 }
 .detail .guilds:first-child {
-    background: green;
+    background: #19600c;
 }
 .detail .guilds:nth-child(2) {
-    background: red;
+    background: #6d280d!important;
+}
+.detail td {
+    padding: 2px 0;
 }
 
 /* ---------- NIGHT MODE ------------ */
