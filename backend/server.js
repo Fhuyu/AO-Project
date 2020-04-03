@@ -39,7 +39,30 @@ app.get('/battles/:offset/:guildName', cors(), (req, res) => {
     .catch((error) => {
         res.status(404).send({ success: false, message: error.message });
     });
-    })
+})
+app.get('/battles/:offset/player/:playerName', cors(), (req, res) => {
+    console.log('player', req.params.playerName)
+    fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.playerName}`, { timeout: 15000 })
+    .then((res) => res.json())
+    .then( json => {
+        console.log(json)
+        let playerName = json.players[0].Id
+        console.log(playerName)
+        let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&playerId=${playerName}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+        fetch(url, { timeout: 15000 })
+            .then((res) => res.json())
+            .then((battles) => {
+                res.send(battles)
+            })
+            .catch((error) => {
+                res.status(404).send({ success: false, message: error.message });
+            });
+        })
+    .catch((error) => {
+        res.status(404).send({ success: false, message: error.message });
+    });
+})
+
 app.get('/killboard/:id', cors(), (req, res) => {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 15000 })
         .then((res) => res.json())

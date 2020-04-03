@@ -1,23 +1,38 @@
 <template>
 <div class="battleboard" uk-grid>
   <div class="uk-width-4-5@m uk-margin-auto">
-  <div class="uk-margin">
-    <!-- <form class="uk-search uk-search-default" > -->
-        <!-- <a href="" class="uk-search-icon-flip" uk-search-icon></a> -->
-        <input class="uk-input search guild" type="search" v-model="searchGuildName" placeholder="Search guild">
-        <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
-    <!-- </form> -->
-  </div>
+    <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
+      <!-- <form class="uk-search uk-search-default" > -->
+          <!-- <a href="" class="uk-search-icon-flip" uk-search-icon></a> -->
+        <div>
+          <input class="uk-input search guild" type="search" v-model="searchGuildName" placeholder="Search guild">
+          <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
+      <!-- </form> -->
+      </div>
+      <div>
+        <form class="uk-form-horizontal">
+        <label class="uk-form-label" for="form-horizontal-select" style="color: white;font-size: 16px;">Filter current battles by</label>
+        <div class="uk-form-controls">
+        <select @change="onChangeFilterPlayer" class="uk-select" v-model="minBattlePlayers">
+              <option value="0">0+ players</option>
+              <option value="20">20+ players</option>
+              <option value="50">50+ players</option>
+              <option value="100">100+ players</option>
+          </select>
+          </div>
+        </form>
+      </div>
+    </div>
 
-  <div class="uk-margin">
-    <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
-    Actual battles : {{currentOffset}} - {{ currentOffset +50}}
-    <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
-    <div v-if="offsetLoading" uk-spinner></div>
-  </div>
+    <div class="uk-margin">
+      <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
+      Actual battles : {{currentOffset}} - {{ currentOffset +50}}
+      <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
+      <div v-if="offsetLoading" uk-spinner></div>
+    </div>
 
-  <RequestFailed v-if="error404">
-  </RequestFailed>
+    <RequestFailed v-if="error404">
+    </RequestFailed>
   <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
     <thead>
       <th width="180">DATE</th>
@@ -32,7 +47,7 @@
   </table>
 
   <div uk-accordion="multiple: true">
-    <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
+    <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in sortedByPlayersBattle" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
           <table class="uk-table result" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <tbody>
@@ -50,7 +65,7 @@
           </table>
 
         </a>
-        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="top: 2px;right: 2px;position: absolute;">See killboard</button></router-link>
+        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="height: 44px;top: 0px;right: 2px;position: absolute;">See killboard</button></router-link>
         <div class="uk-accordion-content">
           <table class="uk-table uk-table-divider detail">
             <thead>
@@ -105,22 +120,30 @@ export default {
     return {
       battles: [],
       searchGuildName: null,
+      searchPlayerName: null,
       error404: false,
       currentOffset: null,
       offsetLoading: false,
-      onClickSearchGuild: false,
+      onClickSearchGuildPlayer: false,
+      minBattlePlayers: "0",
+      sortedByPlayersBattle: [],
     }
   },
   methods: {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}/${this.searchGuildName}`)
+        response = await axios.get(`http://localhost:8000/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
         .catch((error) => {
           this.error404 = true
         });
-      } else {
-        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}`)
+      } /* else if (this.searchPlayerName) {
+        response = await axios.get(`http://localhost:8000/battles/${this.currentOffset}/player/${this.searchPlayerName}`)
+        .catch((error) => {
+          this.error404 = true
+        });
+      } */ else {
+        response = await axios.get(`http://localhost:8000/battles/${this.currentOffset}`)
         .catch((error) => {
           // this.error404 = true
         });
@@ -165,7 +188,13 @@ export default {
       }
     },
     launchGuildSearch: function (guildName) {
-      this.onClickSearchGuild = true
+      this.searchPlayerName = null,
+      this.onClickSearchGuildPlayer = true
+    },
+    launchPlayerSearch: function (guildName) {
+      console.log('search player')
+      this.searchGuildName = null,
+      this.onClickSearchGuildPlayer = true
     },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
@@ -191,6 +220,10 @@ export default {
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
+    onChangeFilterPlayer () {
+      this.sortedByPlayersBattle = this.battles.filter( battle =>  Object.keys(battle.players).length >= parseInt(this.minBattlePlayers)
+      )
+    }
 
   },
   mounted () {
@@ -226,9 +259,10 @@ export default {
           this.OrderBy(battle, 'killFame', 'desc')
           this.offsetLoading = false
         })
+          this.onChangeFilterPlayer()
       })
     },
-    onClickSearchGuild: function () {
+    onClickSearchGuildPlayer: function () {
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -257,6 +291,7 @@ export default {
           this.offsetLoading = false
           this.onClickSearchGuild = false // LOOP ON HIMSELF
         })
+          this.onChangeFilterPlayer()
       })
     }
   }

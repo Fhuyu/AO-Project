@@ -9,11 +9,18 @@
           <div class="uk-modal-dialog uk-modal-body">
               <button class="uk-modal-close-default" type="button" uk-close></button>
               <h2 class="uk-modal-title">Incoming</h2>
-                  Global Battleboard : Battles Design visual <br />
-                  Global Battleboard : Search by player<br />
                   Killboard : Player / Killfame / Kills percent per guild<br />
+                  Killboard : Resolve loading bar blocked for old battles<br />
+                  Battleboard : Highlight searched guild<br />
+                  Website : General design (Logo / Color)<br />
+                  Website : FAQ page
+              <h2 class="uk-modal-title">Ideas</h2>
+                  Comment section under each killboard<br />
+                  Top 5 battles of the week 
               <h2 class="uk-modal-title">Done</h2>
-                  Killboard : See battlemount over weapon (PopHover weapon available)<br />
+                  20-04-03 : Global Battleboard - Filter current battles by player number<br />
+                  20-04-02 : Global Battleboard - Battles Design visual upgraded (Night & Day)<br />
+                  20-03-31 : Killboard - See battlemount over weapon (Hover weapon available)<br />
           </div>
       </div>
     <NightMode class="uk-width-1-2" @clicked="onClickSwitchMode"></NightMode>

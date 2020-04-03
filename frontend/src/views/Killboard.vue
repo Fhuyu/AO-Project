@@ -111,10 +111,10 @@
                     <td>Deaths</td>
                     <td>Assist</td>
                     <!-- <td>Damages</td> -->
-                    <td uk-tooltip="Heal applied on assistance">Heal*</td>
+                    <td uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td>
                     <td> Item Power </td>
                     <td> Kill Fame </td>
-                    <td v-if="showDeathFame"> Death Fame </td>
+                    <td uk-tooltip="Only first death" v-if="showDeathFame"> Death Fame* </td>
                 </tr>
               </thead>
             <tbody>
