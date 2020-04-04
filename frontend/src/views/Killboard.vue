@@ -2,6 +2,46 @@
 <div>
   <div  class="uk-container-xlarge uk-margin-auto">
       <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
+
+    <table class="uk-table stat_battle" style="margin-bottom:0px;bottom: 12px;position: relative;">
+      <thead>
+        <th>ALLIANCE</th>
+        <th>TOTAL PLAYERS</th>
+        <th>TOTAL KILLS</th>
+        <th>TOTAL DEATHS</th>
+        <th>TOTAL KILLFAME</th>
+      </thead>
+      <tbody>
+        <tr class="global">
+          <td>null</td>
+          <td>{{ totalPlayer }}</td>
+          <td>{{ battle.totalKills }}</td>
+          <td>null</td>
+          <td>{{ formatNumber(battle.totalFame) }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="uk-table stat_battle" style="margin-bottom:0px;bottom: 12px;position: relative;">
+        <thead>
+          <th>ALLIANCE</th>
+          <th>PLAYERS</th>
+          <th>KILLS</th>
+          <th>DEATHS</th>
+          <th>KILLFAME</th>
+          <th>AVERAGE IP</th>
+        </thead>
+        <tr class="global" v-for="(alliance, index) in battle.sortedalliances" :key="index">
+          <td>{{ alliance.name }}</td>
+          <td>{{ alliance.players.length }} <span class="chart">{{ (alliance.players.length *100 / totalPlayer).toFixed(1) }} % </span></td>
+          <td>{{ alliance.kills }} <span class="chart">{{ (alliance.kills *100 / battle.totalKills).toFixed(1) }} %</span></td>
+          <td>{{ alliance.deaths }}</td>
+          <td>{{ formatNumber(alliance.killFame) }} <span class="chart">{{ (alliance.killFame *100 / battle.totalFame).toFixed(1) }} %</span></td>
+          <td>{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+
   <!-- <div class="uk-grid-large uk-child-width-expand@s uk-text-center" uk-grid>
     <div>
         <div class="uk-card uk-card-default uk-card-body">PLAYERS <br/>
@@ -72,7 +112,7 @@
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">
         <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.alliances" :key="indexa">
-            <a class="uk-accordion-title" href="#">
+            <a class="uk-accordion-title guild_header" href="#">
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
               <th>ALLIANCE</th>
@@ -261,7 +301,7 @@ export default {
       this.isCollapse = this.isCollapse ? '' : 'collapsible'
     },
     NbColumn () {
-      return this.columnClass ? "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s" : "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn"
+      return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
   },
   mounted () {

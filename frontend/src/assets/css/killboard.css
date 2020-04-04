@@ -34,6 +34,20 @@ li.twocolumn:last-child:nth-child(odd) {
 div.stat.player[class*='alliance-']{
     background-color: red;
 }
+/* ---------- STAT TABLE ------------ */
+.stat_battle .global td {
+    font-size:18px;
+}
+.night .stat_battle tbody tr.global:nth-of-type(odd), .night .stat_battle>tr.global:nth-of-type(odd) {
+    background: #474747;
+    border-top: 1px solid #969696;
+    border-bottom: 1px solid #969696;
+}
+.chart {
+    font-size: 12px;
+    font-style: italic; 
+}
+
 /* ---- HIGHTLIGHTS --- */
 .night .bestKillfame {
     background: #af731f!important;
@@ -101,4 +115,11 @@ div.stat.player[class*='alliance-']{
         width: calc(98% * 1 / 3.001);
         margin: 5px;
     }
+}
+/* ----------- GUILD HEADER -------------- */
+.guild_header .uk-table th {
+    padding: 2px 12px;
+}
+.guild_header .uk-table td {
+    font-size: 15px;
 }

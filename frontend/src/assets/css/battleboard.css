@@ -22,11 +22,11 @@
 .result .other {
     color: #898989;
 }
-.uk-table th {
+.result .uk-table th {
     padding: 0;
     text-align: center;
 }
-.uk-table td {
+.result .uk-table td {
     padding: 0;
     font-size: 16px;
 

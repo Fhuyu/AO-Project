@@ -1,6 +1,7 @@
 <template>
   <div id="app" :class="viewMode">
     <div id="header">
+      <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" />
       <h1 >HANDHOLDREPORT</h1>
       <p>Beta version - 0.1.0 - Under Development</p>
 
