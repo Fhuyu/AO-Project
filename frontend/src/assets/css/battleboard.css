@@ -7,8 +7,13 @@
 .result {
     margin:auto;
 }
+.header_result th  {
+    text-align: center;
+    padding: 0;
+}
 .result td {
     text-align: center;
+    padding: 0;
 }
 .result .winner {
     color: #1aba5c;

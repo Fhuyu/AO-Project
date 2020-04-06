@@ -33,7 +33,7 @@
 
     <RequestFailed v-if="error404">
     </RequestFailed>
-  <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
+  <table class="uk-table header_result" style="margin-bottom:0px;bottom: 12px;position: relative;">
     <thead>
       <th width="180">DATE</th>
       <th width="80">PLAYERS</th>
