@@ -1,5 +1,13 @@
+.night .killboard {
+    background: #1d1d1d;
+    transition: 0.5s ease-in-out;
+
+}
+
 .night ul {
     background: #1d1d1d;
+    transition: 0.5s ease-in-out;
+
 }
 
 thead th {
@@ -9,7 +17,10 @@ thead tr {
     font-size:12px;
     font-weight: 600;
 }
-.uk-table td  {
+.night + .uk-tooltip {
+    border: 2px solid blue;
+}
+.killboard .uk-table td  {
     padding: 1px;
     font-size: 12px;
     line-height: 1;
@@ -35,8 +46,21 @@ div.stat.player[class*='alliance-']{
     background-color: red;
 }
 /* ---------- STAT TABLE ------------ */
+.night .global_battle td {
+    color: #DFA408;
+    border-bottom: 1px solid #969696;
+    padding: 10px 0;
+    font-size:20px!important;
+}
+.night .stat_battle {
+    background: #323232;
+}
+.stat_battle.uk-table td {
+    font-size: 16px!important;
+}
 .stat_battle .global td {
     font-size:18px;
+    padding: 8px;
 }
 .night .stat_battle tbody tr.global:nth-of-type(odd), .night .stat_battle>tr.global:nth-of-type(odd) {
     background: #474747;

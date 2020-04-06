@@ -2,7 +2,7 @@
   <div id="app" :class="viewMode">
     <div id="header">
       <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" />
-      <h1 >HANDHOLDREPORT</h1>
+      <h1><span style="color:#4F00CC;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
       <p>Beta version - 0.1.0 - Under Development</p>
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button>
@@ -57,6 +57,10 @@ export default {
 <style>
 #header {
   text-align: center;
+  padding: 40px;
+}
+#header h1 {
+  margin: 0;
 }
 .night #header h1, .night #header p, .night #header button{
   color:white;

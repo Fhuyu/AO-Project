@@ -1,42 +1,37 @@
 <template>
-<div>
+<div class="killboard">
   <div  class="uk-container-xlarge uk-margin-auto">
       <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
+    <h3 style="text-align:center;">BATTLE STATS</h3> <p style="text-align:center;">(mouseover to see %)</p>
 
-    <table class="uk-table stat_battle" style="margin-bottom:0px;bottom: 12px;position: relative;">
+    <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
+
       <thead>
         <th>ALLIANCE</th>
-        <th>TOTAL PLAYERS</th>
-        <th>TOTAL KILLS</th>
-        <th>TOTAL DEATHS</th>
-        <th>TOTAL KILLFAME</th>
+        <th>PLAYERS</th>
+        <th>KILLS</th>
+        <th>DEATHS</th>
+        <th>KILLFAME</th>
+        <th>AVERAGE IP</th>
       </thead>
       <tbody>
-        <tr class="global">
-          <td>null</td>
+        <tr class="global_battle">
+          <td></td>
           <td>{{ totalPlayer }}</td>
           <td>{{ battle.totalKills }}</td>
-          <td>null</td>
+          <td></td>
           <td>{{ formatNumber(battle.totalFame) }}</td>
+          <td></td>
+
         </tr>
-      </tbody>
-    </table>
-    <table class="uk-table stat_battle" style="margin-bottom:0px;bottom: 12px;position: relative;">
-        <thead>
-          <th>ALLIANCE</th>
-          <th>PLAYERS</th>
-          <th>KILLS</th>
-          <th>DEATHS</th>
-          <th>KILLFAME</th>
-          <th>AVERAGE IP</th>
-        </thead>
-        <tr class="global" v-for="(alliance, index) in battle.sortedalliances" :key="index">
+        <tr class="global" v-for="(alliance, index) in battle.alliances" :key="index">
           <td>{{ alliance.name }}</td>
-          <td>{{ alliance.players.length }} <span class="chart">{{ (alliance.players.length *100 / totalPlayer).toFixed(1) }} % </span></td>
-          <td>{{ alliance.kills }} <span class="chart">{{ (alliance.kills *100 / battle.totalKills).toFixed(1) }} %</span></td>
+          <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
+          <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
           <td>{{ alliance.deaths }}</td>
-          <td>{{ formatNumber(alliance.killFame) }} <span class="chart">{{ (alliance.killFame *100 / battle.totalFame).toFixed(1) }} %</span></td>
-          <td>{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+          <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
+          <td v-if="showStats">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+          <td v-else><div uk-spinner></div></td>
         </tr>
       </tbody>
     </table>
