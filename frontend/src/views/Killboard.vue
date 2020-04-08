@@ -1,7 +1,7 @@
 <template>
 <div class="killboard">
   <div  class="uk-container-xlarge uk-margin-auto">
-      <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
+      <!-- <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link> -->
     <h3 style="text-align:center;">BATTLE STATS</h3> <p style="text-align:center;">(mouseover to see %)</p>
 
     <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
@@ -31,7 +31,7 @@
           <td>{{ alliance.deaths }}</td>
           <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
           <td v-if="showStats">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
-          <td v-else><div uk-spinner></div></td>
+          <td v-else></td> <!-- <div uk-spinner></div> -->
         </tr>
       </tbody>
     </table>
@@ -215,7 +215,10 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`https://handholdreport-backend.herokuapp.com/killboard/${this.$route.params.id}`)
+      if (this.$route.params.battle) {
+        this.battle = this.$route.params.battle
+      } 
+      const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -223,14 +226,14 @@ export default {
     },
 
     async playerDead (playerId) {
-      await axios.get(`https://handholdreport-backend.herokuapp.com/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+      await axios.get(`http://localhost:3000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
           const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
           eventdeath.forEach(eventDeath => {
             // console.log(eventDeath)
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
-                console.log(this.refreshStats.length)
+                // console.log(this.refreshStats.length)
                 this.refreshStats.push(playerId)
                  // KEEP
             } /* else {
@@ -300,6 +303,61 @@ export default {
     },
   },
   mounted () {
+    if (this.$route.params.battle) {
+      console.log("local battle")
+      let battle = this.$route.params.battle
+      for (const guild in battle.guilds) {
+        if (!battle.guilds[guild].allianceId) {
+            battle.alliances[guild] = battle.guilds[guild]
+            battle.guilds[guild].allianceId = guild
+        }
+      }
+      for (const alliance in battle.alliances) {
+          battle.alliances[alliance].players = []
+          battle.alliances[alliance].listItemPower = []
+          battle.alliances[alliance].guilds = []
+      }
+      for (const guild in battle.guilds) {
+          const allianceOfGuild = battle.alliances[battle.guilds[guild].allianceId]
+          allianceOfGuild.guilds.push( battle.guilds[guild].name ) // ONLY NAME : TODO OBJECT
+      } 
+
+      for (const player in battle.players) {
+          battle.players[player].damageDone = []
+          battle.players[player].healingDone = []
+          battle.players[player].assistance = 0
+          battle.players[player].deathFame = ''
+          battle.players[player].weapon = ''
+          battle.players[player].mount = ''
+          battle.players[player].itempower = null
+
+          if (!battle.players[player].allianceId) {
+              battle.players[player].allianceId = battle.players[player].guildId
+          }
+      }
+      this.battle = battle
+      for (const player in this.battle.players) {
+          // --- BEST KILLFAME MEDAL
+          if (this.battle.players[player].killFame > this.bestPlayerKillfame.killfame) {
+            this.bestPlayerKillfame.killfame = this.battle.players[player].killFame
+            this.bestPlayerKillfame.id = this.battle.players[player].id
+          } // --- BEST KILL MEDAL
+          if (this.battle.players[player].kills > this.bestPlayerKill.kill) {
+            this.bestPlayerKill.kill = this.battle.players[player].kills
+            this.bestPlayerKill.id = this.battle.players[player].id
+          }
+      }
+      for (const playerID in this.battle.players) {
+          if (this.battle.players[playerID].allianceId) {
+            const playerAllianceId = this.battle.players[playerID].allianceId
+            this.battle.alliances[playerAllianceId].players.push(this.battle.players[playerID]) // HERE
+            //let player = this.battle.alliances.find( alliance => alliance.id = playerAllianceId)
+          }
+      }
+        this.onClickOrderBy('killFame', 'desc')
+        this.getPlayerDeath()
+    } else {
+      console.log("server battle")
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
@@ -328,8 +386,8 @@ export default {
         this.onClickOrderBy('killFame', 'desc')
         this.getPlayerDeath()
       })
-      
-  },
+    }
+    },
   watch: {
     showWeapon: function () {
       this.refreshStats.forEach(playerID => {
