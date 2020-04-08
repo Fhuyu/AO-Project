@@ -65,8 +65,7 @@
           </table>
 
         </a>
-        <router-link :to="{ name: 'Killboard', params: { id: battle.id, battle: battle } }"><button class="uk-button uk-button-primary aa" style="height: 44px;top: 0px;right: 2px;position: absolute;">See killboard</button></router-link>
-        <!-- <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="height: 44px;top: 0px;right: 2px;position: absolute;">See killboard</button></router-link> -->
+        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="height: 44px;top: 0px;right: 2px;position: absolute;">See killboard</button></router-link>
         <div class="uk-accordion-content">
           <table class="uk-table uk-table-divider detail">
             <thead>
@@ -134,7 +133,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
+        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
         .catch((error) => {
           this.error404 = true
         });
@@ -144,7 +143,7 @@ export default {
           this.error404 = true
         });
       } */ else {
-        response = await axios.get(`http://localhost:3000/battles/${this.currentOffset}`)
+        response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}`)
         .catch((error) => {
           // this.error404 = true
         });
@@ -229,7 +228,6 @@ export default {
   },
   mounted () {
     this.currentOffset = 0
-    this.$router.myProps = 'hello'
     
   },
   watch: {
