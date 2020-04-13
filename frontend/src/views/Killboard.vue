@@ -8,10 +8,22 @@
 
       <thead>
         <th>ALLIANCE</th>
-        <th>PLAYERS</th>
-        <th>KILLS</th>
-        <th>DEATHS</th>
-        <th>KILLFAME</th>
+        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')">PLAYERS
+          <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+          <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </th>
+        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')">KILLS 
+          <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+          <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </th>
+        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')">DEATHS
+          <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+          <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </th>
+        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')">KILLFAME
+            <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </th>
         <th>AVERAGE IP</th>
       </thead>
       <tbody>
@@ -24,14 +36,14 @@
           <td></td>
         </tr>
 
-        <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" index === 0 ? 'background:green;' : ''">
+        <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" alliance.id === bestAlliance ? 'background:#19600c;' : alliance.id === loserAlliance ? 'background:#6d280d;' : ''">
           <td>{{ alliance.name }}</td>
           <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
           <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
           <td>{{ alliance.deaths }}</td>
           <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
-          <td v-if="showStats">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
-          <td v-else><div uk-spinner></div></td>
+          <td v-if="showStats && alliance.listItemPower.length">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+          <td v-else></td>
         </tr>
       </tbody>
     </table> 
@@ -167,6 +179,8 @@ export default {
       bestPlayerKill: { id: '', kill: 0 },
       bestPlayerAssistance: { id: '', assistance: 0 },
       bestPlayerIP: { id: '', itempower: 0 },
+      bestAlliance: null,
+      loserAlliance: null,
       showWeapon: false,
       showStats: false,
       showDeathFame: false,
@@ -174,6 +188,8 @@ export default {
       isCollapse: false,
       searchPlayerName: null,
       error404: false,
+      currentTopTableSort: '',
+      currentTopTableSortDir: 'desc',
     }
   },
   components: {
@@ -255,8 +271,8 @@ export default {
           })
       } 
     },
-    allianceOrderBy (battle, currentSortName, currentSortDir) {
-        battle.sort((a, b) => {
+    allianceOrderBy (alliance, currentSortName, currentSortDir, allianceChanged) {
+        alliance.sort((a, b) => {
             let modifier = 1
             if (currentSortDir === 'desc') {
                 modifier = -1
@@ -265,6 +281,10 @@ export default {
             if (a[currentSortName] > b[currentSortName]) return 1 * modifier
             return 0
         })
+        if (allianceChanged === 'sortedTopTableAlliances') {
+          this.currentTopTableSortDir = currentSortDir
+          this.currentTopTableSort = currentSortName
+        }
     } ,
     onChangeColumn () {
       this.columnClass = !this.columnClass
@@ -302,12 +322,16 @@ export default {
         this.battle.sortedalliances = []
         this.battle.sortedTopTableAlliances = []
         for (const alliance in this.battle.alliances) {
+          // INIT SORTED ALLIANCE LIST TO ORDER
           this.battle.sortedalliances.push(this.battle.alliances[alliance])
           this.battle.sortedTopTableAlliances.push(this.battle.alliances[alliance])
         }
         // LAUNCH ALLIANCES ORDER BY KILLFAME
-        this.allianceOrderBy(this.battle.sortedalliances, 'players', 'desc')
-        this.allianceOrderBy(this.battle.sortedTopTableAlliances, 'killFame', 'desc')
+        this.allianceOrderBy(this.battle.sortedalliances, 'players', 'desc', 'sortedalliances')
+        this.allianceOrderBy(this.battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')
+        this.bestAlliance = this.battle.sortedTopTableAlliances[0].id
+        this.loserAlliance = this.battle.sortedTopTableAlliances[1].id
+
         
         this.onClickOrderBy('killFame', 'desc')
         this.getPlayerDeath()
