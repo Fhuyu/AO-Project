@@ -2,8 +2,8 @@
 <div class="killboard">
   <div  class="uk-container-xlarge uk-margin-auto">
       <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
-    <h3 style="text-align:center;">BATTLE STATS</h3> <p style="text-align:center;">(mouseover to see %)</p>
 
+    <h3 style="text-align:center;">BATTLE STATS</h3> <p style="text-align:center;">(mouseover to see %)</p>
     <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
 
       <thead>
@@ -22,9 +22,9 @@
           <td></td>
           <td>{{ formatNumber(battle.totalFame) }}</td>
           <td></td>
-
         </tr>
-        <tr class="global" v-for="(alliance, index) in battle.alliances" :key="index">
+
+        <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" index === 0 ? 'background:green;' : ''">
           <td>{{ alliance.name }}</td>
           <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
           <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
@@ -34,33 +34,7 @@
           <td v-else><div uk-spinner></div></td>
         </tr>
       </tbody>
-    </table>
-
-
-  <!-- <div class="uk-grid-large uk-child-width-expand@s uk-text-center" uk-grid>
-    <div>
-        <div class="uk-card uk-card-default uk-card-body">PLAYERS <br/>
-          {{ totalPlayer }} <br />
-          <div 
-              :style="'width:' + (alliance.players.length *100 / totalPlayer).toFixed(1) + '%' " 
-              v-for="(alliance, indexa) in battle.alliances" 
-              :key="indexa"
-              :uk-tooltip="`${alliance.name} ${alliance.players.length}`"
-              class="stat player"
-              :class="`alliance-${alliance.id}`">
-                {{ alliance.players.length }}{{ (alliance.players.length *100 / totalPlayer).toFixed(1)}}
-          </div>  </div>
-    </div>
-    <div>
-        <div class="uk-card uk-card-default uk-card-body">TOTAL KILLS<br/>
-          {{ battle.totalKills }}</div>
-    </div>
-    <div>
-        <div class="uk-card uk-card-default uk-card-body">TOTAL KILLFAME<br/>
-          {{ formatNumber(battle.totalFame) }}</div>
-    </div>
-  </div> -->
-  
+    </table> 
 
   <!-- PLAYER SEARCH -->
   <div class="uk-margin">
@@ -90,6 +64,7 @@
       </div>
       <div>
           <div class="uk-padding-small uk-light">
+            Loading more stats
             <div class="loading_bar">
               <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' " >
               </div>
@@ -106,7 +81,7 @@
 
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">
         <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
-          v-for="(alliance, indexa) in battle.alliances" :key="indexa">
+          v-for="(alliance, indexa) in battle.sortedalliances" :key="indexa">
             <a class="uk-accordion-title guild_header" href="#">
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
@@ -281,7 +256,7 @@ export default {
       } 
     },
     allianceOrderBy (battle, currentSortName, currentSortDir) {
-        battle.sortedalliances.sort((a, b) => {
+        battle.sort((a, b) => {
             let modifier = 1
             if (currentSortDir === 'desc') {
                 modifier = -1
@@ -304,7 +279,6 @@ export default {
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
         this.totalPlayer = Object.keys(this.battle.players).length
-        this.battle.sortedalliances = []
 
         for (const player in this.battle.players) {
           // --- BEST KILLFAME MEDAL
@@ -324,6 +298,16 @@ export default {
             //let player = this.battle.alliances.find( alliance => alliance.id = playerAllianceId)
           }
         }
+        // -----------------------INIT SORTED ALLIANCES ------------ COULD BE SERVER
+        this.battle.sortedalliances = []
+        this.battle.sortedTopTableAlliances = []
+        for (const alliance in this.battle.alliances) {
+          this.battle.sortedalliances.push(this.battle.alliances[alliance])
+          this.battle.sortedTopTableAlliances.push(this.battle.alliances[alliance])
+        }
+        // LAUNCH ALLIANCES ORDER BY KILLFAME
+        this.allianceOrderBy(this.battle.sortedalliances, 'players', 'desc')
+        this.allianceOrderBy(this.battle.sortedTopTableAlliances, 'killFame', 'desc')
         
         this.onClickOrderBy('killFame', 'desc')
         this.getPlayerDeath()
@@ -395,14 +379,6 @@ export default {
         }
         
       }
-        // -----------------------INIT SORTED ALLIANCES PER KILLFAME
-        this.battle.sortedalliances = []
-        for (const alliance in this.battle.alliances) {
-          this.battle.sortedalliances.push(this.battle.alliances[alliance])
-        }
-        this.battle.alliances = this.battle.sortedalliances
-        // LAUNCH ALLIANCES ORDER BY KILLFAME
-        this.allianceOrderBy(this.battle, 'players', 'desc')
       this.showStats = true
     },
   },

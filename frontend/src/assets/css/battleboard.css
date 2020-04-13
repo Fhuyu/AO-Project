@@ -40,6 +40,9 @@
     font-weight: 600;
 }
 /* -------------- TABLE DETAIL ---------------- */
+.detail th {
+    text-align: center!important;
+}
 .detail .guilds {
     text-align: center;
 }
