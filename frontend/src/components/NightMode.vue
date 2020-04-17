@@ -28,8 +28,9 @@ export default {
 <style scoped>
 
 .switch__container {
-  margin: 30px auto;
-  width: 120px;
+  right: 20px;
+  top: 20px;
+  position: absolute;
 }
 
 .switch {
@@ -44,9 +45,6 @@ export default {
   cursor: pointer;
   outline: none;
   user-select: none;
-}
-label {
-
 }
 .switch--shadow.night + label {
   padding: 2px;

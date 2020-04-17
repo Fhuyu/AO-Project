@@ -1,94 +1,95 @@
 <template>
 <div class="killboard">
-  <div  class="uk-container-xlarge uk-margin-auto">
-      <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link>
+  <div v-if="totalPlayer > 1" class="before_basic_load">
+    <!-- POUR CACHER LE PREMIER CHARGEMENT -->
+    <div class="uk-container-xlarge uk-margin-auto">
+        <!-- <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link> -->
 
-    <h3 style="text-align:center;">BATTLE STATS</h3> <p style="text-align:center;">(mouseover to see %)</p>
-    <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
+        <h3 style="text-align:center;">BATTLE STATS</h3>
+        <p style="text-align:center;">(mouseover to see %)</p>
+        <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
 
-      <thead>
-        <th>ALLIANCE</th>
-        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')">PLAYERS
-          <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
-          <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </th>
-        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')">KILLS 
-          <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
-          <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </th>
-        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')">DEATHS
-          <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
-          <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </th>
-        <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')">KILLFAME
-            <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </th>
-        <th>AVERAGE IP</th>
-      </thead>
-      <tbody>
-        <tr class="global_battle">
-          <td></td>
-          <td>{{ totalPlayer }}</td>
-          <td>{{ battle.totalKills }}</td>
-          <td></td>
-          <td>{{ formatNumber(battle.totalFame) }}</td>
-          <td></td>
-        </tr>
+            <thead>
+                <th>ALLIANCE</th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')">PLAYERS
+                    <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+                    <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+                </th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')">KILLS
+                    <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+                    <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+                </th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')">DEATHS
+                    <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+                    <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+                </th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')">KILLFAME
+                    <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+                    <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+                </th>
+                <th>AVERAGE IP</th>
+            </thead>
+            <tbody>
+                <tr class="global_battle">
+                    <td></td>
+                    <td>{{ totalPlayer }}</td>
+                    <td>{{ battle.totalKills }}</td>
+                    <td></td>
+                    <td>{{ formatNumber(battle.totalFame) }}</td>
+                    <td></td>
+                </tr>
 
-        <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" alliance.id === bestAlliance ? 'background:#19600c;' : alliance.id === loserAlliance ? 'background:#6d280d;' : ''">
-          <td>{{ alliance.name }}</td>
-          <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
-          <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
-          <td>{{ alliance.deaths }}</td>
-          <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
-          <td v-if="showStats && alliance.listItemPower.length">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
-          <td v-else></td>
-        </tr>
-      </tbody>
-    </table> 
+                <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" alliance.id === bestAlliance ? 'background:#19600c;' : alliance.id === loserAlliance ? 'background:#6d280d;' : ''">
+                    <td>{{ alliance.name }}</td>
+                    <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
+                    <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
+                    <td>{{ alliance.deaths }}</td>
+                    <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
+                    <td v-if="showStats && alliance.listItemPower.length">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+                    <td v-else></td>
+                </tr>
+            </tbody>
+        </table>
 
-  <!-- PLAYER SEARCH -->
-  <div class="uk-margin">
-    <form class="uk-search uk-search-default" v-on:submit.prevent>
-          <span uk-search-icon></span>
-          <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Highlight player">  
-    </form>
-    <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
-    <button v-else class="uk-button uk-button-primary" disabled> GO</button>
-  </div>
+        <!-- PLAYER SEARCH -->
+        <div class="uk-margin">
+            <form class="uk-search uk-search-default" v-on:submit.prevent>
+                <span uk-search-icon></span>
+                <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Highlight player">
+            </form>
+            <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
+            <button v-else class="uk-button uk-button-primary" disabled> GO</button>
+        </div>
 
-  <RequestFailed v-if="error404"
-    :killboardID="battle.id">
-  </RequestFailed>
+        <RequestFailed v-if="error404" :killboardID="battle.id">
+        </RequestFailed>
 
-  <KillboardOrderBy
-    style="text-align: center;"
-    :showStats="showStats"
-    @clicked="onClickOrderBy"
-    @changecolumn="onChangeColumn">
-  </KillboardOrderBy>
+        <KillboardOrderBy style="text-align: center;" :showStats="showStats" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
+        </KillboardOrderBy>
 
-
-  <div v-if="!showStats" class="uk-grid-collapse uk-child-width-expand@s uk-text-center uk-margin-large-top" uk-grid>
-      <div>
-          <div class="uk-padding"></div>
-      </div>
-      <div>
-          <div class="uk-padding-small uk-light">
-            Loading more stats
-            <div class="loading_bar">
-              <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' " >
-              </div>
+        <div v-if="!showStats" class="uk-grid-collapse uk-child-width-expand@s uk-text-center uk-margin-large-top" uk-grid>
+            <div>
+                <div class="uk-padding"></div>
             </div>
-          </div>
-            <span v-if="refreshStats.length">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
-      </div>
-      <div>
-          <div class="uk-padding"></div>
-      </div>
+            <div>
+                <div class="uk-padding-small uk-light">
+                    Loading more stats
+                    <div class="loading_bar">
+                        <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' ">
+                        </div>
+                    </div>
+                </div>
+                <span v-if="refreshStats.length">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
+            </div>
+            <div>
+                <div class="uk-padding"></div>
+            </div>
+        </div>
+    </div>
   </div>
-
+  <div v-else class="uk-margin-auto" style="text-align:center;"> <!--  -->
+      <h1 style="color:white;">Loading initial statistics</h1>
+      <div uk-spinner="ratio: 3"></div>
   </div>
 
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">

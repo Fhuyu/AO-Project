@@ -1,34 +1,46 @@
 <template>
 <div class="battleboard" uk-grid>
-  <div class="uk-width-4-5@m uk-margin-auto">
+  <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> <!--  -->
+      <h1 style="color:white;">Loading last battles</h1>
+      <div uk-spinner="ratio: 3"></div>
+  </div>
+  <div v-else class="uk-width-4-5@m uk-margin-auto">
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <!-- <form class="uk-search uk-search-default" > -->
-          <!-- <a href="" class="uk-search-icon-flip" uk-search-icon></a> -->
-        <div>
-          <input class="uk-input search guild" type="search" v-model="searchGuildName" placeholder="Search guild">
-          <button class="uk-button" @click="launchGuildSearch(searchGuildName)">Valider</button>
-      <!-- </form> -->
-      </div>
+      <form class="uk-search uk-search-default" @submit="launchGuildSearch(searchGuildName)">
+          <a @click="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
+          <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild name">
+      </form>
       <div>
         <form class="uk-form-horizontal">
-        <label class="uk-form-label" for="form-horizontal-select" style="color: white;font-size: 16px;">Filter current battles by</label>
-        <div class="uk-form-controls">
-        <select @change="onChangeFilterPlayer" class="uk-select" v-model="minBattlePlayers">
+          <label class="uk-form-label" for="form-horizontal-select" style="color: white;font-size: 16px;">Filter current battles by</label>
+          <div class="uk-form-controls">
+            <select @change="onChangeFilterPlayer" class="uk-select" v-model="minBattlePlayers">
               <option value="0">0+ players</option>
               <option value="20">20+ players</option>
               <option value="50">50+ players</option>
               <option value="100">100+ players</option>
-          </select>
+            </select>
           </div>
         </form>
       </div>
     </div>
+    <!-- PAGINATION -->
+    <div class="uk-margin-medium">
+      <ul class="uk-pagination">
+        <li><a  v-if="currentOffset > 1" 
+                @click="changeOffset('previous')" 
+                :uk-tooltip="currentOffset -50 +' - '+currentOffset+' Battles'">
+                  <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
+        </a></li>
 
-    <div class="uk-margin">
-      <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
-      Actual battles : {{currentOffset}} - {{ currentOffset +50}}
-      <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
-      <div v-if="offsetLoading" uk-spinner></div>
+        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
+        <span v-else class="uk-width-expand" style="text-align: center;">Actual battles : {{currentOffset}} - {{ currentOffset +50}}</span>
+
+        <li class="uk-margin-auto-left"><a @click="changeOffset('next')"
+          :uk-tooltip="(currentOffset+50) +' - '+(currentOffset+100) +' Battles'">
+            Next <span class="uk-margin-small-left" uk-pagination-next></span>
+        </a></li>
+      </ul>
     </div>
 
     <RequestFailed v-if="error404">
@@ -97,12 +109,25 @@
         </div>
       </li>
   </div>
-  <div class="uk-margin">
-    <button v-if="currentOffset > 1" class="uk-button" @click="changeOffset('previous')">See {{currentOffset -50}} - {{ currentOffset}} Battles</button>
-    Actual battles : {{currentOffset}} - {{ currentOffset +50}}
-    <button class="uk-button" @click="changeOffset('next')">See {{currentOffset +50}} - {{ currentOffset +100}} Battles</button>
-    <div v-if="offsetLoading" uk-spinner></div>
-  </div>
+  <!-- PAGINATION -->
+    <div class="uk-margin-medium">
+      <ul class="uk-pagination">
+        <li><a  v-if="currentOffset > 1" 
+                @click="changeOffset('previous')" 
+                :uk-tooltip="currentOffset -50 +' - '+currentOffset+' Battles'">
+                  <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
+        </a></li>
+
+        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
+        <span v-else class="uk-width-expand" style="text-align: center;">Actual battles : {{currentOffset}} - {{ currentOffset +50}}</span>
+
+        <li class="uk-margin-auto-left"><a @click="changeOffset('next')"
+          :uk-tooltip="(currentOffset+50) +' - '+(currentOffset+100) +' Battles'">
+            Next <span class="uk-margin-small-left" uk-pagination-next></span>
+        </a></li>
+      </ul>
+    </div>
+    <!-- END PAGINATION -->
   </div>
 </div>
 </template>
@@ -123,6 +148,7 @@ export default {
       searchPlayerName: null,
       error404: false,
       currentOffset: null,
+      initialLoader: false,
       offsetLoading: false,
       onClickSearchGuildPlayer: false,
       minBattlePlayers: "0",
@@ -228,6 +254,8 @@ export default {
   },
   mounted () {
     this.currentOffset = 0
+    if (this.currentOffset === 0) this.initialLoader = true
+
     
   },
   watch: {
@@ -258,6 +286,7 @@ export default {
           }
           this.OrderBy(battle, 'killFame', 'desc')
           this.offsetLoading = false
+          this.initialLoader = false
         })
           this.onChangeFilterPlayer()
       })

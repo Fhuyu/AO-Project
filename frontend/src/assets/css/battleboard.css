@@ -1,3 +1,7 @@
+/* ---------------- PAGINATION ---------------- */
+.uk-pagination li {
+    background: none;
+}
 /* ---------------- SEARCH INPUT ---------------- */
 .search.guild {
     width: 50%;
