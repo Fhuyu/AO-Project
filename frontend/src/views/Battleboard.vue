@@ -1,11 +1,13 @@
 <template>
 <div class="battleboard" uk-grid>
   <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
-      <h1 v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
+      <h1 style="color:white;" v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
       <h1 style="color:white;">Loading last battles</h1>
+      <div v-if="!error404" uk-spinner="ratio: 3"></div>
       <RequestFailed v-if="error404">
       </RequestFailed>
   </div>
+  
 
   <div v-else class="uk-width-4-5@m uk-margin-auto">
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
@@ -28,7 +30,7 @@
       </div>
     </div>
     <!-- PAGINATION -->
-    <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" @changeOffset="onChangeOffset"></Pagination>
+    <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" :searchGuildName="searchGuildName" @changeOffset="onChangeOffset"></Pagination>
 
     <RequestFailed v-if="error404">
     </RequestFailed>

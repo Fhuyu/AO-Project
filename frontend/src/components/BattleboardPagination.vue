@@ -7,7 +7,7 @@
                   <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
         </a></li>
 
-        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
+        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading {{searchGuildName}} battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
         <span v-else class="uk-width-expand" style="text-align: center;">Actual battles : {{currentOffset}} - {{ currentOffset +50}}</span>
 
         <li class="uk-margin-auto-left"><a @click="changeOffset('next')"
@@ -21,7 +21,7 @@
 <script>
 export default {
   name: 'Pagination',
-  props: ['currentOffset', 'offsetLoading'],
+  props: ['currentOffset', 'offsetLoading', 'searchGuildName'],
   data: function () {
     return {
     }
