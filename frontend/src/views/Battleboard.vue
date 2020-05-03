@@ -1,13 +1,16 @@
 <template>
 <div class="battleboard" uk-grid>
-  <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> <!--  -->
+  <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
       <h1 style="color:white;">Loading last battles</h1>
-      <div uk-spinner="ratio: 3"></div>
+      <div v-if="!error404" uk-spinner="ratio: 3"></div>
+      <RequestFailed v-if="error404">
+      </RequestFailed>
   </div>
+
   <div v-else class="uk-width-4-5@m uk-margin-auto">
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <form class="uk-search uk-search-default" @submit="launchGuildSearch(searchGuildName)">
-          <a @click="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
+      <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
+          <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
           <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild name">
       </form>
       <div>
@@ -25,23 +28,7 @@
       </div>
     </div>
     <!-- PAGINATION -->
-    <div class="uk-margin-medium">
-      <ul class="uk-pagination">
-        <li><a  v-if="currentOffset > 1" 
-                @click="changeOffset('previous')" 
-                :uk-tooltip="currentOffset -50 +' - '+currentOffset+' Battles'">
-                  <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
-        </a></li>
-
-        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
-        <span v-else class="uk-width-expand" style="text-align: center;">Actual battles : {{currentOffset}} - {{ currentOffset +50}}</span>
-
-        <li class="uk-margin-auto-left"><a @click="changeOffset('next')"
-          :uk-tooltip="(currentOffset+50) +' - '+(currentOffset+100) +' Battles'">
-            Next <span class="uk-margin-small-left" uk-pagination-next></span>
-        </a></li>
-      </ul>
-    </div>
+    <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" @changeOffset="onChangeOffset"></Pagination>
 
     <RequestFailed v-if="error404">
     </RequestFailed>
@@ -110,24 +97,7 @@
       </li>
   </div>
   <!-- PAGINATION -->
-    <div class="uk-margin-medium">
-      <ul class="uk-pagination">
-        <li><a  v-if="currentOffset > 1" 
-                @click="changeOffset('previous')" 
-                :uk-tooltip="currentOffset -50 +' - '+currentOffset+' Battles'">
-                  <span class="uk-margin-small-right" uk-pagination-previous></span> Previous
-        </a></li>
-
-        <span v-if="offsetLoading" class="uk-width-expand" style="text-align: center;">Loading battles : {{currentOffset}} - {{ currentOffset +50}} <div uk-spinner></div></span>
-        <span v-else class="uk-width-expand" style="text-align: center;">Actual battles : {{currentOffset}} - {{ currentOffset +50}}</span>
-
-        <li class="uk-margin-auto-left"><a @click="changeOffset('next')"
-          :uk-tooltip="(currentOffset+50) +' - '+(currentOffset+100) +' Battles'">
-            Next <span class="uk-margin-small-left" uk-pagination-next></span>
-        </a></li>
-      </ul>
-    </div>
-    <!-- END PAGINATION -->
+  <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" @changeOffset="onChangeOffset"></Pagination>
   </div>
 </div>
 </template>
@@ -135,16 +105,18 @@
 <script>
 import axios from 'axios'
 import RequestFailed from "@/components/RequestFailed"
+import Pagination from "@/components/BattleboardPagination"
 
 export default {
   name: 'battles',
   components: {
     RequestFailed,
+    Pagination,
   },
   data: function () {
     return {
       battles: [],
-      searchGuildName: null,
+      searchGuildName: this.$route.params.guildName,
       searchPlayerName: null,
       error404: false,
       currentOffset: null,
@@ -217,11 +189,11 @@ export default {
       this.searchPlayerName = null,
       this.onClickSearchGuildPlayer = true
     },
-    launchPlayerSearch: function (guildName) {
-      console.log('search player')
-      this.searchGuildName = null,
-      this.onClickSearchGuildPlayer = true
-    },
+    // launchPlayerSearch: function (guildName) {
+    //   console.log('search player')
+    //   this.searchGuildName = null,
+    //   this.onClickSearchGuildPlayer = true
+    // },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
     },
@@ -239,14 +211,14 @@ export default {
             return 0
         })
     },
-    changeOffset (step) {
-      this.currentOffset += step === 'next' ? 50 : -50
+    onChangeOffset (offset) {
+      this.currentOffset = offset
       this.fetchData()
     },
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
-    onChangeFilterPlayer () {
+    onChangeFilterPlayer () { // NB PLAYER PER BATTLE
       this.sortedByPlayersBattle = this.battles.filter( battle =>  Object.keys(battle.players).length >= parseInt(this.minBattlePlayers)
       )
     }
@@ -254,12 +226,13 @@ export default {
   },
   mounted () {
     this.currentOffset = 0
-    if (this.currentOffset === 0) this.initialLoader = true
+    if (this.currentOffset === 0) this.initialLoader = true // Condition needed ?
 
     
   },
   watch: {
     currentOffset: function () {
+      console.log(this.$route.params.guildName)
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -292,6 +265,9 @@ export default {
       })
     },
     onClickSearchGuildPlayer: function () {
+      this.$router.push({ path: `/${this.searchGuildName}` })
+      console.log(this.$route)
+
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
