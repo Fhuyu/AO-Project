@@ -3,7 +3,6 @@
   <div v-if="totalPlayer > 1" class="before_basic_load">
     <!-- POUR CACHER LE PREMIER CHARGEMENT -->
     <div class="uk-container-xlarge uk-margin-auto">
-        <!-- <router-link class="uk-width-1-2" to="/"><span uk-icon="chevron-left"></span>Back to battleboard</router-link> -->
 
         <h3 style="text-align:center;">BATTLE STATS</h3>
         <p style="text-align:center;">(mouseover to see %)</p>
@@ -89,7 +88,7 @@
   </div>
   <div v-else class="uk-margin-auto" style="text-align:center;"> <!--  -->
       <h1 style="color:white;">Loading initial statistics</h1>
-      <div uk-spinner="ratio: 3"></div>
+      <span uk-spinner="ratio: 3"></span>
   </div>
 
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">

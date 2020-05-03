@@ -1,8 +1,8 @@
 <template>
 <div class="battleboard" uk-grid>
   <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
+      <h1 v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
       <h1 style="color:white;">Loading last battles</h1>
-      <div v-if="!error404" uk-spinner="ratio: 3"></div>
       <RequestFailed v-if="error404">
       </RequestFailed>
   </div>
@@ -143,7 +143,7 @@ export default {
       } */ else {
         response = await axios.get(`https://handholdreport-backend.herokuapp.com/battles/${this.currentOffset}`)
         .catch((error) => {
-          // this.error404 = true
+          this.error404 = true
         });
       }
       return response

@@ -60,8 +60,8 @@ export default {
       this.currentSort = column
       this.$emit('clicked', this.currentSort, this.currentSortDir)
     },
-      changeColumn: function () {
-    this.treeColumn = this.treeColumn ? false : true
+    changeColumn: function () {
+      this.treeColumn = this.treeColumn ? false : true
       this.$emit('changecolumn')
       this.$emit('clicked', this.currentSort, this.currentSortDir)
 
