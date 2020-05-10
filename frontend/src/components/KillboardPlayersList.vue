@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import store from './store.js'
+
 export default {
   name: 'PlayersList',
   props: ['player', 'showStats', 'showDeathFame', 'searchPlayerName', 'bestPlayerKillfame', 'bestPlayerKill', 'bestPlayerAssistance', 'bestPlayerIP'],
@@ -50,23 +52,18 @@ export default {
       if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
     showWeaponOrMount (player) {
-      if (player.mount) {
-        if (player.mount.Type === 'T8_MOUNT_MAMMOTH_BATTLE@1' ||
-          player.mount.Type === 'T6_MOUNT_SIEGE_BALLISTA' ||
-          player.mount.Type === 'UNIQUE_MOUNT_BEETLE_GOLD' ||
-          player.mount.Type === 'UNIQUE_MOUNT_BEETLE_SILVER' ||
-          player.mount.Type === 'UNIQUE_MOUNT_BEETLE_CRYSTAL' ||
-          player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_GOLD' ||
-          player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_CRYSTAL' ||
-          player.mount.Type === 'UNIQUE_MOUNT_ARMORED_EAGLE_SILVER') {
+      console.log(store.battlemount)
+      if (player.mount) { // --------------> Should use include
+        if (store.battlemount.includes(player.mount.Type)) {
             return player.mount.Type
         } else {
           return player.weapon.Type
         }
+      } else {
+        return player.weapon.Type
       }
-      
     }
-  }
+  } // METHOD END
 }
 </script>
 
