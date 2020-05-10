@@ -52,18 +52,9 @@ export default {
       if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
     showWeaponOrMount (player) {
-      console.log(store.battlemount)
-      if (player.mount) { // --------------> Should use include
-        if (store.battlemount.includes(player.mount.Type)) {
-            return player.mount.Type
-        } else {
-          return player.weapon.Type
-        }
-      } else {
-        return player.weapon.Type
-      }
+        return player.mount && store.battlemount.includes(player.mount.Type) ? player.mount.Type : player.weapon.Type
     }
-  } // METHOD END
+  }
 }
 </script>
 
