@@ -1,6 +1,8 @@
 <template>
 <div class="orderby uk-margin">
     <h5> ORDER BY </h5>
+    <div v-if="treeColumn" class="switchColumn"><button class="uk-button uk-button-primary" @click="changeColumn()">3 COLUMNS VIEW</button></div>
+    <div v-else class="switchColumn"><button class="uk-button uk-button-primary" @click="changeColumn()">2 COLUMNS VIEW</button></div>
     <div class="uk-button-group">
         <button @click="sort('guildName')" class="uk-button uk-button-secondary">GUILDNAME
             <span v-if="currentSort === 'guildName' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
@@ -9,15 +11,6 @@
         <button @click="sort('name')" class="uk-button uk-button-secondary">NAME
             <span v-if="currentSort === 'name' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
             <span v-if="currentSort === 'name' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-if="showStats" @click="sort('itempower')" class="uk-button uk-button-secondary">ITEM POWER
-            <span v-if="currentSort === 'itempower' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'itempower' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-        </button>
-        <button v-else class="uk-button uk-button-secondary" disabled>ITEM POWER</button>
-        <button @click="sort('killFame')" class="uk-button uk-button-secondary">KILLFAME
-            <span v-if="currentSort === 'killFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-            <span v-if="currentSort === 'killFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
         <button @click="sort('kills')" class="uk-button uk-button-secondary">KILLS
             <span v-if="currentSort === 'kills' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
@@ -28,6 +21,22 @@
             <span v-if="currentSort === 'assistance' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
         </button>
         <button v-else class="uk-button uk-button-secondary" disabled>ASSISTANCE</button>
+
+        <button v-if="showStats" @click="sort('itempower')" class="uk-button uk-button-secondary">ITEM POWER
+            <span v-if="currentSort === 'itempower' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'itempower' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-else class="uk-button uk-button-secondary" disabled>ITEM POWER</button>
+
+        <button @click="sort('killFame')" class="uk-button uk-button-secondary">KILLFAME
+            <span v-if="currentSort === 'killFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'killFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-if="showStats" @click="sort('deathFame')" class="uk-button uk-button-secondary">DEATHFAME
+            <span v-if="currentSort === 'deathFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
+            <span v-if="currentSort === 'deathFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
+        </button>
+        <button v-else class="uk-button uk-button-secondary" disabled>DEATHFAME</button>
     </div>
   </div>
 </template>
@@ -40,6 +49,7 @@ export default {
     return {
       currentSort: 'killFame',
       currentSortDir: 'desc',
+      treeColumn: false,
     }
   },
   methods: {
@@ -50,6 +60,18 @@ export default {
       this.currentSort = column
       this.$emit('clicked', this.currentSort, this.currentSortDir)
     },
+    changeColumn: function () {
+      this.treeColumn = this.treeColumn ? false : true
+      this.$emit('changecolumn')
+      this.$emit('clicked', this.currentSort, this.currentSortDir)
+
+  },
+  },
+
+  watch: {
+    treeColumn: function () {
+      
+    }
   }
 }
 </script>

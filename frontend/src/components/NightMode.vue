@@ -1,8 +1,10 @@
 <template>
     <div class="switch__container">
-        <input id="switch-shadow" class="switch switch--shadow" type="checkbox">
+        <div>
+          <!-- <img src="../assets/sun.svg" alt="sun" /> -->
+        </div>
+        <input id="switch-shadow" class="switch switch--shadow" :class="currentMode" type="checkbox">
         <label @click="switchMode()" for="switch-shadow"></label>
-        {{currentMode}}
     </div>
 </template>
 <script>
@@ -26,8 +28,9 @@ export default {
 <style scoped>
 
 .switch__container {
-  margin: 30px auto;
-  width: 120px;
+  right: 20px;
+  top: 20px;
+  position: absolute;
 }
 
 .switch {
@@ -43,12 +46,18 @@ export default {
   outline: none;
   user-select: none;
 }
-
-.switch--shadow + label {
+.switch--shadow.night + label {
   padding: 2px;
   width: 120px;
   height: 60px;
-  background-color: #dddddd;
+  background-color: #092d6b;
+  border-radius: 60px;
+}
+.switch--shadow.day + label {
+  padding: 2px;
+  width: 120px;
+  height: 60px;
+  background-color: #b0eff4;
   border-radius: 60px;
 }
 .switch--shadow + label:before,
@@ -62,19 +71,27 @@ export default {
 }
 .switch--shadow + label:before {
   right: 1px;
-  background-color: #f1f1f1;
+  background-color: #144777;
   border-radius: 60px;
   transition: background 0.4s;
 }
-.switch--shadow + label:after {
+.switch--shadow.night + label:after {
   width: 62px;
-  background-color: #fff;
+  background-image: url(https://image.flaticon.com/icons/svg/2204/2204369.svg);
+  background-size: 62px;
   border-radius: 100%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   transition: all 0.4s;
 }
+.switch--shadow.day + label:after {
+  width: 62px;
+  background-image: url(https://image.flaticon.com/icons/svg/2204/2204346.svg);
+  background-size: 62px;
+  border-radius: 100%;
+  transition: all 0.4s;
+}
 .switch--shadow:checked + label:before {
-  background-color: #8ce196;
+  background-color: #85c7dd;
 }
 .switch--shadow:checked + label:after {
   transform: translateX(60px);

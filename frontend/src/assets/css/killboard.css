@@ -1,3 +1,14 @@
+.night .killboard {
+    background: #1d1d1d;
+    transition: 0.5s ease-in-out;
+
+}
+
+.night ul {
+    background: #1d1d1d;
+    transition: 0.5s ease-in-out;
+
+}
 
 thead th {
     text-align: center!important;
@@ -6,11 +17,15 @@ thead tr {
     font-size:12px;
     font-weight: 600;
 }
-.uk-table td  {
-    padding: 2px;
-    font-size: 13px;
+.night + .uk-tooltip {
+    border: 2px solid blue;
+}
+.killboard .uk-table td  {
+    padding: 1px;
+    font-size: 12px;
     line-height: 1;
     vertical-align: middle;
+    text-align: center;
 }
 .uk-accordion>:nth-child(n+2) {
     margin-top: 0;
@@ -21,7 +36,7 @@ thead tr {
 li + .noguild {
     visibility: hidden;
 }
-li:last-child:nth-child(odd) {
+li.twocolumn:last-child:nth-child(odd) {
     margin-left: 5%!important; 
 }
 .stat {
@@ -30,6 +45,33 @@ li:last-child:nth-child(odd) {
 div.stat.player[class*='alliance-']{
     background-color: red;
 }
+/* ---------- STAT TABLE ------------ */
+.night .global_battle td {
+    color: #DFA408;
+    border-bottom: 1px solid #969696;
+    padding: 10px 0;
+    font-size:20px!important;
+}
+.night .stat_battle {
+    background: #323232;
+}
+.stat_battle.uk-table td {
+    font-size: 16px!important;
+}
+.stat_battle .global td {
+    font-size:18px;
+    padding: 8px;
+}
+.night .stat_battle tbody tr.global:nth-of-type(odd), .night .stat_battle>tr.global:nth-of-type(odd) {
+    background: #474747;
+    border-top: 1px solid #969696;
+    border-bottom: 1px solid #969696;
+}
+.chart {
+    font-size: 12px;
+    font-style: italic; 
+}
+
 /* ---- HIGHTLIGHTS --- */
 .night .bestKillfame {
     background: #af731f!important;
@@ -56,7 +98,10 @@ div.stat.player[class*='alliance-']{
     background: #a57e29!important;
 }
 .highlighted {
-    background: lightblue!important;
+    background: rgb(170, 213, 228)!important;
+}
+.night .highlighted {
+    background: #86adba!important;
 }
 .night .uk-table-striped tbody tr:nth-of-type(odd), .night .uk-table-striped>tr:nth-of-type(odd) {
     background: #474747;
@@ -81,4 +126,24 @@ div.stat.player[class*='alliance-']{
 }
 .percent_bar {
     background: black;
+}
+/* SWITCH COLUMN BUTTON */
+@media (max-width: 1200px) {
+    .switchColumn {
+        display:none;
+    }
+}
+/* KILLBOARD GUILDES (UL )*/
+@media (min-width: 960px) {
+    .killboard_guilds .uk-width-1-3\@l {
+        width: calc(98% * 1 / 3.001);
+        margin: 5px;
+    }
+}
+/* ----------- GUILD HEADER -------------- */
+.guild_header .uk-table th {
+    padding: 2px 12px;
+}
+.guild_header .uk-table td {
+    font-size: 15px;
 }

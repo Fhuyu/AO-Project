@@ -1,34 +1,84 @@
+/* ---------------- PAGINATION ---------------- */
+.uk-pagination li {
+    background: none;
+}
+/* ---------------- SEARCH INPUT ---------------- */
+.search.guild {
+    width: 50%;
+    margin-right: 10px;
+}
+
 .result {
     margin:auto;
 }
-.result td{
-    min-width:200px;
+.header_result th  {
+    text-align: center;
+    padding: 0;
+}
+.result td {
+    text-align: center;
+    padding: 0;
 }
 .result .winner {
-    background: #a8d6a7;
+    color: #1aba5c;
 }
 .result .loser {
-    background: #d68080;
+    color: red;
+}
+.night .result .other {
+    color: #c6c6c6;
 }
 .result .other {
-    background: #c6c6c6;
+    color: #898989;
 }
-
-.uk-table th {
+.result .uk-table th {
     padding: 0;
     text-align: center;
 }
-.uk-table td {
+.result .uk-table td {
     padding: 0;
+    font-size: 16px;
+
 }
 .uk-table thead tr {
     font-weight: 600;
 }
+/* -------------- TABLE DETAIL ---------------- */
+.detail th {
+    text-align: center!important;
+}
+.detail .guilds {
+    text-align: center;
+}
+.detail .guilds:first-child {
+    background: #96ce6b;
+}
+.night .detail .guilds:first-child {
+    background: #19600c;
+}
+.detail .guilds:nth-child(2) {
+    background: #ea8252!important;
+}
+.night .detail .guilds:nth-child(2) {
+    background: #6d280d!important;
+}
+.detail td {
+    padding: 2px 0;
+}
 
 /* ---------- NIGHT MODE ------------ */
+.detail tr:nth-child(2n) {
+    background: #f8f8f8;
+}
 .night .detail tr:nth-child(2n) {
     background: #474747;
 }
+.battleboard li:nth-child(2n) {
+    background: #fcfcfc;
+}
 .night .battleboard li:nth-child(2n) {
     background: #3d3d3d;
+}
+.night svg { /* Spinner */
+    color: white;
 }
