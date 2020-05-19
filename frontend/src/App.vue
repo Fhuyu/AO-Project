@@ -5,21 +5,25 @@
         <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" />
         <h1><span style="color:#4F00CC;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
       </router-link>
-      <p>Beta version - 0.1.4 - Under Development</p>
+      <p>Beta version - 0.2.0</p>
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button>
       <div id="modal-close-default" uk-modal>
           <div class="uk-modal-dialog uk-modal-body">
               <button class="uk-modal-close-default" type="button" uk-close></button>
               <h2 class="uk-modal-title">Incoming</h2>
+                  Killboard : Configure the fast loading.<br />
                   Battleboard : Save guild research to be able to click back from killboard<br />
                   Killboard : Resolve loading bar blocked for old battles<br />
                   Battleboard : Highlight searched guild & player<br />
                   Website : General design (Logo / Color)<br />
               <h2 class="uk-modal-title">Idea</h2>
                   Comment section under each killboard<br />
-                  Top 5 battles of the week 
+                  Top 5 battles of the week <br />
+                  Top PVP guild of the week <br />
+                  Show guild presentation with video <br />
               <h2 class="uk-modal-title">Done</h2>
+                  20-05-31 : New version available (HTTPS / Faster battleboard loading)<br />
                   20-04-17 : Battleboard - Visual update + Able to type Enter to search guild<br />
                   20-04-06 : Killboard - Global statistics // Mode switch updated<br />
                   20-04-03 : Global Battleboard - Filter current battles by player number<br />
