@@ -216,7 +216,7 @@ export default {
   methods: {
     async fetchData () {
       try {
-          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`)
+          return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`)
       } catch {
           this.error404 = true
       }
