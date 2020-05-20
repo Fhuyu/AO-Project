@@ -54,7 +54,10 @@ export default {
     showWeaponOrMount (player) {
         return player.mount && store.battlemount.includes(player.mount.Type) ? player.mount.Type : player.weapon.Type
     }
-  }
+  },
+    mounted () {
+      console.log("OK")
+    }
 }
 </script>
 

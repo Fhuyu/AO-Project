@@ -5,28 +5,30 @@
     <div class="uk-container-xlarge uk-margin-auto">
 
         <h3 style="text-align:center;">BATTLE STATS</h3>
-        <p style="text-align:center;">(mouseover to see %)</p>
         <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
 
             <thead>
                 <th>ALLIANCE</th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')">PLAYERS
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">PLAYERS
                     <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')">KILLS
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">KILLS
                     <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')">DEATHS
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">DEATHS
                     <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')">KILLFAME
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">KILLFAME
                     <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th>AVERAGE IP</th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'itempower', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">AVERAGE IP
+                    <span v-if="currentTopTableSort === 'itempower' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
+                    <span v-if="currentTopTableSort === 'itempower' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
+                </th>
             </thead>
             <tbody>
                 <tr class="global_battle">
@@ -44,7 +46,7 @@
                     <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
                     <td>{{ alliance.deaths }}</td>
                     <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
-                    <td v-if="showStats && alliance.listItemPower.length">{{ (sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0) }}</td>
+                    <td v-if="showStats && alliance.itempower">{{alliance.itempower.toFixed(0)}}</td>
                     <td v-else></td>
                 </tr>
             </tbody>
@@ -174,7 +176,7 @@ export default {
     return {
       battle: [],
       totalPlayer: 0,
-      refreshStats: [],
+      // refreshStats: [],
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
       bestPlayerAssistance: { id: '', assistance: 0 },
@@ -190,6 +192,7 @@ export default {
       error404: false,
       currentTopTableSort: '',
       currentTopTableSortDir: 'desc',
+       
     }
   },
   components: {
@@ -202,6 +205,12 @@ export default {
       if (this.searchPlayerName) {
         return `#${this.searchPlayerName}`
       }
+    },
+    fullEventDeath : function () {
+      return this.battle.fullEventDeath
+    },
+    refreshStats : function () {
+      return this.battle ? this.battle.refreshStats : []
     }
   },
   methods: {
@@ -312,14 +321,13 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
-          console.log(playerID)
           if (this.battle.players[playerID].allianceId) {
             const playerAllianceId = this.battle.players[playerID].allianceId
             this.battle.alliances[playerAllianceId].players.push(this.battle.players[playerID]) // HERE
             //let player = this.battle.alliances.find( alliance => alliance.id = playerAllianceId)
           }
         }
-        // -----------------------INIT SORTED ALLIANCES ------------ COULD BE SERVER
+        // -----------------------INIT SORTED ALLIANCES
         this.battle.sortedalliances = []
         this.battle.sortedTopTableAlliances = []
         for (const alliance in this.battle.alliances) {
@@ -335,7 +343,12 @@ export default {
 
         
         this.onClickOrderBy('killFame', 'desc')
-        this.getPlayerDeath()
+        if (this.fullEventDeath) {
+          this.showWeapon = true
+        } else {
+          this.getPlayerDeath()
+        }
+        // 
       })
       
   },
@@ -404,6 +417,12 @@ export default {
         }
         
       }
+      // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
+      this.battle.sortedTopTableAlliances.forEach( alliance => {
+        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+      })
+
+
       this.showStats = true
     },
   },

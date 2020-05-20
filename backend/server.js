@@ -51,6 +51,35 @@ let fetching = false
 let lastFecthTime = null
 const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] 
 
+async function deathPlayer (battle, player) {
+        // console.log(player.id)
+        
+        console.log(player.id)
+        try {
+            await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
+            .then(response => {
+                const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+                eventdeath.forEach(eventDeath => {
+                    if (eventDeath.BattleId === battle.id) {
+                        // console.log('DEATH FOUND, player', player.id)
+                        battle.players[player.id].eventDeath = eventDeath
+                        battle.refreshStats.push(player.id)
+
+                        if (battle.totalKills === battle.refreshStats.length) {
+                            console.log('READY TO REGISTER EVENTDEATH')
+                            battle.fullEventDeath = true
+                            console.log(battle.id)
+                            redis_client.setex(battle.id, 259200, JSON.stringify(battle));
+                        }
+                    } 
+                })
+            })
+        } catch {
+            console.log('ERROR PLAYER')
+        }
+        
+}
+
 setInterval( async() => { 
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
@@ -73,16 +102,29 @@ setInterval( async() => {
             redis_client.setex(`battles${value}`, 1800, JSON.stringify(battlesData)); // 30min
             fetchDone += 1
             console.log('cache set interval', value)
-            battlesData.forEach( battle => {
+
+            battlesData.forEach( async (battle) => {
                 redis_client.get( battle.id, (err, data) => {
                     if (err) {
                         console.log('err')
                         res.status(500).send(err);
                     }
                     if (data === null) {
+                        battle.fullEventDeath = false
+                        battle.refreshStats = []
+
                         redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
                         console.log('killboard cache set', battle.id)
+                        // EXCECUTE DEATH FETCH FONCTION HERE
+                        for (const player in battle.players) {
+                            // console.log(player)
+                            if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
+                                battle.refreshStats.push(player)
+                            } else if (battle.players[player].deaths > 0) {
+                                deathPlayer (battle, battle.players[player]) 
+                        }
                     }
+                }
                 });
             })
             if (fetchDone === offset.length) {
