@@ -134,7 +134,7 @@ export default {
       console.log('fetch')
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
         .catch((error) => {
           this.error404 = true
         });
@@ -144,7 +144,8 @@ export default {
           this.error404 = true
         });
       } */ else {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`)
+        console.log('hello')
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -216,7 +217,7 @@ export default {
     },
     onChangeOffset (offset) {
       this.currentOffset = offset
-      this.fetchData()
+      // this.fetchData()
     },
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });

@@ -34,7 +34,10 @@
     <NightMode @clicked="onClickSwitchMode"></NightMode>
 
     </div>
-
+      <!-- <div class="uk-card uk-card-secondary uk-card-body uk-width-1-2@m uk-margin-auto" style="text-align:center;">
+        <h3 class="uk-card-title"> NEW DOMAIN NAME <a href="https://handholdreport.com/" target="_blank">https://handholdreport.com/</a></h3>
+        <p>HTTPS + MAIN PAGE IS LOADING FASTER</p>
+      </div> -->
     <router-view/>
 
   </div>

@@ -206,11 +206,11 @@ export default {
   },
   methods: {
     async fetchData () {
-      const response = await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`)
-        .catch((error) => {
+      try {
+          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`)
+      } catch {
           this.error404 = true
-        });
-      return response
+      }
     },
 
     async playerDead (playerId) {
@@ -312,6 +312,7 @@ export default {
           }
         }
         for (const playerID in this.battle.players) {
+          console.log(playerID)
           if (this.battle.players[playerID].allianceId) {
             const playerAllianceId = this.battle.players[playerID].allianceId
             this.battle.alliances[playerAllianceId].players.push(this.battle.players[playerID]) // HERE
