@@ -226,18 +226,17 @@ export default {
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
-                this.refreshStats.push(playerId) // USEFULL ?
+                this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
                 this.treatmentPlayerEventDeath(playerId)
             }
-            // this.showWeapon = playerId;
-              // Show weapons when completly loaded
-              //   if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-              //     this.showWeapon = true
-              // }
+              if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
+                  this.battle.fullEventDeath = true
+                  // NEED TO SEND TO SERVER  fulleventdeath + refreshstat
+              }
           })
         })
       } catch {
-          this.refreshStats.push(playerId)
+          this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
           // if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
           //         this.showWeapon = true
           //     }
@@ -295,7 +294,6 @@ export default {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
     treatmentPlayerEventDeath (playerID) {
-      console.log(playerID)
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
           this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
@@ -413,21 +411,23 @@ export default {
         } else {
           this.getPlayerDeath()
         }
-        // 
+        this.battle.sortedTopTableAlliances.forEach( alliance => {
+        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+      })
       })
       
   },
   watch: {
-    showWeapon: function (playerID) {
-      // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
-      this.battle.sortedTopTableAlliances.forEach( alliance => {
-        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
-      })
-      this.showStats = true
-    },
+    // showWeapon: function (playerID) {
+    //   console.log('trigger')
+    //   // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
+    //   this.battle.sortedTopTableAlliances.forEach( alliance => {
+    //     alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+    //   })
+    //   this.showStats = true
+    // },
   },
 }
-// DANS LE TABLEAU DES GUILDES, POUR CHAQUE GUILDES (TABLEAU) AVOIR TOUS SES JOUEURS (OBJ)
 </script>
 
 <style scoped>
