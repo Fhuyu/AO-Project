@@ -18,6 +18,7 @@ const redis_client = redis.createClient(port_redis);
 const app = express();
 
 middlewares = require("./middlewares");
+functions = require("./functions");
 
 //Body Parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -52,8 +53,6 @@ let lastFecthTime = null
 const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] 
 
 async function deathPlayer (battle, player) {
-        // console.log(player.id)
-        
         console.log(player.id)
         try {
             await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
@@ -69,7 +68,7 @@ async function deathPlayer (battle, player) {
                             console.log('READY TO REGISTER EVENTDEATH')
                             battle.fullEventDeath = true
                             console.log(battle.id)
-                            redis_client.setex(battle.id, 259200, JSON.stringify(battle));
+                            redis_client.setex(battle.id, 604800, JSON.stringify(battle));
                         }
                     } 
                 })
@@ -117,7 +116,6 @@ setInterval( async() => {
                         console.log('killboard cache set', battle.id)
                         // EXCECUTE DEATH FETCH FONCTION HERE
                         for (const player in battle.players) {
-                            // console.log(player)
                             if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
                                 battle.refreshStats.push(player)
                             } else if (battle.players[player].deaths > 0) {
@@ -195,50 +193,21 @@ app.get('/battles/:offset/:guildName', cors(), (req, res) => {
 //         res.status(404).send({ success: false, message: error.message });
 //     });
 // })
-function battleTreatment (battle) {
-    for (const guild in battle.guilds) {
-        if (!battle.guilds[guild].allianceId) {
-            battle.alliances[guild] = battle.guilds[guild]
-            battle.guilds[guild].allianceId = guild
-        }
-    }
-    for (const alliance in battle.alliances) {
-        battle.alliances[alliance].players = []
-        battle.alliances[alliance].listItemPower = []
-        battle.alliances[alliance].guilds = []
-    }
-    for (const guild in battle.guilds) {
-        const allianceOfGuild = battle.alliances[battle.guilds[guild].allianceId]
-        allianceOfGuild.guilds.push( battle.guilds[guild].name ) // ONLY NAME : TODO OBJECT
-    } 
-
-    for (const player in battle.players) {
-        battle.players[player].damageDone = []
-        battle.players[player].healingDone = []
-        battle.players[player].assistance = 0
-        battle.players[player].deathFame = ''
-        battle.players[player].weapon = ''
-        battle.players[player].mount = ''
-        battle.players[player].itempower = null
-
-        if (!battle.players[player].allianceId) {
-            battle.players[player].allianceId = battle.players[player].guildId
-        }
-    }
-    return battle
-}
 app.use('/killboard/:id', middlewares.killboardRedisMDW)
 app.get('/killboard/:id', cors(), (req, res) => {
+    console.log('hello')
+
     if (req.data) {        
         console.log('cache send killboard')
         // console.log(battle)
-        const battle = battleTreatment(req.data)
+        const battle = functions.battleTreatment(req.data)
         res.send(battle)
     } else {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 15000 })
         .then((res) => res.json())
         .then( battle => {
-            battleTreatment(battle)
+            console.log('hello')
+            functions.battleTreatment(battle)
             console.log('request send killboard')
             res.send(battle)
         })
@@ -249,7 +218,7 @@ app.get('/killboard/:id', cors(), (req, res) => {
 })
 app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
-    fetch(url, { timeout: 15000 })
+    fetch(url, { timeout: 30000 })
         .then((res) => res.json())
         .then((json) => {
             res.send(json)

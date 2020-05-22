@@ -16,7 +16,7 @@
         <td>{{player.deaths}}</td>
         <td>{{player.assistance}}</td>
         <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
-        <td v-if="showStats">{{formatNumber(sumArray(player.healingDone).toFixed(0)) > 0 ? formatNumber(sumArray(player.healingDone).toFixed(0)) : ''}}</td> <td v-else><!-- <div uk-spinner></div> --></td>
+        <td v-if="showStats">{{player.healingDone.length > 0 ? formatNumber(sumArray(player.healingDone).toFixed(0)) : ''}}</td> <td v-else></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
         <td v-if="showDeathFame"> <a v-if="player.eventDeath" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId -->
@@ -54,10 +54,7 @@ export default {
     showWeaponOrMount (player) {
         return player.mount && store.battlemount.includes(player.mount.Type) ? player.mount.Type : player.weapon.Type
     }
-  },
-    mounted () {
-      console.log("OK")
-    }
+  }
 }
 </script>
 
