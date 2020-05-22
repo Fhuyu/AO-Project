@@ -208,34 +208,28 @@ export default {
     fullEventDeath : function () {
       return this.battle.fullEventDeath
     },
-    // refreshStats : function () {
-    //   return this.battle && this.battle.refreshStats ? this.battle.refreshStats : []
-    // }
   },
   methods: {
     async fetchData () {
       try {
-          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
+          return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
       } catch {
           this.error404 = true
       }
     },
 
     async playerDead (playerId) {
-      // this.refreshStats.push(playerId)
       try {
-await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+        await axios.get(`https://handholdreport.com/api/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
-          const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+          const eventdeath = response.data
           eventdeath.forEach(eventDeath => {
-            // console.log(eventDeath)
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
-                console.log(this.refreshStats.length)
                 this.refreshStats.push(playerId)
             } 
             this.showWeapon = playerId;
-                // Show weapons when completly loaded
+              // Show weapons when completly loaded
               //   if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
               //     this.showWeapon = true
               // }
@@ -341,7 +335,6 @@ await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA
 
         
         this.onClickOrderBy('killFame', 'desc')
-        console.log(this.fullEventDeath)
         if (this.fullEventDeath === true) {
           this.showWeapon = true
         } else {
@@ -353,7 +346,7 @@ await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA
   },
   watch: {
     showWeapon: function (playerID) {
-        if (this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
+        if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
           this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
           // ------- VICTIM MOUNT

@@ -5,7 +5,7 @@
         <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" />
         <h1><span style="color:#4F00CC;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
       </router-link>
-      <p>Beta version - 0.2.1 | 
+      <p>Beta version - 0.2.2 - Bugfix update | 
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
@@ -24,6 +24,7 @@
                   Top PVP guild of the week <br />
                   Show guild presentation with video <br /> -->
               <h2 class="uk-modal-title">Done</h2>
+                  20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />
                   20-05-20 : Killboards are loading faster + Half of them show directly Weapon, IP ... || Killboard global stat can now be order by IP<br />
                   20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
                   20-04-17 : Battleboard - Visual update + Able to type Enter to search guild<br />

@@ -53,28 +53,24 @@ let lastFecthTime = null
 const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] 
 
 async function deathPlayer (battle, player) {
-        console.log(player.id)
         try {
             await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
             .then(response => {
                 const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
                 eventdeath.forEach(eventDeath => {
                     if (eventDeath.BattleId === battle.id) {
-                        // console.log('DEATH FOUND, player', player.id)
                         battle.players[player.id].eventDeath = eventDeath
                         battle.refreshStats.push(player.id)
 
                         if (battle.totalKills === battle.refreshStats.length) {
-                            console.log('READY TO REGISTER EVENTDEATH')
                             battle.fullEventDeath = true
-                            console.log(battle.id)
                             redis_client.setex(battle.id, 604800, JSON.stringify(battle));
                         }
                     } 
                 })
             })
         } catch {
-            console.log('ERROR PLAYER')
+            
         }
         
 }
@@ -83,29 +79,26 @@ setInterval( async() => {
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
-    console.log('minutes -----------', minutes)
-    console.log('fetching---', fetching)
+    // console.log('minutes -----------', minutes)
+    // console.log('fetching---', fetching)
 
     if ((minutes === null && !fetching) || (minutes >= 1 && !fetching)) {
       let fetchDone = 0
       fetching = true
 
       offset.forEach( async (value) => {
-        console.log(value)
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             battles = await axios.get(url, { timeout: 120000 })
-            console.log('fetched')
             const battlesData = battles.data;
 
-            redis_client.setex(`battles${value}`, 1800, JSON.stringify(battlesData)); // 30min
+            redis_client.setex(`battles${value}`, 3600, JSON.stringify(battlesData)); // 1h
             fetchDone += 1
-            console.log('cache set interval', value)
+            // console.log('cache set interval', value)
 
             battlesData.forEach( async (battle) => {
                 redis_client.get( battle.id, (err, data) => {
                     if (err) {
-                        console.log('err')
                         res.status(500).send(err);
                     }
                     if (data === null) {
@@ -113,7 +106,7 @@ setInterval( async() => {
                         battle.refreshStats = []
 
                         redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
-                        console.log('killboard cache set', battle.id)
+                        // console.log('killboard cache set', battle.id)
                         // EXCECUTE DEATH FETCH FONCTION HERE
                         for (const player in battle.players) {
                             if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
@@ -129,12 +122,11 @@ setInterval( async() => {
                 fetching = false
             }
         } catch {
-            console.log('ERROR-----------------------')
             fetching = false
         }
       })
   }
-}, 5000);
+}, 40000);
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 app.get('/battles/:offset', cors(), (req, res) => {
@@ -195,20 +187,15 @@ app.get('/battles/:offset/:guildName', cors(), (req, res) => {
 // })
 app.use('/killboard/:id', middlewares.killboardRedisMDW)
 app.get('/killboard/:id', cors(), (req, res) => {
-    console.log('hello')
 
     if (req.data) {        
-        console.log('cache send killboard')
-        // console.log(battle)
         const battle = functions.battleTreatment(req.data)
         res.send(battle)
     } else {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 15000 })
         .then((res) => res.json())
         .then( battle => {
-            console.log('hello')
             functions.battleTreatment(battle)
-            console.log('request send killboard')
             res.send(battle)
         })
         .catch((error) => {
