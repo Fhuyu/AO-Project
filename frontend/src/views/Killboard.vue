@@ -227,7 +227,8 @@ export default {
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
                 this.refreshStats.push(playerId)
-            } 
+            }
+            this.treatmentPlayerEventDeath(playerId)
             this.showWeapon = playerId;
               // Show weapons when completly loaded
               //   if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
@@ -293,59 +294,7 @@ export default {
     NbColumn () {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
-  },
-  mounted () {
-    this.fetchData()
-      .then(res => {
-        this.battle = res.data // EVENT NOT USEFULL
-        this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
-        this.totalPlayer = Object.keys(this.battle.players).length
-
-        for (const player in this.battle.players) {
-          // --- BEST KILLFAME MEDAL
-          if (this.battle.players[player].killFame > this.bestPlayerKillfame.killfame) {
-            this.bestPlayerKillfame.killfame = this.battle.players[player].killFame
-            this.bestPlayerKillfame.id = this.battle.players[player].id
-          } // --- BEST KILL MEDAL
-          if (this.battle.players[player].kills > this.bestPlayerKill.kill) {
-            this.bestPlayerKill.kill = this.battle.players[player].kills
-            this.bestPlayerKill.id = this.battle.players[player].id
-          }
-        }
-        for (const playerID in this.battle.players) {
-          if (this.battle.players[playerID].allianceId) {
-            const playerAllianceId = this.battle.players[playerID].allianceId
-            this.battle.alliances[playerAllianceId].players.push(this.battle.players[playerID]) // HERE
-            //let player = this.battle.alliances.find( alliance => alliance.id = playerAllianceId)
-          }
-        }
-        // -----------------------INIT SORTED ALLIANCES
-        this.battle.sortedalliances = []
-        this.battle.sortedTopTableAlliances = []
-        for (const alliance in this.battle.alliances) {
-          // INIT SORTED ALLIANCE LIST TO ORDER
-          this.battle.sortedalliances.push(this.battle.alliances[alliance])
-          this.battle.sortedTopTableAlliances.push(this.battle.alliances[alliance])
-        }
-        // LAUNCH ALLIANCES ORDER BY KILLFAME
-        this.allianceOrderBy(this.battle.sortedalliances, 'players', 'desc', 'sortedalliances')
-        this.allianceOrderBy(this.battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')
-        this.bestAlliance = this.battle.sortedTopTableAlliances[0].id
-        this.loserAlliance = this.battle.sortedTopTableAlliances[1].id
-
-        
-        this.onClickOrderBy('killFame', 'desc')
-        if (this.fullEventDeath === true) {
-          this.showWeapon = true
-        } else {
-          this.getPlayerDeath()
-        }
-        // 
-      })
-      
-  },
-  watch: {
-    showWeapon: function (playerID) {
+    treatmentPlayerEventDeath (playerID) {
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
           this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
@@ -412,8 +361,67 @@ export default {
       this.battle.sortedTopTableAlliances.forEach( alliance => {
         alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
       })
+      this.showStats = true
+    }
+  },
+  mounted () {
+    this.fetchData()
+      .then(res => {
+        this.battle = res.data // EVENT NOT USEFULL
+        this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
+        this.totalPlayer = Object.keys(this.battle.players).length
 
+        for (const player in this.battle.players) {
+          // --- BEST KILLFAME MEDAL
+          if (this.battle.players[player].killFame > this.bestPlayerKillfame.killfame) {
+            this.bestPlayerKillfame.killfame = this.battle.players[player].killFame
+            this.bestPlayerKillfame.id = this.battle.players[player].id
+          } // --- BEST KILL MEDAL
+          if (this.battle.players[player].kills > this.bestPlayerKill.kill) {
+            this.bestPlayerKill.kill = this.battle.players[player].kills
+            this.bestPlayerKill.id = this.battle.players[player].id
+          }
+        }
+        for (const playerID in this.battle.players) {
+          if (this.battle.players[playerID].allianceId) {
+            const playerAllianceId = this.battle.players[playerID].allianceId
+            this.battle.alliances[playerAllianceId].players.push(this.battle.players[playerID]) // HERE
+            //let player = this.battle.alliances.find( alliance => alliance.id = playerAllianceId)
+          }
+        }
+        // -----------------------INIT SORTED ALLIANCES
+        this.battle.sortedalliances = []
+        this.battle.sortedTopTableAlliances = []
+        for (const alliance in this.battle.alliances) {
+          // INIT SORTED ALLIANCE LIST TO ORDER
+          this.battle.sortedalliances.push(this.battle.alliances[alliance])
+          this.battle.sortedTopTableAlliances.push(this.battle.alliances[alliance])
+        }
+        // LAUNCH ALLIANCES ORDER BY KILLFAME
+        this.allianceOrderBy(this.battle.sortedalliances, 'players', 'desc', 'sortedalliances')
+        this.allianceOrderBy(this.battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')
+        this.bestAlliance = this.battle.sortedTopTableAlliances[0].id
+        this.loserAlliance = this.battle.sortedTopTableAlliances[1].id
 
+        
+        this.onClickOrderBy('killFame', 'desc')
+        if (this.fullEventDeath === true) {
+          this.battle.refreshStats.forEach( playerID => {
+            this.treatmentPlayerEventDeath(playerID)
+          })
+        } else {
+          this.getPlayerDeath()
+        }
+        // 
+      })
+      
+  },
+  watch: {
+    showWeapon: function (playerID) {
+      // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
+      this.battle.sortedTopTableAlliances.forEach( alliance => {
+        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+      })
       this.showStats = true
     },
   },
