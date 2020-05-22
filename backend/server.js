@@ -79,55 +79,96 @@ setInterval( async() => {
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
-    // console.log('minutes -----------', minutes)
-    // console.log('fetching---', fetching)
+    console.log('minutes -----------', minutes)
+    console.log('fetching---', fetching)
 
     if ((minutes === null && !fetching) || (minutes >= 1 && !fetching)) {
-      let fetchDone = 0
-      fetching = true
+        let fetchDone = 0
+        fetching = true
 
-      offset.forEach( async (value) => {
-        let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
-        try {
-            battles = await axios.get(url, { timeout: 120000 })
-            const battlesData = battles.data;
-
-            redis_client.setex(`battles${value}`, 3600, JSON.stringify(battlesData)); // 1h
-            fetchDone += 1
-            // console.log('cache set interval', value)
-
-            battlesData.forEach( async (battle) => {
-                redis_client.get( battle.id, (err, data) => {
-                    if (err) {
-                        res.status(500).send(err);
-                    }
-                    if (data === null) {
-                        battle.fullEventDeath = false
-                        battle.refreshStats = []
-
-                        redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
-                        // console.log('killboard cache set', battle.id)
-                        // EXCECUTE DEATH FETCH FONCTION HERE
-                        for (const player in battle.players) {
-                            if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
-                                battle.refreshStats.push(player)
-                            } else if (battle.players[player].deaths > 0) {
-                                deathPlayer (battle, battle.players[player]) 
-                        }
-                    }
-                }
-                });
-            })
-            if (fetchDone === offset.length) {
-                fetching = false
+        let battlesTemp = []
+        let lastBattleID = 0
+        redis_client.get('battles', (err, data) => {
+            if (err) {
+                console.log('nope err')
+                res.status(500).send(err);
             }
-        } catch {
+            if (data) {
+                console.log('battles initial length :', typeof(data))
+                battlesTemp = JSON.parse(data)
+                console.log('battles initial length :', typeof(battlesTemp))
+                lastBattleID = battlesTemp[0].id
+            } else {
+                console.log('nope')
+
+            }
+        })
+        console.log('lastBattleID :', lastBattleID)
+
+        let value = 50
+        const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
+        try {
+            console.log('begin data fetch')
+            battles = await axios.get(url, { timeout: 120000 })
+            console.log('battles.length : ', typeof(battles))
+            console.log('done data fetch')
+
+            let battlesData = battles.data;
+
+            index = battlesData.findIndex(battle => battle.id === lastBattleID);
+            console.log('index :', index)
+            if (index > 0 ) battlesData = battlesData.slice(0, index) // TO TEST
+            console.log('battlesData : ', battlesData.length)
+            console.log('battlesTemp : ', battlesTemp.length)
+            battlesTemp.unshift.apply(battlesTemp, battlesData)
+            console.log('battlesTemp après : ', battlesTemp.length)
+
+            redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
+            fetching = false
+
+            // battlesData.forEach( async (battle) => {
+            //     redis_client.get( battle.id, (err, data) => {
+            //         if (err) {
+            //             res.status(500).send(err);
+            //         }
+            //         if (data === null) {
+            //             battle.fullEventDeath = false
+            //             battle.refreshStats = []
+
+            //             redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
+            //             // console.log('killboard cache set', battle.id)
+            //             // EXCECUTE DEATH FETCH FONCTION HERE
+            //             for (const player in battle.players) {
+            //                 if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
+            //                     battle.refreshStats.push(player)
+            //                 } else if (battle.players[player].deaths > 0) {
+            //                     deathPlayer (battle, battle.players[player]) 
+            //             }
+            //         }
+            //     }
+            //     });
+            // })
+            // if (fetchDone === offset.length) {
+            //     fetching = false
+            // }
+        } catch (err){
+            console.log('err axios', err)
             fetching = false
         }
-      })
   }
-}, 40000);
+}, 5000);
 
+app.get('/test', cors(), (req, res) => {
+    redis_client.get(`battles`, (err, data) => {
+        if (err) {
+        res.status(500).send(err);
+        }
+        if (data != null) {
+            console.log('cache found')
+            res.send(data)
+        }
+})
+})
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
