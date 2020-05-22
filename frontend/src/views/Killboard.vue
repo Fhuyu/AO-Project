@@ -226,10 +226,10 @@ export default {
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
-                this.refreshStats.push(playerId)
+                this.refreshStats.push(playerId) // USEFULL ?
+                this.treatmentPlayerEventDeath(playerId)
             }
-            this.treatmentPlayerEventDeath(playerId)
-            this.showWeapon = playerId;
+            // this.showWeapon = playerId;
               // Show weapons when completly loaded
               //   if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
               //     this.showWeapon = true
@@ -295,6 +295,7 @@ export default {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
     treatmentPlayerEventDeath (playerID) {
+      console.log(playerID)
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
           this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
