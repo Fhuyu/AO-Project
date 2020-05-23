@@ -6,13 +6,18 @@ const redis_client = redis.createClient(port_redis);
 
 module.exports = {
     battlesRedisMDW: function (req, res, next) {
-        redis_client.get(`battles${req.params.offset}`, (err, data) => {
+        redis_client.get(`battles`, (err, data) => { //${req.params.offset}
             if (err) {
             res.status(500).send(err);
             }
             if (data != null) {
                 console.log('cache found', req.params.offset)
-                req.data = data
+                dataParse = JSON.parse(data)
+                dataSorted = dataParse.sort((a,b) => (a.startTime > b.startTime) ? -1 : ((b.startTime > a.startTime) ? 1 : 0));
+                console.log('begin slice')
+                req.data = dataSorted.slice(req.params.offset, (parseInt(req.params.offset) + 50))
+                console.log('end slice', req.data.length)
+
             }
             next();
         });

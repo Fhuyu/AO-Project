@@ -50,7 +50,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] 
+const offset = [0, 50, 100, 150, 200, 250] //, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
         try {
@@ -82,48 +82,27 @@ setInterval( async() => {
     console.log('minutes -----------', minutes)
     console.log('fetching---', fetching)
 
-    if ((minutes === null && !fetching) || (minutes >= 1 && !fetching)) {
+    if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
         fetching = true
 
         let battlesTemp = []
-        // let lastBattleID = 0
         redis_client.get('battles', (err, data) => {
             if (err) {
-                console.log('nope err')
                 res.status(500).send(err);
             }
             if (data) {
-                console.log('battles initial length :', typeof(data))
                 battlesTemp = JSON.parse(data)
-                console.log('battles initial length :', typeof(battlesTemp))
-                // lastBattleID = battlesTemp[0].id
-            } else {
-                console.log('nope')
-
             }
         })
-        // console.log('lastBattleID :', lastBattleID)
 
-        let value = 50
+        offset.forEach( async (value) => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
-            console.log('begin data fetch')
             battles = await axios.get(url, { timeout: 120000 })
-            console.log('done data fetch')
+            console.log('done data fetch', value)
 
             let battlesData = battles.data;
-
-            // index = battlesData.findIndex(battle => battle.id === lastBattleID);
-            // console.log('index :', index)
-            // if (index > 0 ) battlesData = battlesData.slice(0, index) // TO TEST
-            // console.log('battlesData : ', battlesData.length)
-            // console.log('battlesTemp : ', battlesTemp.length)
-            // battlesTemp.unshift.apply(battlesTemp, battlesData)
-            // console.log('battlesTemp après : ', battlesTemp.length)
-
-            // redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-            // fetching = false
 
             battlesData.forEach( async (battle) => {
                 redis_client.get( battle.id, (err, data) => {
@@ -144,41 +123,25 @@ setInterval( async() => {
                             }
                         }
                         console.log('killboard cache set', battle.id)
-                        console.log('battlelength before', battlesTemp.length)
                         battlesTemp.unshift(battle)
+                        redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
                         console.log('battlelength after', battlesTemp.length)
 
                     }
                 })
             })
-            console.log('set battles redis')
-            redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-
-            //             battle.fullEventDeath = false
-            //             battle.refreshStats = []
-
-            //             redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
-            //             // console.log('killboard cache set', battle.id)
-            //             // EXCECUTE DEATH FETCH FONCTION HERE
-            //             for (const player in battle.players) {
-            //                 if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
-            //                     battle.refreshStats.push(player)
-            //                 } else if (battle.players[player].deaths > 0) {
-            //                     deathPlayer (battle, battle.players[player]) 
-            //             }
-            //         }
-            //     }
-            //     });
-            // })
-            // if (fetchDone === offset.length) {
-            //     fetching = false
-            // }
+            fetchDone += 1
+            if (fetchDone === offset.length) {
+                    console.log('FETCH DONE ----------------------')
+                    fetching = false
+                }
         } catch (err){
-            console.log('err axios', err)
+            console.log('err axios')
             fetching = false
         }
-  }
-}, 5000);
+  })
+}
+}, 20000);
 
 app.get('/test', cors(), (req, res) => {
     redis_client.get(`battles`, (err, data) => {
