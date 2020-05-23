@@ -87,7 +87,7 @@ setInterval( async() => {
         fetching = true
 
         let battlesTemp = []
-        let lastBattleID = 0
+        // let lastBattleID = 0
         redis_client.get('battles', (err, data) => {
             if (err) {
                 console.log('nope err')
@@ -97,41 +97,63 @@ setInterval( async() => {
                 console.log('battles initial length :', typeof(data))
                 battlesTemp = JSON.parse(data)
                 console.log('battles initial length :', typeof(battlesTemp))
-                lastBattleID = battlesTemp[0].id
+                // lastBattleID = battlesTemp[0].id
             } else {
                 console.log('nope')
 
             }
         })
-        console.log('lastBattleID :', lastBattleID)
+        // console.log('lastBattleID :', lastBattleID)
 
         let value = 50
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             console.log('begin data fetch')
             battles = await axios.get(url, { timeout: 120000 })
-            console.log('battles.length : ', typeof(battles))
             console.log('done data fetch')
 
             let battlesData = battles.data;
 
-            index = battlesData.findIndex(battle => battle.id === lastBattleID);
-            console.log('index :', index)
-            if (index > 0 ) battlesData = battlesData.slice(0, index) // TO TEST
-            console.log('battlesData : ', battlesData.length)
-            console.log('battlesTemp : ', battlesTemp.length)
-            battlesTemp.unshift.apply(battlesTemp, battlesData)
-            console.log('battlesTemp après : ', battlesTemp.length)
+            // index = battlesData.findIndex(battle => battle.id === lastBattleID);
+            // console.log('index :', index)
+            // if (index > 0 ) battlesData = battlesData.slice(0, index) // TO TEST
+            // console.log('battlesData : ', battlesData.length)
+            // console.log('battlesTemp : ', battlesTemp.length)
+            // battlesTemp.unshift.apply(battlesTemp, battlesData)
+            // console.log('battlesTemp après : ', battlesTemp.length)
 
+            // redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
+            // fetching = false
+
+            battlesData.forEach( async (battle) => {
+                redis_client.get( battle.id, (err, data) => {
+                    if (err) {
+                        res.status(500).send(err);
+                    }
+                    if (data === null) {
+                        battle.fullEventDeath = false
+                        battle.refreshStats = []
+
+                        redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
+                        // EXCECUTE DEATH FETCH FONCTION HERE
+                        for (const player in battle.players) {
+                            if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
+                                battle.refreshStats.push(player)
+                            } else if (battle.players[player].deaths > 0) {
+                                deathPlayer (battle, battle.players[player]) 
+                            }
+                        }
+                        console.log('killboard cache set', battle.id)
+                        console.log('battlelength before', battlesTemp.length)
+                        battlesTemp.unshift(battle)
+                        console.log('battlelength after', battlesTemp.length)
+
+                    }
+                })
+            })
+            console.log('set battles redis')
             redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-            fetching = false
 
-            // battlesData.forEach( async (battle) => {
-            //     redis_client.get( battle.id, (err, data) => {
-            //         if (err) {
-            //             res.status(500).send(err);
-            //         }
-            //         if (data === null) {
             //             battle.fullEventDeath = false
             //             battle.refreshStats = []
 
