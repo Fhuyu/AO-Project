@@ -8,7 +8,6 @@
       </RequestFailed>
   </div>
   
-
   <div v-else class="uk-width-4-5@m uk-margin-auto">
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
       <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
@@ -132,7 +131,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, 
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
@@ -148,7 +147,7 @@ export default {
           this.error404 = true
         });
       } */ else {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
