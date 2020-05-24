@@ -13,17 +13,16 @@
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
       <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
           <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
-          <input class="uk-search-input" type="search" v-model="searchGuildName" placeholder="Search guild name">
+          <input class="uk-search-input uk-form-width-medium" type="search" v-model="searchGuildName" placeholder="Search guild name">
       </form>
       <div>
         <form class="uk-form-horizontal">
-          <label class="uk-form-label" for="form-horizontal-select" style="color: white;font-size: 16px;">Filter current battles by</label>
           <div class="uk-form-controls">
-            <select @change="onChangeFilterPlayer" class="uk-select" v-model="minBattlePlayers">
-              <option value="0">0+ players</option>
-              <option value="20">20+ players</option>
-              <option value="50">50+ players</option>
-              <option value="100">100+ players</option>
+            <select class="uk-select uk-form-width-medium uk-form-small" v-model="minBattlePlayers"> <!-- @change="onChangeFilterPlayer"  -->
+              <option value="0">0 + players</option>
+              <option value="20">20 + players</option>
+              <option value="50">50 + players</option>
+              <option value="100">100 + players</option>
             </select>
           </div>
         </form>
@@ -48,7 +47,7 @@
   </table>
 
   <div uk-accordion="multiple: true">
-    <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in sortedByPlayersBattle" :key="index">
+    <li class="uk-card uk-card-default uk-margin-small" v-for="(battle, index) in battles" :key="index">
         <a class="uk-accordion-title uk-width-4-5@m " href="#" style="font-size: 16px;">
           <table class="uk-table result" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <tbody>
@@ -131,10 +130,15 @@ export default {
   },
   methods: {
     async fetchData () {
-      console.log('fetch')
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`) //https://handholdreport-backend.herokuapp.com
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, 
+          { params: {
+              minBattlePlayers : this.minBattlePlayers,
+              searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
+            }
+          }
+        ) 
         .catch((error) => {
           this.error404 = true
         });
@@ -144,8 +148,13 @@ export default {
           this.error404 = true
         });
       } */ else {
-        console.log('hello')
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`)
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
+          { params: {
+              minBattlePlayers : this.minBattlePlayers,
+              searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
+            }
+          }
+        )
         .catch((error) => {
           this.error404 = true
         });
@@ -222,10 +231,10 @@ export default {
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
-    onChangeFilterPlayer () { // NB PLAYER PER BATTLE
-      this.sortedByPlayersBattle = this.battles.filter( battle =>  Object.keys(battle.players).length >= parseInt(this.minBattlePlayers)
-      )
-    }
+    // onChangeFilterPlayer () { // NB PLAYER PER BATTLE
+    //   this.sortedByPlayersBattle = this.battles.filter( battle =>  Object.keys(battle.players).length >= parseInt(this.minBattlePlayers)
+    //   )
+    // }
 
   },
   mounted () {
@@ -235,8 +244,8 @@ export default {
     
   },
   watch: {
-    currentOffset: function () {
-      console.log(this.$route.params.guildName)
+    minBattlePlayers: function () {
+      console.log('minbattleplayer', this.minBattlePlayers)
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -265,12 +274,45 @@ export default {
           this.offsetLoading = false
           this.initialLoader = false
         })
-          this.onChangeFilterPlayer()
+          // this.onChangeFilterPlayer()
+      })
+    },
+    currentOffset: function () {
+      // console.log(this.$route.params.guildName)
+      this.offsetLoading = true
+      this.fetchData()
+      .then(res => {
+        this.battles = res.data
+        this.battles.map(this.missGuild)
+        this.battles.map(this.guildsNumber)
+
+        this.battles.forEach(battle => {
+          battle.bestGuildFame = { id: '', killfame: 0 }
+          battle.bestGuildKill = { id: '', kills: 0 }
+          battle.sortedGuilds = []
+
+          for (const guild in battle.guilds) {
+            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
+            // --- BEST KILL FAME MEDALbattle.guilds[guild]
+            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
+              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
+              battle.bestGuildFame.id = battle.guilds[guild].id
+            } // --- BEST KILL MEDAL
+            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
+              battle.bestGuildKill.kills = battle.guilds[guild].kills
+              battle.bestGuildKill.id = battle.guilds[guild].id
+            }
+          }
+          this.OrderBy(battle, 'killFame', 'desc')
+          this.offsetLoading = false
+          this.initialLoader = false
+        })
+          // this.onChangeFilterPlayer()
       })
     },
     onClickSearchGuildPlayer: function () {
       this.$router.push({ path: `/${this.searchGuildName}` })
-      console.log(this.$route)
+      // console.log(this.$route)
 
       this.offsetLoading = true
       this.fetchData()
@@ -300,7 +342,7 @@ export default {
           this.offsetLoading = false
           this.onClickSearchGuild = false // LOOP ON HIMSELF
         })
-          this.onChangeFilterPlayer()
+          // this.onChangeFilterPlayer()
       })
     }
   }
