@@ -78,8 +78,8 @@ setInterval( async() => {
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
-    // console.log('minutes -----------', minutes)
-    // console.log('fetching---', fetching)
+    console.log('minutes -----------', minutes)
+    console.log('fetching---', fetching)
 
     if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
@@ -104,7 +104,7 @@ setInterval( async() => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             battles = await axios.get(url, { timeout: 120000 })
-            // console.log('done data fetch', value)
+            console.log('done data fetch', value)
 
             let battlesData = battles.data;
 
@@ -129,11 +129,11 @@ setInterval( async() => {
                         // console.log('killboard cache set', battle.id)
                         battlesTemp.unshift(battle)
                         redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-                        // console.log('battlelength after', battlesTemp.length)
+                        console.log('battlelength after', battlesTemp.length)
                         
                         for (const guild in battle.guilds) {
                             if (!(guild in guilds)) {
-                                // console.log('need to set guild', guild)
+                                console.log('need to set guild', guild)
                                 guildValue = battle.guilds[guild]
                                 guilds[guild] = guildValue.name
                                 redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
