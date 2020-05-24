@@ -131,7 +131,7 @@ setInterval( async() => {
                         console.log('battlelength after', battlesTemp.length)
                         
                         for (const guild in battle.guilds) {
-                            if (!(guild in guilds) && guild !== 'Y3iI50HpTgScVGSeLbNFQQ') {
+                            if (!(guild in guilds) && guild !== 'Y3iI50HpTgScVGSeLbNFQQ' && guild !== 'ygt6NzKNRY2pKt1okNJpnA') { 
                                 console.log('need to set guild', guild)
                                 guildValue = battle.guilds[guild]
                                 guilds[guild] = guildValue.name
