@@ -131,10 +131,9 @@ export default {
   },
   methods: {
     async fetchData () {
-      console.log('fetch')
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`)
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -144,8 +143,7 @@ export default {
           this.error404 = true
         });
       } */ else {
-        console.log('hello')
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`) //https://handholdreport.com/api
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`)
         .catch((error) => {
           this.error404 = true
         });
@@ -236,7 +234,7 @@ export default {
   },
   watch: {
     currentOffset: function () {
-      console.log(this.$route.params.guildName)
+      // console.log(this.$route.params.guildName)
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -270,7 +268,7 @@ export default {
     },
     onClickSearchGuildPlayer: function () {
       this.$router.push({ path: `/${this.searchGuildName}` })
-      console.log(this.$route)
+      // console.log(this.$route)
 
       this.offsetLoading = true
       this.fetchData()

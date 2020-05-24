@@ -50,7 +50,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50, 100, 150, 200, 250] //, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500] // 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
         try {
@@ -71,20 +71,24 @@ async function deathPlayer (battle, player) {
             })
         } catch {
             
-        }
-        
+        }    
 }
 
 setInterval( async() => { 
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
-    console.log('minutes -----------', minutes)
-    console.log('fetching---', fetching)
+    // console.log('minutes -----------', minutes)
+    // console.log('fetching---', fetching)
 
     if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
         fetching = true
+
+        let guilds = {}
+        redis_client.get('guilds', function(err, reply) {
+            guilds = reply ? JSON.parse(reply) : {}
+        });
 
         let battlesTemp = []
         redis_client.get('battles', (err, data) => {
@@ -100,7 +104,7 @@ setInterval( async() => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             battles = await axios.get(url, { timeout: 120000 })
-            console.log('done data fetch', value)
+            // console.log('done data fetch', value)
 
             let battlesData = battles.data;
 
@@ -122,39 +126,40 @@ setInterval( async() => {
                                 deathPlayer (battle, battle.players[player]) 
                             }
                         }
-                        console.log('killboard cache set', battle.id)
+                        // console.log('killboard cache set', battle.id)
                         battlesTemp.unshift(battle)
                         redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-                        console.log('battlelength after', battlesTemp.length)
-
+                        // console.log('battlelength after', battlesTemp.length)
+                        
+                        for (const guild in battle.guilds) {
+                            if (!(guild in guilds)) {
+                                // console.log('need to set guild', guild)
+                                guildValue = battle.guilds[guild]
+                                guilds[guild] = guildValue.name
+                                redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
+                            } 
+                        }
                     }
                 })
             })
             fetchDone += 1
             if (fetchDone === offset.length) {
-                    console.log('FETCH DONE ----------------------')
                     fetching = false
                 }
         } catch (err){
-            console.log('err axios')
             fetching = false
         }
   })
 }
 }, 20000);
 
-app.get('/test', cors(), (req, res) => {
-    redis_client.get(`battles`, (err, data) => {
-        if (err) {
-        res.status(500).send(err);
-        }
-        if (data != null) {
-            console.log('cache found')
-            res.send(data)
-        }
-})
-})
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
+
+app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
+app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
+
+app.use('/battles/:offset', middlewares.battlesSortMDW)
+app.use('/battles/:offset', middlewares.battlesOffsetMDW)
 app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
@@ -170,47 +175,56 @@ app.get('/battles/:offset', cors(), (req, res) => {
             });
     }
 });
-app.get('/battles/:offset/:guildName', cors(), (req, res) => {
-    fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 15000 })
-    .then((res) => res.json())
-    .then( json => {
-        let guildId = json.guilds[0].Id
-        let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-        fetch(url, { timeout: 10000 })
+
+
+app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
+    if (req.data && req.guildID) {
+        // console.log('DATA OR GUILD ID')
+        res.send(req.data)
+    } else {
+        // console.log('NO DATA OR NO GUILD ID')
+        // console.log('guildname', req.params.guildName)
+        // console.log('req.guildID', JSON.stringify(req.guildID))
+        // console.log('offset', req.params.offset)
+        guildIDReq = req.guildID
+        if(req.guildID) {
+            // console.log('GUILD ID FOUND')
+            // console.log("guildId", req.guildID)
+            let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${req.guildID}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+            fetch(url, { timeout: 10000 })
+                .then((res) => res.json())
+                .then((battles) => {
+                    res.send(battles)
+                })
+                .catch((error) => {
+                    res.status(404).send({ success: false, message: error.message });
+                });
+
+        } else  {
+            // console.log('no guild id found')
+            fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 15000 })
             .then((res) => res.json())
-            .then((battles) => {
-                res.send(battles)
-            })
+            .then( json => {
+                let guildId = json.guilds[0].Id
+                // console.log("guildId", guildId)
+                let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
+                fetch(url, { timeout: 10000 })
+                    .then((res) => res.json())
+                    .then((battles) => {
+                        res.send(battles)
+                    })
+                    .catch((error) => {
+                        res.status(404).send({ success: false, message: error.message });
+                    });
+                })
             .catch((error) => {
                 res.status(404).send({ success: false, message: error.message });
-            });
-        })
-    .catch((error) => {
-        res.status(404).send({ success: false, message: error.message });
-    });
+            });      
+        }
+
+    }
 })
-// app.get('/battles/:offset/player/:playerName', cors(), (req, res) => {
-//     // console.log('player', req.params.playerName)
-//     fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.playerName}`, { timeout: 15000 })
-//     .then((res) => res.json())
-//     .then( json => {
-//         // console.log(json)
-//         let playerName = json.players[0].Id
-//         // console.log(playerName)
-//         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&playerId=${playerName}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
-//         fetch(url, { timeout: 15000 })
-//             .then((res) => res.json())
-//             .then((battles) => {
-//                 res.send(battles)
-//             })
-//             .catch((error) => {
-//                 res.status(404).send({ success: false, message: error.message });
-//             });
-//         })
-//     .catch((error) => {
-//         res.status(404).send({ success: false, message: error.message });
-//     });
-// })
+
 app.use('/killboard/:id', middlewares.killboardRedisMDW)
 app.get('/killboard/:id', cors(), (req, res) => {
 
