@@ -68,13 +68,12 @@
         <KillboardOrderBy style="text-align: center;" :showStats="showStats" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
         </KillboardOrderBy>
 
-        <div v-if="!showStats" class="uk-grid-collapse uk-child-width-expand@s uk-text-center uk-margin-large-top" uk-grid>
+        <div class="uk-grid-collapse uk-child-width-expand@s uk-text-center uk-margin-large-top" uk-grid>
             <div>
                 <div class="uk-padding"></div>
             </div>
             <div>
                 <div class="uk-padding-small uk-light">
-                    Loading more stats
                     <div class="loading_bar">
                         <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' ">
                         </div>
@@ -176,14 +175,14 @@ export default {
     return {
       battle: [],
       totalPlayer: 0,
-      // refreshStats: [],
+      refreshStats: [],
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
       bestPlayerAssistance: { id: '', assistance: 0 },
       bestPlayerIP: { id: '', itempower: 0 },
       bestAlliance: null,
       loserAlliance: null,
-      showWeapon: false,
+      showWeapon: null,
       showStats: false,
       showDeathFame: false,
       columnClass: false,
@@ -209,53 +208,45 @@ export default {
     fullEventDeath : function () {
       return this.battle.fullEventDeath
     },
-    refreshStats : function () {
-      return this.battle ? this.battle.refreshStats : []
-    }
   },
   methods: {
     async fetchData () {
       try {
-          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`)
+          return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
       } catch {
           this.error404 = true
       }
     },
 
     async playerDead (playerId) {
-      await axios.get(`https://handholdreport.com/api/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+      try {
+        await axios.get(`https://handholdreport.com/api/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
-          const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+          const eventdeath = response.data
           eventdeath.forEach(eventDeath => {
-            // console.log(eventDeath)
             if (eventDeath.BattleId === this.battle.id) {
                 this.battle.players[playerId].eventDeath = eventDeath
-                console.log(this.refreshStats.length)
-                this.refreshStats.push(playerId)
-                 // KEEP
-            } /* else {
-                console.log('player died too much')
-                this.refreshStats.push(playerId) // KEEP
-                console.log(this.refreshStats.length) // KEEP
-            } */
-                // Show weapons when completly loaded
-                if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-                  this.showWeapon = true
+                this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
+                this.treatmentPlayerEventDeath(playerId)
+            }
+              if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
+                  this.battle.fullEventDeath = true
+                  // NEED TO SEND TO SERVER  fulleventdeath + refreshstat
               }
           })
         })
-        .catch((error) => {
-          this.refreshStats.push(playerId)
-          this.error404 = true
-        });
+      } catch {
+          this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
+          // if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
+          //         this.showWeapon = true
+          //     }
+      }
+
     },
-    getPlayerDeath (playerId) {
-      for (const player in this.battle.players) {
-        if (this.battle.players[player].deaths > 0 && this.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
-          this.refreshStats.push(player)
-          // Else if player died more than once, put his name in array for final count line 101
-        } else if (this.battle.players[player].deaths > 0) {
-          this.playerDead(player)
+    getPlayerDeath () {
+      for (const playerID in this.battle.players) {
+        if (this.battle.players[playerID].deaths > 0) {
+          this.playerDead(playerID)
         }
       }
     },
@@ -302,11 +293,81 @@ export default {
     NbColumn () {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
+    treatmentPlayerEventDeath (playerID) {
+        if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
+          // ------- VICTIM ITEM
+          this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
+          // ------- VICTIM MOUNT
+          this.battle.players[playerID].mount = this.battle.players[playerID].eventDeath.Victim.Equipment.Mount
+          // ------- VICTIM IP
+          this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower.toFixed(0)
+          // this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
+          // ------- Death IP
+          this.battle.players[playerID].deathFame = this.battle.players[playerID].eventDeath.Victim.DeathFame
+
+          // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
+          for (const participant in this.battle.players[playerID].eventDeath.Participants) {
+            const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
+
+            if (this.battle.players[participantId]) {
+              this.battle.players[participantId].assistance += 1
+              // this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
+              const heal = this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone
+              if (!this.battle.players[participantId].healingDone.includes(heal)) this.battle.players[participantId].healingDone.push(heal)
+              if (!this.battle.players[participantId].weapon) {
+                this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
+                this.battle.players[participantId].mount = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount
+                this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
+                this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
+              }
+            }
+          }
+          const killerId = this.battle.players[playerID].eventDeath.Killer.Id
+          if (!this.battle.players[killerId].weapon) {
+            this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand
+            this.battle.players[killerId].mount = this.battle.players[playerID].eventDeath.Killer.Equipment.Mount
+            this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
+          }
+        }
+        
+      // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
+      for (const alliance in this.battle.alliances) {
+        this.battle.alliances[alliance].players = [] //HERE
+      }
+      for (const playerID in this.battle.players) {
+        if (this.battle.players[playerID].allianceId) {
+          const playerAlliance = this.battle.players[playerID].allianceId
+          this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID]) //HERE
+          if (this.battle.players[playerID].itempower) {
+            this.battle.alliances[playerAlliance].listItemPower.push(parseInt(this.battle.players[playerID].itempower)) // HERE
+          }
+        }
+        // --- BEST ASSITANCE MEDAL
+        if (this.battle.players[playerID].assistance > this.bestPlayerAssistance.assistance) {
+          this.bestPlayerAssistance.assistance = this.battle.players[playerID].assistance
+          this.bestPlayerAssistance.id = this.battle.players[playerID].id
+        } 
+        // --- BEST IP MEDAL
+        if (this.battle.players[playerID].itempower > 999) {
+          if (this.battle.players[playerID].itempower > this.bestPlayerIP.itempower) {
+            this.bestPlayerIP.itempower = this.battle.players[playerID].itempower
+            this.bestPlayerIP.id = this.battle.players[playerID].id
+          } 
+        }
+        
+      }
+      // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
+      this.battle.sortedTopTableAlliances.forEach( alliance => {
+        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+      })
+      this.showStats = true
+    }
   },
   mounted () {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
+        this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
         this.totalPlayer = Object.keys(this.battle.players).length
 
         for (const player in this.battle.players) {
@@ -343,91 +404,30 @@ export default {
 
         
         this.onClickOrderBy('killFame', 'desc')
-        if (this.fullEventDeath) {
-          this.showWeapon = true
+        if (this.fullEventDeath === true) {
+          this.battle.refreshStats.forEach( playerID => {
+            this.treatmentPlayerEventDeath(playerID)
+          })
         } else {
           this.getPlayerDeath()
         }
-        // 
+        this.battle.sortedTopTableAlliances.forEach( alliance => {
+        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+      })
       })
       
   },
   watch: {
-    showWeapon: function () {
-      this.refreshStats.forEach(playerID => {
-        // ------- VICTIM ITEM
-        this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
-        // ------- VICTIM MOUNT
-        this.battle.players[playerID].mount = this.battle.players[playerID].eventDeath.Victim.Equipment.Mount
-        // ------- VICTIM IP
-        this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower
-        this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
-        // ------- Death IP
-        this.battle.players[playerID].deathFame = this.battle.players[playerID].eventDeath.Victim.DeathFame
-
-        // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
-        for (const participant in this.battle.players[playerID].eventDeath.Participants) {
-          const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
-
-          if (this.battle.players[participantId]) {
-            this.battle.players[participantId].assistance += 1
-            // this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
-            const heal = this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone
-            if (!this.battle.players[participantId].healingDone.includes(heal)) this.battle.players[participantId].healingDone.push(heal)
-            if (this.battle.players[participantId].weapon) {
-            } else {
-              this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
-              this.battle.players[participantId].mount = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount
-              this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
-              this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
-              // this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.padStart(4, '0')
-            }
-          }
-        }
-        const killerId = this.battle.players[playerID].eventDeath.Killer.Id
-        if (!this.battle.players[killerId].weapon) {
-          this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand
-          this.battle.players[killerId].mount = this.battle.players[playerID].eventDeath.Killer.Equipment.Mount
-          this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
-        }
-      })
-      // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
-      for (const alliance in this.battle.alliances) {
-        this.battle.alliances[alliance].players = [] //HERE
-      }
-      for (const playerID in this.battle.players) {
-        if (this.battle.players[playerID].allianceId) {
-          const playerAlliance = this.battle.players[playerID].allianceId
-          this.battle.alliances[playerAlliance].players.push(this.battle.players[playerID]) //HERE
-          if (this.battle.players[playerID].itempower) {
-            this.battle.alliances[playerAlliance].listItemPower.push(parseInt(this.battle.players[playerID].itempower)) // HERE
-          }
-        }
-        // --- BEST ASSITANCE MEDAL
-        if (this.battle.players[playerID].assistance > this.bestPlayerAssistance.assistance) {
-          this.bestPlayerAssistance.assistance = this.battle.players[playerID].assistance
-          this.bestPlayerAssistance.id = this.battle.players[playerID].id
-        } 
-        // --- BEST IP MEDAL
-        if (this.battle.players[playerID].itempower > 999) {
-          if (this.battle.players[playerID].itempower > this.bestPlayerIP.itempower) {
-            this.bestPlayerIP.itempower = this.battle.players[playerID].itempower
-            this.bestPlayerIP.id = this.battle.players[playerID].id
-          } 
-        }
-        
-      }
-      // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
-      this.battle.sortedTopTableAlliances.forEach( alliance => {
-        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
-      })
-
-
-      this.showStats = true
-    },
+    // showWeapon: function (playerID) {
+    //   console.log('trigger')
+    //   // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
+    //   this.battle.sortedTopTableAlliances.forEach( alliance => {
+    //     alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+    //   })
+    //   this.showStats = true
+    // },
   },
 }
-// DANS LE TABLEAU DES GUILDES, POUR CHAQUE GUILDES (TABLEAU) AVOIR TOUS SES JOUEURS (OBJ)
 </script>
 
 <style scoped>

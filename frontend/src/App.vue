@@ -2,18 +2,18 @@
   <div id="app" :class="viewMode">
     <div id="header">
       <router-link to='/' style="text-decoration: none;">
-        <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" />
-        <h1><span style="color:#4F00CC;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
+        <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
+        <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
       </router-link>
-      <p>Beta version - 0.2.1 | 
+      <p>Beta version - 0.3.1 - Filter by players number reworked | 
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
           <div class="uk-modal-dialog uk-modal-body">
               <button class="uk-modal-close-default" type="button" uk-close></button>
               <h2 class="uk-modal-title">Incoming</h2>
-                  <b>Killboard : Show weapons in all killboard without loading.</b><br />
-                  <b>Battleboard : Fast loading when a guild is searched</b><br />
+                  <b>Battleboard : Alliance + Player search</b><br />
+                  <b>Killboard : Optimize weapons in all killboard without loading.</b><br />
                   Battleboard : Save guild research to be able to click back from killboard<br />
                   Killboard : Resolve loading bar blocked for old battles<br />
                   Battleboard : Highlight searched guild & player<br />
@@ -24,6 +24,9 @@
                   Top PVP guild of the week <br />
                   Show guild presentation with video <br /> -->
               <h2 class="uk-modal-title">Done</h2>
+                  20-05-25 : Battleboard : Filter current battles by players : reworked (now show all battles and not only current offset)<br />
+                  20-05-24 : Battleboard : Guild quick search !<br />
+                  20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />
                   20-05-20 : Killboards are loading faster + Half of them show directly Weapon, IP ... || Killboard global stat can now be order by IP<br />
                   20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
                   20-04-17 : Battleboard - Visual update + Able to type Enter to search guild<br />
