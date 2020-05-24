@@ -16,7 +16,6 @@ module.exports = {
     },
     guildIdMDW: function (req, res, next) {
         redis_client.get(`guilds`, (err, data) => {
-            console.log(req.params.guildName)
             if (data != null) {
                 guilds = JSON.parse(data)
                 req.guildID = Object.keys(guilds).find(key => guilds[key].toLowerCase() === req.params.guildName.toLowerCase());
@@ -31,7 +30,6 @@ module.exports = {
         next();
     },
     battlesMinPlayers: function (req, res, next) {
-        console.log('minBattlePlayers', req.query.minBattlePlayers)
         if (req.dataParse && req.query.minBattlePlayers > 0) {
             req.dataParse = req.dataParse.filter((battle)=> Object.keys(battle.players).length > parseInt(req.query.minBattlePlayers))
         }
