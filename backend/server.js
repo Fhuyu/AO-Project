@@ -131,7 +131,7 @@ setInterval( async() => {
                         console.log('battlelength after', battlesTemp.length)
                         
                         for (const guild in battle.guilds) {
-                            if (!(guild in guilds) && guild !== 'Y3iI50HpTgScVGSeLbNFQQ' && guild !== 'ygt6NzKNRY2pKt1okNJpnA') { 
+                            if (!(guild in guilds) && battle.guilds[guild].name) { 
                                 console.log('need to set guild', guild)
                                 guildValue = battle.guilds[guild]
                                 guilds[guild] = guildValue.name
@@ -147,12 +147,12 @@ setInterval( async() => {
                 }
         } catch (err){
             fetching = false
-            // redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
+            redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
 
         }
   })
 }
-}, 5000);
+}, 40000);
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
