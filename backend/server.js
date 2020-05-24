@@ -131,7 +131,7 @@ setInterval( async() => {
                         console.log('battlelength after', battlesTemp.length)
                         
                         for (const guild in battle.guilds) {
-                            if (!(guild in guilds)) {
+                            if (!(guild in guilds) && guild !== 'Y3iI50HpTgScVGSeLbNFQQ' && guild !== 'ygt6NzKNRY2pKt1okNJpnA') { 
                                 console.log('need to set guild', guild)
                                 guildValue = battle.guilds[guild]
                                 guilds[guild] = guildValue.name
@@ -152,7 +152,7 @@ setInterval( async() => {
         }
   })
 }
-}, 20000);
+}, 5000);
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
@@ -185,10 +185,10 @@ app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
         // console.log('DATA OR GUILD ID')
         res.send(req.data)
     } else {
-        console.log('NO DATA OR NO GUILD ID')
-        console.log('guildname', req.params.guildName)
-        console.log('req.guildID', JSON.stringify(req.guildID))
-        console.log('offset', req.params.offset)
+        // console.log('NO DATA OR NO GUILD ID')
+        // console.log('guildname', req.params.guildName)
+        // console.log('req.guildID', JSON.stringify(req.guildID))
+        // console.log('offset', req.params.offset)
         guildIDReq = req.guildID
         if(req.guildID) {
             // console.log('GUILD ID FOUND')
