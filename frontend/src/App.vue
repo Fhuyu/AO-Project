@@ -79,6 +79,7 @@ export default {
 #footer {
   text-align: center;
   padding: 40px;
+
 }
 #header {
   text-align: center;
@@ -93,16 +94,13 @@ export default {
 .night#app {
     height: 100vh;
     background-color: #1d1d1d;
-    transition: 0.5s ease-in-out;
-
 }
 
 .night h3 {
   color:white;
 }
-.night, .night .battleboard {
+.night, .night .battleboard, .night #footer {
     background: #1d1d1d;
-    transition: 0.5s ease-in-out;
 }
 .night li {
     background: #323232;
