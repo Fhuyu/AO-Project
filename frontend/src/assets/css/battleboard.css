@@ -1,3 +1,15 @@
+#background {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    opacity: 0.15;
+    background-image: url("../hhr.png");
+    background-size:     cover; 
+    background-repeat:   no-repeat;
+    background-position: center center; 
+}
+
 /* ---------------- PAGINATION ---------------- */
 .uk-pagination li {
     background: none;

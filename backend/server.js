@@ -109,37 +109,36 @@ setInterval( async() => {
             let battlesData = battles.data;
 
             battlesData.forEach( async (battle) => {
-                redis_client.get( battle.id, (err, data) => {
-                    if (err) {
-                        res.status(500).send(err);
+                if (!(battlesTemp.some(b => b.id === battle.id))) {
+
+                    battlesTemp.unshift(battle)
+                    redis_client.set(`battles`, JSON.stringify(battlesTemp));
+                    console.log('battlelength after', battlesTemp.length)
+
+                    for (const guild in battle.guilds) {
+                        if (!(guild in guilds) && battle.guilds[guild].name) { 
+                            console.log('need to set guild', guild)
+                            guildValue = battle.guilds[guild]
+                            guilds[guild] = guildValue.name
+                            redis_client.set('guilds', JSON.stringify(guilds)); // 3j
+                        }  
                     }
-                    if (data === null) {
-                        battle.fullEventDeath = false
-                        battle.refreshStats = []
-                        redis_client.setex(battle.id, 259200, JSON.stringify(battle)); // 3j
-                        // EXCECUTE DEATH FETCH FONCTION HERE
-                        for (const player in battle.players) {
-                            if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) { // NOT USEFULL, seulement la requete ca devrait aller
-                                battle.refreshStats.push(player)
-                            } else if (battle.players[player].deaths > 0) {
-                                deathPlayer (battle, battle.players[player]) 
-                            }
+                    
+                    // SET BATTLE-ID REDIS
+                    battle.fullEventDeath = false
+                    battle.refreshStats = []
+                    redis_client.setex(battle.id, 259200, JSON.stringify(battle))
+                    console.log('killboard cache set', battle.id)
+                    // EVENTDEATH BATTLE-iD
+                    for (const player in battle.players) {
+                        if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) {
+                            battle.refreshStats.push(player)
+                        } else if (battle.players[player].deaths > 0) {
+                            deathPlayer (battle, battle.players[player]) 
                         }
-                        // console.log('killboard cache set', battle.id)
-                        battlesTemp.unshift(battle)
-                        redis_client.setex(`battles`, 7200, JSON.stringify(battlesTemp)); // 2h
-                        console.log('battlelength after', battlesTemp.length)
+                    }
+                  }
                         
-                        for (const guild in battle.guilds) {
-                            if (!(guild in guilds) && battle.guilds[guild].name) { 
-                                console.log('need to set guild', guild)
-                                guildValue = battle.guilds[guild]
-                                guilds[guild] = guildValue.name
-                                redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
-                            } 
-                        }
-                    }
-                })
             })
             fetchDone += 1
             if (fetchDone === offset.length) {
@@ -147,8 +146,8 @@ setInterval( async() => {
                 }
         } catch (err){
             fetching = false
-            redis_client.setex('guilds', 259200, JSON.stringify(guilds)); // 3j
-
+            redis_client.set('guilds', JSON.stringify(guilds));
+            redis_client.set(`battles`, JSON.stringify(battlesTemp));
         }
   })
 }

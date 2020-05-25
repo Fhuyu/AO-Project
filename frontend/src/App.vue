@@ -1,5 +1,7 @@
 <template>
   <div id="app" :class="viewMode">
+    <div id="background">
+    </div>
     <div id="header">
       <router-link to='/' style="text-decoration: none;">
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
@@ -44,6 +46,10 @@
         <p>HTTPS + MAIN PAGE IS LOADING FASTER</p>
       </div> -->
     <router-view/>
+    <div id="footer">
+      <p>Website under development. Wanna share your feedback ? <br />
+        Contact discord : Fuyu#2494</p>
+    </div>
 
   </div>
 </template>
@@ -70,6 +76,10 @@ export default {
 </script>
 
 <style>
+#footer {
+  text-align: center;
+  padding: 40px;
+}
 #header {
   text-align: center;
   padding: 40px;
@@ -86,6 +96,7 @@ export default {
     transition: 0.5s ease-in-out;
 
 }
+
 .night h3 {
   color:white;
 }

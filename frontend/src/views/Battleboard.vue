@@ -8,7 +8,7 @@
       </RequestFailed>
   </div>
   
-  <div v-else class="uk-width-4-5@m uk-margin-auto">
+  <div v-else class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
       <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
           <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
@@ -131,7 +131,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, 
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`,
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
