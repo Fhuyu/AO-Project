@@ -11,7 +11,7 @@ const cors = require('cors') // https://github.com/expressjs/cors
 const mongoose = require('mongoose')
 const Battle = require('./models/Battle')
 const Guild = require('./models/Guild')
-const url = 'mongodb://127.0.0.1:27017/mydb'
+const url = 'mongodb://127.0.0.1:27017/hhr'
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }) // useFind... is to make findOneAndUpdate work without warning
 
@@ -67,7 +67,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     try {
@@ -84,7 +84,7 @@ async function deathPlayer (battle, player) {
                         await Battle.updateOne({ battleID: battle.id }, {
                             battleData: battle
                         });
-                        console.log('battle updated', battle.id)
+                        // console.log('battle updated', battle.id)
                     }
                 } 
             })
@@ -98,8 +98,8 @@ setInterval( async() => {
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
-    console.log('minutes -----------', minutes)
-    console.log('fetching---', fetching)
+    // console.log('minutes -----------', minutes)
+    // console.log('fetching---', fetching)
 
     if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
@@ -115,7 +115,7 @@ setInterval( async() => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             battles = await axios.get(url, { timeout: 120000 })
-            console.log('done data fetch', value)
+            // console.log('done data fetch', value)
 
             let battlesData = battles.data;
 
@@ -128,6 +128,7 @@ setInterval( async() => {
                     await new Battle({
                         battleID: battle.id,
                         battleStartTime: battle.startTime,
+                        battleTotalPlayers: Object.keys(battle.players).length,
                         battleData : battle
                     })
                     .save()
@@ -168,7 +169,12 @@ setInterval( async() => {
         }
     })
 }
-}, 20000);
+}, 10000);
+
+app.post('/updateBattle', function(req, res) {
+    console.log(req.body)
+    const battleData = req.body.battleData
+})
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
@@ -176,13 +182,14 @@ app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
 
 app.use('/battles/:offset', middlewares.battlesMinPlayers)
-app.use('/battles/:offset', middlewares.battlesSortMDW) // Cache here ?
+// app.use('/battles/:offset', middlewares.battlesSortMDW) // Cache here ?
 app.use('/battles/:offset', middlewares.battlesOffsetMDW)
 
 app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
     } else {
+        console.log('fetching')
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 60000 })
             .then((res) => res.json())
@@ -244,7 +251,7 @@ app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
     }
 })
 
-app.use('/killboard/:id', middlewares.killboardRedisMDW)
+app.use('/killboard/:id', middlewares.killboardMDW)
 app.get('/killboard/:id', cors(), (req, res) => {
 
     if (req.data) {        

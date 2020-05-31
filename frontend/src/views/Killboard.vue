@@ -231,6 +231,13 @@ export default {
             }
               if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
                   this.battle.fullEventDeath = true
+                  this.battle.refreshStats = this.refreshStats
+                  /* axios.post('http://localhost:5000/updateBattle', {
+                      battleData : this.battle
+                    })
+                    .then(function (response) {
+                      console.log(response);
+                    }) */
                   // NEED TO SEND TO SERVER  fulleventdeath + refreshstat
               }
           })
