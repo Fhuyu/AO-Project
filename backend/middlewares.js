@@ -3,6 +3,7 @@ const redis = require("redis");
 const port_redis = process.env.PORT || 6379;
 const redis_client = redis.createClient(port_redis);
 
+// APPELER MONGO .FIND AVEC TRI SUR LES DATES -> DELETE SORTMDW
 
 module.exports = {
     battlesRedisMDW: function (req, res, next) {

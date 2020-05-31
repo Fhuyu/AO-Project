@@ -7,6 +7,23 @@ const axios = require("axios");
 
 const cors = require('cors') // https://github.com/expressjs/cors
 
+
+const mongoose = require('mongoose')
+const Battle = require('./models/Battle')
+const Guild = require('./models/Guild')
+const url = 'mongodb://127.0.0.1:27017/mydb'
+
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }) // useFind... is to make findOneAndUpdate work without warning
+
+const db = mongoose.connection
+db.once('open', _ => {
+  console.log('Database connected:', url)
+})
+
+db.on('error', err => {
+  console.error('connection error:', err)
+})
+
 //setup port constants
 const port_redis = process.env.PORT || 6379;
 const port = process.env.PORT || 5000;
@@ -50,28 +67,31 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500] // 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
-        try {
-            await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
-            .then(response => {
-                const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
-                eventdeath.forEach(eventDeath => {
-                    if (eventDeath.BattleId === battle.id) {
-                        battle.players[player.id].eventDeath = eventDeath
-                        battle.refreshStats.push(player.id)
+    try {
+        await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
+        .then(response => {
+            const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+            eventdeath.forEach(async(eventDeath) => {
+                if (eventDeath.BattleId === battle.id) {
+                    battle.players[player.id].eventDeath = eventDeath
+                    battle.refreshStats.push(player.id)
 
-                        if (battle.totalKills === battle.refreshStats.length) {
-                            battle.fullEventDeath = true
-                            redis_client.setex(battle.id, 604800, JSON.stringify(battle));
-                        }
-                    } 
-                })
+                    if (battle.totalKills === battle.refreshStats.length) {
+                        battle.fullEventDeath = true
+                        await Battle.updateOne({ battleID: battle.id }, {
+                            battleData: battle
+                        });
+                        console.log('battle updated', battle.id)
+                    }
+                } 
             })
-        } catch {
-            
-        }    
+        })
+    } catch {
+        
+    }    
 }
 
 setInterval( async() => { 
@@ -85,20 +105,11 @@ setInterval( async() => {
         let fetchDone = 0
         fetching = true
 
-        let guilds = {}
-        redis_client.get('guilds', function(err, reply) {
-            guilds = reply ? JSON.parse(reply) : {}
-        });
+        // ----------- TO OPTIMIZE
+        const guildsInDB = await Guild.find()
+        let guildsIDInDB = []
+        guildsInDB.forEach( guild => guildsIDInDB.push(guild.guildID))
 
-        let battlesTemp = []
-        redis_client.get('battles', (err, data) => {
-            if (err) {
-                res.status(500).send(err);
-            }
-            if (data) {
-                battlesTemp = JSON.parse(data)
-            }
-        })
 
         offset.forEach( async (value) => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
@@ -109,27 +120,33 @@ setInterval( async() => {
             let battlesData = battles.data;
 
             battlesData.forEach( async (battle) => {
-                if (!(battlesTemp.some(b => b.id === battle.id))) {
-
-                    battlesTemp.unshift(battle)
-                    redis_client.set(`battles`, JSON.stringify(battlesTemp));
-                    console.log('battlelength after', battlesTemp.length)
-
-                    for (const guild in battle.guilds) {
-                        if (!(guild in guilds) && battle.guilds[guild].name) { 
-                            console.log('need to set guild', guild)
-                            guildValue = battle.guilds[guild]
-                            guilds[guild] = guildValue.name
-                            redis_client.set('guilds', JSON.stringify(guilds)); // 3j
-                        }  
-                    }
-                    
-                    // SET BATTLE-ID REDIS
+                const battleInDB = await Battle.find({ battleID : battle.id}).limit(1)
+                if (!battleInDB.length) {
                     battle.fullEventDeath = false
                     battle.refreshStats = []
-                    redis_client.setex(battle.id, 259200, JSON.stringify(battle))
-                    console.log('killboard cache set', battle.id)
-                    // EVENTDEATH BATTLE-iD
+
+                    await new Battle({
+                        battleID: battle.id,
+                        battleStartTime: battle.startTime,
+                        battleData : battle
+                    })
+                    .save()
+                    .then( battle => console.log('battle registered', battle.battleData[0].id))
+
+                    for (const currentGuildID in battle.guilds) {
+                        // Not with find, because if I push the result of newGuild in guildsInDB, it might have an error cause another battle had the same guildID not in array
+                        // let guildFound = guildsInDB.find(guild => guild.guildID === currentGuildID)
+                        let guildFound = guildsIDInDB.includes(currentGuildID)
+                        if (!guildFound) {
+                            guildsIDInDB.push(currentGuildID)
+                            // console.log('need to set guild', currentGuildID)
+                            const newGuild = await new Guild({
+                                guildID: currentGuildID,
+                                guildName: battle.guilds[currentGuildID].name,
+                            }).save()
+                        }
+                    }
+                    // EVENTDEATH BATTLE-ID
                     for (const player in battle.players) {
                         if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) {
                             battle.refreshStats.push(player)
@@ -137,7 +154,7 @@ setInterval( async() => {
                             deathPlayer (battle, battle.players[player]) 
                         }
                     }
-                  }
+                }
                         
             })
             fetchDone += 1
@@ -146,12 +163,12 @@ setInterval( async() => {
                 }
         } catch (err){
             fetching = false
-            redis_client.set('guilds', JSON.stringify(guilds));
-            redis_client.set(`battles`, JSON.stringify(battlesTemp));
+            // redis_client.set('guilds', JSON.stringify(guilds));
+            // redis_client.set(`battles`, JSON.stringify(battlesTemp));
         }
-  })
+    })
 }
-}, 40000);
+}, 20000);
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
@@ -159,7 +176,7 @@ app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
 
 app.use('/battles/:offset', middlewares.battlesMinPlayers)
-app.use('/battles/:offset', middlewares.battlesSortMDW)
+app.use('/battles/:offset', middlewares.battlesSortMDW) // Cache here ?
 app.use('/battles/:offset', middlewares.battlesOffsetMDW)
 
 app.get('/battles/:offset', cors(), (req, res) => {
