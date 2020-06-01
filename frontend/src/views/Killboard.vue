@@ -220,15 +220,11 @@ export default {
 
     async playerDead (playerId) {
       try {
-        console.log('in')
         await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
-          console.log('getdata')
           const eventdeath = response.data
-          console.log(eventdeath)
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
-                console.log('id match')
                 this.battle.players[playerId].eventDeath = eventDeath
                 this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
                 this.treatmentPlayerEventDeath(playerId)
@@ -307,9 +303,9 @@ export default {
     treatmentPlayerEventDeath (playerID) {
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
-          this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
+          this.battle.players[playerID].weapon = `${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Quality}`
           // ------- VICTIM MOUNT
-          this.battle.players[playerID].mount = this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Type
+          this.battle.players[playerID].mount = `${this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Quality}`
           // ------- VICTIM IP
           this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower.toFixed(0)
           // this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
@@ -325,20 +321,20 @@ export default {
               // this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
               const heal = this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone
               if (!this.battle.players[participantId].healingDone.includes(heal)) this.battle.players[participantId].healingDone.push(heal)
-              if (!this.battle.players[participantId].weapon) {
-                this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
-                this.battle.players[participantId].mount = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Type
-                this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
-                this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
-              }
+              this.battle.players[participantId].weapon = `${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Quality}`
+              this.battle.players[participantId].mount = `${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Quality}`
+              this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
+              this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
             }
           }
           const killerId = this.battle.players[playerID].eventDeath.Killer.Id
-          if (!this.battle.players[killerId].weapon) {
-            this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Type
-            this.battle.players[killerId].mount = this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Type
-            this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
-          }
+          this.battle.players[killerId].weapon = `${this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Quality}`
+          this.battle.players[killerId].mount = `${this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Quality}`
+          this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
+          
+          this.battle.players[playerID].eventDeath.GroupMembers.forEach( member => {
+            this.battle.players[member.Id].weapon = member.Equipment.MainHand && member.Equipment.MainHand.Type ? `${member.Equipment.MainHand.Type}?quality=${member.Equipment.MainHand.Quality}` : ''
+          })
         }
         
       // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
@@ -378,7 +374,6 @@ export default {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
-        console.log(this.battle)
         this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
         this.totalPlayer = Object.keys(this.battle.players).length
 
@@ -428,16 +423,6 @@ export default {
       })
       })
       
-  },
-  watch: {
-    // showWeapon: function (playerID) {
-    //   console.log('trigger')
-    //   // --- TO BE ABLE TO ORDER BY ON TOP TABLE PER IP (moved from template)
-    //   this.battle.sortedTopTableAlliances.forEach( alliance => {
-    //     alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
-    //   })
-    //   this.showStats = true
-    // },
   },
 }
 </script>

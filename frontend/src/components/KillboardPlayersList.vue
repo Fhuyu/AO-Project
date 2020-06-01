@@ -8,7 +8,7 @@
         </td>
         <td style="font-size:11px;">{{player.guildName}}</td>
         <td v-if="showStats && player.weapon">
-            <img :uk-tooltip="player.weapon.Type" style="height:35px" :src="imageWeaponUri(showWeaponOrMount(player))">
+            <img :uk-tooltip="weaponTooltip(player.weapon)" style="height:35px" :src="imageWeaponUri(showWeaponOrMount(player))">
         </td>
         <td style="height:30px;" v-else></td>
         <td style="text-align:left;">{{player.name}}</td>
@@ -54,6 +54,12 @@ export default {
     showWeaponOrMount (player) {
         const regex = '^[^?]+'
         return player.mount && store.battlemount.includes(player.mount.match(regex)[0]) ? player.mount : player.weapon
+    },
+    weaponTooltip (weapon) {
+      // FROM "T4_2H_TWINSCYTHE_HELL@2?quality=3" TO T4.2 2H WINSCYTHE HELL OUTSTANDING
+      const regex = '^[^?]+'
+      const quality = '[^=]*$'
+      return `${store.quality[weapon.match(quality)[0]]} ${weapon.match(regex)[0]}`
     }
   }
 }

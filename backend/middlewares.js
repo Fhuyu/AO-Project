@@ -35,7 +35,7 @@ module.exports = {
         next();
     },
     battlesMinPlayers: function (req, res, next) {
-        console.log('battlesMinPlayers')
+        // console.log('battlesMinPlayers')
         console.log('req.datapase :', req.dataParse.length)
         if (req.dataParse && req.query.minBattlePlayers > 0) {
             req.dataParse = req.dataParse.filter((battle)=> battle.battleTotalPlayers > parseInt(req.query.minBattlePlayers))
@@ -43,17 +43,11 @@ module.exports = {
         console.log('req.datapase after min battle:', req.dataParse.length)
         next();
     },
-    // battlesSortMDW: function (req, res, next) {
-    //     if (req.dataParse) {
-    //         req.dataSorted = req.dataParse.sort((a,b) => (a.startTime > b.startTime) ? -1 : ((b.startTime > a.startTime) ? 1 : 0));
-    //     }
-    //     next();
-    // },
     battlesOffsetMDW: function (req, res, next) {
         if (req.dataParse) {
-            console.log('----------------')
-            console.log('battlesOffsetMDW')
-            console.log('offset', parseInt(req.params.offset))
+            // console.log('----------------')
+            // console.log('battlesOffsetMDW')
+            // console.log('offset', parseInt(req.params.offset))
             if (!(req.dataParse.length < parseInt(req.params.offset))) {
                 req.data = req.dataParse.slice(req.params.offset, (parseInt(req.params.offset) + 50))
                 req.data.forEach( (battle, index) => {
@@ -68,20 +62,10 @@ module.exports = {
     killboardMDW: async function (req, res, next) {
         await Battle.find({ battleID : req.params.id}).limit(1)
         .then(killboard => {
-        // console.log('data found : ', killboard)
         // If battle is in DB
         if (killboard.length) req.data = killboard[0].battleData[0]
         next();
     })
-
-        // redis_client.get(req.params.id, (err, data) => {
-        //     if (data != null) {
-        //         // console.log('cache found', req.params.id)
-        //         req.data = JSON.parse(data)
-        //         // console.log(data)
-        //     }
-        //     next();
-        // });
 
     }
 }

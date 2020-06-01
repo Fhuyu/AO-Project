@@ -7,7 +7,7 @@
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
         <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
       </router-link>
-      <p>Beta version - 0.3.1 - Filter by players number reworked | 
+      <p>Beta version - 0.3.2 | 
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
@@ -15,17 +15,14 @@
               <button class="uk-modal-close-default" type="button" uk-close></button>
               <h2 class="uk-modal-title">Incoming</h2>
                   <b>Battleboard : Alliance + Player search</b><br />
-                  <b>Killboard : Optimize weapons in all killboard without loading.</b><br />
+                  <b>Killboard : See all weapons</b><br />
+                  <b>Killboard : Show killboard without loading.</b><br />
                   Battleboard : Save guild research to be able to click back from killboard<br />
                   Killboard : Resolve loading bar blocked for old battles<br />
                   Battleboard : Highlight searched guild & player<br />
                   Website : General design (Logo / Color)<br />
-              <!-- <h2 class="uk-modal-title">Idea</h2>
-                  Comment section under each killboard<br />
-                  Top 5 battles of the week <br />
-                  Top PVP guild of the week <br />
-                  Show guild presentation with video <br /> -->
               <h2 class="uk-modal-title">Done</h2>
+                  20-06-02 : New Database on duty ! Data Optimized<br />
                   20-05-25 : Battleboard : Filter current battles by players : reworked (now show all battles and not only current offset)<br />
                   20-05-24 : Battleboard : Guild quick search !<br />
                   20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />

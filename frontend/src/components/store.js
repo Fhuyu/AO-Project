@@ -20,5 +20,12 @@ module.exports =  {
         'UNIQUE_MOUNT_BEHEMOTH_CRYSTAL',
         'T7_MOUNT_SWAMPDRAGON_BATTLE',
         'T7_MOUNT_ARMORED_SWAMPDRAGON_BATTLE'
-    ]
+    ],
+    quality : {
+        1 : '',
+        2 : 'GOOD',
+        3 : 'OUTSTANDING',
+        4 : 'EXCELLENT',
+        5 : 'MASTERPIECE'
+    }
 }    
