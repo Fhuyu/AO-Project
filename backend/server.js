@@ -74,18 +74,26 @@ async function deathPlayer (battle, player) {
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
         .then(response => {
             const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+            playerEventDeath = []
             eventdeath.forEach(async(eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
                     // HERE
-                    battle.players[player.id].eventDeath = eventDeath
+                    playerEventDeath.push(eventDeath) // In case someone died several times - to calc total deathfame
                     battle.refreshStats.push(player.id)
+                     // ------- VICTIM ITEM
+                    battle.players[player.id].weapon = `${eventDeath.Victim.Equipment.MainHand.Type}?quality=${eventDeath.Victim.Equipment.MainHand.Quality}`
+                    // ------- VICTIM MOUNT
+                    battle.players[player.id].mount = `${eventDeath.Victim.Equipment.Mount.Type}?quality=${eventDeath.Victim.Equipment.Mount.Quality}`
+                    // ------- VICTIM IP
+                    battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
+                    // // ------- VICTIM DEATH FAME
+                    battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
 
                     if (battle.totalKills === battle.refreshStats.length) {
                         battle.fullEventDeath = true
                         await Battle.updateOne({ battleID: battle.id }, {
                             battleData: battle
                         });
-                        // console.log('battle updated', battle.id)
                     }
                 } 
             })
