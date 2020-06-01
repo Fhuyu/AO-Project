@@ -30,5 +30,8 @@ module.exports = {
             }
         }
         return battle
-    }
+    },
+    battleEventDeathTreatment : function (battle) {
+        }
+
 }

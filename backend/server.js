@@ -76,6 +76,7 @@ async function deathPlayer (battle, player) {
             const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
             eventdeath.forEach(async(eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
+                    // HERE
                     battle.players[player.id].eventDeath = eventDeath
                     battle.refreshStats.push(player.id)
 
@@ -124,6 +125,7 @@ setInterval( async() => {
                 if (!battleInDB.length) {
                     battle.fullEventDeath = false
                     battle.refreshStats = []
+                    battle = functions.battleTreatment(battle)
 
                     await new Battle({
                         battleID: battle.id,
@@ -255,8 +257,7 @@ app.use('/killboard/:id', middlewares.killboardMDW)
 app.get('/killboard/:id', cors(), (req, res) => {
 
     if (req.data) {        
-        const battle = functions.battleTreatment(req.data)
-        res.send(battle)
+        res.send(req.data)
     } else {
       fetch(`https://gameinfo.albiononline.com/api/gameinfo/battles/${req.params.id}`, { timeout: 15000 })
         .then((res) => res.json())

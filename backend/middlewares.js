@@ -13,12 +13,12 @@ module.exports = {
     battlesRedisMDW: async function (req, res, next) {
         console.log('battlesRedisMDW')
         console.log('params :', req.params)
-        req.dataParse = await Battle.find().sort({ battleStartTime: -1} ) // ORDER BY DATE
+        req.dataParse = await Battle.find().sort({battleID:-1})  // ORDER BY DATE .sort({ battleStartTime: -1} )
         next()
+        // RAM LIMIT -> NEED ADMINCOMMAND ON
     },
     guildIdMDW: function (req, res, next) {
         console.log('guildIdMDW')
-        console.log('req.datapase :', req.dataParse)
         redis_client.get(`guilds`, (err, data) => {
             if (data != null) {
                 guilds = JSON.parse(data)
@@ -30,7 +30,7 @@ module.exports = {
     battlesGuildMDW: function (req, res, next) {
         console.log('battlesGuildMDW')
         if (req.dataParse) {
-            req.dataParse = req.dataParse.filter((battle)=> battle.guilds[req.guildID]); // REDO
+            req.dataParse = req.dataParse.filter((battle)=> battle.battleData[0].guilds[req.guildID]); // REDO
         }
         next();
     },
