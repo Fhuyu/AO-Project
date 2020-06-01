@@ -67,7 +67,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     try {
@@ -77,25 +77,47 @@ async function deathPlayer (battle, player) {
             playerEventDeath = []
             eventdeath.forEach(async(eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
-                    // HERE
                     playerEventDeath.push(eventDeath) // In case someone died several times - to calc total deathfame
                     battle.refreshStats.push(player.id)
-                     // ------- VICTIM ITEM
-                    battle.players[player.id].weapon = `${eventDeath.Victim.Equipment.MainHand.Type}?quality=${eventDeath.Victim.Equipment.MainHand.Quality}`
-                    // ------- VICTIM MOUNT
-                    battle.players[player.id].mount = `${eventDeath.Victim.Equipment.Mount.Type}?quality=${eventDeath.Victim.Equipment.Mount.Quality}`
-                    // ------- VICTIM IP
-                    battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
-                    // // ------- VICTIM DEATH FAME
-                    battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
+                    battle.KillArea = eventDeath.KillArea
 
-                    if (battle.totalKills === battle.refreshStats.length) {
-                        battle.fullEventDeath = true
-                        await Battle.updateOne({ battleID: battle.id }, {
-                            battleData: battle
-                        });
-                    }
-                } 
+                     // ------- VICTIM ITEM - IP - DEATHFAME
+                    battle.players[player.id].weapon = eventDeath.Victim.Equipment.MainHand && eventDeath.Victim.Equipment.MainHand.Type ? `${eventDeath.Victim.Equipment.MainHand.Type}?quality=${eventDeath.Victim.Equipment.MainHand.Quality}` : ''
+                    battle.players[player.id].mount = eventDeath.Victim.Equipment.Mount && eventDeath.Victim.Equipment.Mount.Type ?`${eventDeath.Victim.Equipment.Mount.Type}?quality=${eventDeath.Victim.Equipment.Mount.Quality}` : ''
+                    battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
+                    battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
+                    
+                    // ------- KILLER ITEM - IP - DEATHFAME
+                    battle.players[eventDeath.Killer.Id].weapon = eventDeath.Killer.Equipment.MainHand && eventDeath.Killer.Equipment.MainHand.Type ? `${eventDeath.Killer.Equipment.MainHand.Type}?quality=${eventDeath.Killer.Equipment.MainHand.Quality}` : ''
+                    battle.players[eventDeath.Killer.Id].mount = eventDeath.Killer.Equipment.Mount && eventDeath.Killer.Equipment.Mount.Type ? `${eventDeath.Killer.Equipment.Mount.Type}?quality=${eventDeath.Killer.Equipment.Mount.Quality}` : ''
+                    battle.players[eventDeath.Killer.Id].itempower = eventDeath.Killer.AverageItemPower.toFixed(0)
+
+                    // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
+                    eventDeath.Participants.forEach( participant => {
+                        // console.log(battle.players[participant.Id])
+                        if (battle.players[participant.Id] && !battle.players[participant.Id].weapon) {
+                            battle.players[participant.Id].weapon = participant.Equipment.MainHand && participant.Equipment.MainHand.Type ? `${participant.Equipment.MainHand.Type}?quality=${participant.Equipment.MainHand.Quality}` : ''
+                            battle.players[participant.Id].mount = participant.Equipment.Mount && participant.Equipment.Mount.Type ? `${participant.Equipment.Mount.Type}?quality=${participant.Equipment.Mount.Quality}` : ''
+                            battle.players[participant.Id].assistance += 1
+                            battle.players[participant.Id].damageDone.push(participant.DamageDone)
+                            battle.players[participant.Id].healingDone.push(participant.SupportHealingDone)
+                            battle.players[participant.Id].itempower = participant.AverageItemPower.toFixed(0)
+                        }
+                        
+                    })
+                    eventDeath.GroupMembers.forEach( member => {
+                        if (!battle.players[member.Id].weapon) {
+                            battle.players[member.Id].weapon = member.Equipment.MainHand && member.Equipment.MainHand.Type ? `${member.Equipment.MainHand.Type}?quality=${member.Equipment.MainHand.Quality}` : ''
+                        }
+                    }) 
+                }
+
+                if (battle.totalKills === battle.refreshStats.length) {
+                    battle.fullEventDeath = true
+                    await Battle.updateOne({ battleID: battle.id }, {
+                        battleData: battle
+                    });
+                }
             })
         })
     } catch {
@@ -279,10 +301,12 @@ app.get('/killboard/:id', cors(), (req, res) => {
     }
 })
 app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
+    console.log('in', req.params.id)
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
     fetch(url, { timeout: 30000 })
         .then((res) => res.json())
         .then((json) => {
+            console.log('send')
             res.send(json)
         })
         .catch((error) => {

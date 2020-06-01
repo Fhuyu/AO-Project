@@ -52,7 +52,8 @@ export default {
       if (player.id === this.bestPlayerIP.id) return "bestIp"
     },
     showWeaponOrMount (player) {
-        return player.mount && store.battlemount.includes(player.mount.Type) ? player.mount.Type : player.weapon.Type
+        const regex = '^[^?]+'
+        return player.mount && store.battlemount.includes(player.mount.match(regex)[0]) ? player.mount : player.weapon
     }
   }
 }

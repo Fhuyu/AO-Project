@@ -212,7 +212,7 @@ export default {
   methods: {
     async fetchData () {
       try {
-          return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
+          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
       } catch {
           this.error404 = true
       }
@@ -220,11 +220,15 @@ export default {
 
     async playerDead (playerId) {
       try {
-        await axios.get(`https://handholdreport.com/api/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+        console.log('in')
+        await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
+          console.log('getdata')
           const eventdeath = response.data
+          console.log(eventdeath)
           eventdeath.forEach(eventDeath => {
             if (eventDeath.BattleId === this.battle.id) {
+                console.log('id match')
                 this.battle.players[playerId].eventDeath = eventDeath
                 this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
                 this.treatmentPlayerEventDeath(playerId)
@@ -303,9 +307,9 @@ export default {
     treatmentPlayerEventDeath (playerID) {
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
           // ------- VICTIM ITEM
-          this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand
+          this.battle.players[playerID].weapon = this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type
           // ------- VICTIM MOUNT
-          this.battle.players[playerID].mount = this.battle.players[playerID].eventDeath.Victim.Equipment.Mount
+          this.battle.players[playerID].mount = this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Type
           // ------- VICTIM IP
           this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower.toFixed(0)
           // this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
@@ -322,8 +326,8 @@ export default {
               const heal = this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone
               if (!this.battle.players[participantId].healingDone.includes(heal)) this.battle.players[participantId].healingDone.push(heal)
               if (!this.battle.players[participantId].weapon) {
-                this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand
-                this.battle.players[participantId].mount = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount
+                this.battle.players[participantId].weapon = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type
+                this.battle.players[participantId].mount = this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Type
                 this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
                 this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
               }
@@ -331,8 +335,8 @@ export default {
           }
           const killerId = this.battle.players[playerID].eventDeath.Killer.Id
           if (!this.battle.players[killerId].weapon) {
-            this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand
-            this.battle.players[killerId].mount = this.battle.players[playerID].eventDeath.Killer.Equipment.Mount
+            this.battle.players[killerId].weapon = this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Type
+            this.battle.players[killerId].mount = this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Type
             this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
           }
         }
@@ -374,6 +378,7 @@ export default {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
+        console.log(this.battle)
         this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
         this.totalPlayer = Object.keys(this.battle.players).length
 

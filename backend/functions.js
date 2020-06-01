@@ -6,6 +6,7 @@ module.exports = {
                 battle.guilds[guild].allianceId = guild
             }
         }
+        // IN FRONT ?
         for (const alliance in battle.alliances) {
             battle.alliances[alliance].players = []
             battle.alliances[alliance].listItemPower = []
