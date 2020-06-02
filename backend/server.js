@@ -125,7 +125,7 @@ async function deathPlayer (battle, player) {
 
 setInterval( async() => { 
     lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
-    let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
+    // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
     // console.log('minutes -----------', minutes)
     // console.log('fetching---', fetching)
@@ -173,7 +173,7 @@ setInterval( async() => {
                             // console.log('need to set guild', currentGuildID)
                             const newGuild = await new Guild({
                                 guildID: currentGuildID,
-                                guildName: battle.guilds[currentGuildID].name,
+                                guildName: battle.guilds[currentGuildID].name.toUpperCase(),
                             }).save()
                         }
                     }
@@ -201,10 +201,10 @@ setInterval( async() => {
 }
 }, 10000);
 
-app.post('/updateBattle', function(req, res) {
-    console.log(req.body)
-    const battleData = req.body.battleData
-})
+// app.post('/updateBattle', function(req, res) {
+//     console.log(req.body)
+//     const battleData = req.body.battleData
+// })
 
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
@@ -219,7 +219,6 @@ app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
     } else {
-        console.log('fetching')
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 60000 })
             .then((res) => res.json())
@@ -235,17 +234,10 @@ app.get('/battles/:offset', cors(), (req, res) => {
 
 app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
     if (req.data && req.guildID) {
-        // console.log('DATA OR GUILD ID')
         res.send(req.data)
     } else {
-        // console.log('NO DATA OR NO GUILD ID')
-        // console.log('guildname', req.params.guildName)
-        // console.log('req.guildID', JSON.stringify(req.guildID))
-        // console.log('offset', req.params.offset)
         guildIDReq = req.guildID
         if(req.guildID) {
-            // console.log('GUILD ID FOUND')
-            // console.log("guildId", req.guildID)
             let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${req.guildID}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
             fetch(url, { timeout: 10000 })
                 .then((res) => res.json())
@@ -257,12 +249,10 @@ app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
                 });
 
         } else  {
-            // console.log('no guild id found')
             fetch(`https://gameinfo.albiononline.com/api/gameinfo/search?q=${req.params.guildName}`, { timeout: 15000 })
             .then((res) => res.json())
             .then( json => {
                 let guildId = json.guilds[0].Id
-                // console.log("guildId", guildId)
                 let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&guildId=${guildId}&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
                 fetch(url, { timeout: 10000 })
                     .then((res) => res.json())
@@ -299,12 +289,10 @@ app.get('/killboard/:id', cors(), (req, res) => {
     }
 })
 app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR FAIRE LE TRI DANS LE BACK
-    console.log('in', req.params.id)
     let url = `https://gameinfo.albiononline.com/api/gameinfo/players/${req.params.id}/deaths`;
     fetch(url, { timeout: 30000 })
         .then((res) => res.json())
         .then((json) => {
-            console.log('send')
             res.send(json)
         })
         .catch((error) => {

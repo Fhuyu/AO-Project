@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     imageWeaponUri (weaponType) {
-      return `https://gameinfo.albiononline.com/api/gameinfo/items/${weaponType}` // -------> LOCAL STORE ?
+      return `https://render.albiononline.com/v1/item/${weaponType}` // https://gameinfo.albiononline.com/api/gameinfo/items/
     },
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });

@@ -5,7 +5,7 @@
     <div id="header">
       <router-link to='/' style="text-decoration: none;">
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
-        <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1>
+        <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
       </router-link>
       <p>Beta version - 0.3.2 | 
 
@@ -28,11 +28,6 @@
                   20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />
                   20-05-20 : Killboards are loading faster + Half of them show directly Weapon, IP ... || Killboard global stat can now be order by IP<br />
                   20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
-                  20-04-17 : Battleboard - Visual update + Able to type Enter to search guild<br />
-                  20-04-06 : Killboard - Global statistics // Mode switch updated<br />
-                  20-04-03 : Global Battleboard - Filter current battles by player number<br />
-                  20-04-02 : Global Battleboard - Battles Design visual upgraded (Night & Day)<br />
-                  20-03-31 : Killboard - See battlemount over weapon (Hover weapon available)<br />
           </div>
       </div>
     <NightMode @clicked="onClickSwitchMode"></NightMode>
@@ -45,7 +40,8 @@
     <router-view/>
     <div id="footer">
       <p>Website under development. Wanna share your feedback ? <br />
-        Contact discord : Fuyu#2494</p>
+      <a href="https://discord.gg/nJRu5e" target="_blank"><img id="discord" src="./assets/discord.png" alt="discord" /></a>
+      </p>
     </div>
 
   </div>
@@ -73,6 +69,9 @@ export default {
 </script>
 
 <style>
+#discord {
+  width: 60px;
+}
 #footer {
   text-align: center;
   padding: 40px;
