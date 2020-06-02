@@ -131,7 +131,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
@@ -147,7 +147,7 @@ export default {
           this.error404 = true
         });
       } */ else {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER

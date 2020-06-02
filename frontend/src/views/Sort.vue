@@ -78,7 +78,7 @@ export default {
       return player[Object.keys(player)[0]]
     },
     async fetchData () {
-      const response = await axios.get(`http://localhost:3000/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
+      const response = await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) // Passer la battle en props ?? plutot que de request
       return response
     },
     sort: function (column) {
