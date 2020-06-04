@@ -9,22 +9,17 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     battlesRedisMDW: async function (req, res, next) {
-        console.log('new battles fetch')
-        console.log(req.params)
+        const offsetNumber = parseInt(req.params.offset) + 50
         if (req.params.guildName) {
-            console.log('in guild')
             req.dataParse = await Battle.find().sort({battleID:-1})
         } else {
-            const offsetNumber = parseInt(req.params.offset) + 50
-            req.dataParse = await Battle.find().sort({battleID:-1}).limit(offsetNumber)
+            req.dataParse = await Battle.find({ battleTotalPlayers: { $gt: req.query.minBattlePlayers } }).sort({battleID:-1}).limit(offsetNumber)
         }
 
         next()
         // RAM LIMIT -> NEED ADMINCOMMAND ON
     },
     guildIdMDW: async function (req, res, next) {
-        console.log(req.params)
-
         guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
         console.log(req.params.guildName)
         req.guildID = guilds[0].guildID
@@ -36,13 +31,13 @@ module.exports = {
         }
         next();
     },
-    battlesMinPlayers: function (req, res, next) {
-        console.log('minplayers :', req.query.minBattlePlayers)
-        if (req.dataParse && req.query.minBattlePlayers > 0) {
-            req.dataParse = req.dataParse.filter((battle)=> battle.battleTotalPlayers > parseInt(req.query.minBattlePlayers))
-        }
-        next();
-    },
+    // battlesMinPlayers: function (req, res, next) {
+    //     console.log('minplayers :', req.query.minBattlePlayers)
+    //     if (req.dataParse && req.query.minBattlePlayers > 0) {
+    //         req.dataParse = req.dataParse.filter((battle)=> battle.battleTotalPlayers > parseInt(req.query.minBattlePlayers))
+    //     }
+    //     next();
+    // },
     battlesOffsetMDW: function (req, res, next) {
         if (req.dataParse) {
             // console.log('----------------')

@@ -212,7 +212,7 @@ app.use('/battles/:offset/:guildName', middlewares.battlesRedisMDW)
 app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
 
-app.use('/battles/:offset', middlewares.battlesMinPlayers)
+// app.use('/battles/:offset', middlewares.battlesMinPlayers)
 // app.use('/battles/:offset', middlewares.battlesSortMDW) // Cache here ?
 app.use('/battles/:offset', middlewares.battlesOffsetMDW)
 
