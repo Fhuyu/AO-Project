@@ -7,12 +7,13 @@
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
         <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
       </router-link>
-      <p>Beta version - 0.3.2 | 
+      <p>Beta version - 0.3.3 | 
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
           <div class="uk-modal-dialog uk-modal-body">
               <button class="uk-modal-close-default" type="button" uk-close></button>
+              All details on HandHoldReport Discord : <a href="https://discord.gg/eQnTDFn" target="_blank"><img style="width:20px;" src="./assets/discord.png" alt="discord" /></a>
               <h2 class="uk-modal-title">Incoming</h2>
                   <b>Battleboard : Alliance + Player search</b><br />
                   <b>Killboard : See all weapons</b><br />
@@ -22,6 +23,7 @@
                   Battleboard : Highlight searched guild & player<br />
                   Website : General design (Logo / Color)<br />
               <h2 class="uk-modal-title">Done</h2>
+                  20-06-04 : Loading battles (without guildname) is faster<br />
                   20-06-02 : New Database on duty ! Data Optimized<br />
                   20-05-25 : Battleboard : Filter current battles by players : reworked (now show all battles and not only current offset)<br />
                   20-05-24 : Battleboard : Guild quick search !<br />
@@ -40,7 +42,7 @@
     <router-view/>
     <div id="footer">
       <p>Website under development. Wanna share your feedback ? <br />
-      <a href="https://discord.gg/nJRu5e" target="_blank"><img id="discord" src="./assets/discord.png" alt="discord" /></a>
+      <a href="https://discord.gg/eQnTDFn" target="_blank"><img id="discord" src="./assets/discord.png" alt="discord" /></a>
       </p>
     </div>
 
