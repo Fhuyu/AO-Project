@@ -9,11 +9,22 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     battlesRedisMDW: async function (req, res, next) {
-        req.dataParse = await Battle.find().sort({battleID:-1})  // ORDER BY DATE .sort({ battleStartTime: -1} )
+        console.log('new battles fetch')
+        console.log(req.params)
+        if (req.params.guildName) {
+            console.log('in guild')
+            req.dataParse = await Battle.find().sort({battleID:-1})
+        } else {
+            const offsetNumber = parseInt(req.params.offset) + 50
+            req.dataParse = await Battle.find().sort({battleID:-1}).limit(offsetNumber)
+        }
+
         next()
         // RAM LIMIT -> NEED ADMINCOMMAND ON
     },
     guildIdMDW: async function (req, res, next) {
+        console.log(req.params)
+
         guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
         console.log(req.params.guildName)
         req.guildID = guilds[0].guildID

@@ -67,7 +67,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     try {
@@ -205,8 +205,9 @@ setInterval( async() => {
 //     console.log(req.body)
 //     const battleData = req.body.battleData
 // })
-
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
+
+app.use('/battles/:offset/:guildName', middlewares.battlesRedisMDW)
 
 app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
@@ -219,6 +220,8 @@ app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
     } else {
+        console.log('fetching')
+        console.log("offset", req.params.offset)
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 60000 })
             .then((res) => res.json())
