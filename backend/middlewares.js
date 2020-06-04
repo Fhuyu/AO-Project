@@ -10,14 +10,20 @@ const Guild = require('./models/Guild')
 module.exports = {
     battlesRedisMDW: async function (req, res, next) {
         const offsetNumber = parseInt(req.params.offset) + 50
-        if (req.params.guildName) {
-            req.dataParse = await Battle.find().sort({battleID:-1})
+        console.log('nbplayer', req.query.minBattlePlayers)
+        if (req.guildID) {
+
+            let query = {}
+            let guildTosearch = "battleData.guilds." + req.guildID
+            query[guildTosearch] = {$exists: true }
+            query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
+
+            req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
         } else {
             req.dataParse = await Battle.find({ battleTotalPlayers: { $gt: req.query.minBattlePlayers } }).sort({battleID:-1}).limit(offsetNumber)
         }
 
         next()
-        // RAM LIMIT -> NEED ADMINCOMMAND ON
     },
     guildIdMDW: async function (req, res, next) {
         guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
@@ -25,12 +31,12 @@ module.exports = {
         req.guildID = guilds[0].guildID
         next();
     },
-    battlesGuildMDW: function (req, res, next) {
-        if (req.dataParse) {
-            req.dataParse = req.dataParse.filter((battle)=> battle.battleData[0].guilds[req.guildID]); // REDO
-        }
-        next();
-    },
+    // battlesGuildMDW: function (req, res, next) {
+    //     if (req.dataParse) {
+    //         req.dataParse = req.dataParse.filter((battle)=> battle.battleData[0].guilds[req.guildID]); // REDO
+    //     }
+    //     next();
+    // },
     // battlesMinPlayers: function (req, res, next) {
     //     console.log('minplayers :', req.query.minBattlePlayers)
     //     if (req.dataParse && req.query.minBattlePlayers > 0) {
@@ -51,6 +57,9 @@ module.exports = {
                     }
                 )
             }
+            // if (req.guildID && req.dataParse.length < parseInt(req.params.offset)) {
+            //     req.data = ['empty']
+            // }
         }    
         next();
     },

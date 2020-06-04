@@ -162,7 +162,7 @@ setInterval( async() => {
                         battleData : battle
                     })
                     .save()
-                    .then( battle => console.log('battle registered', battle.battleData[0].id))
+                    //.then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     for (const currentGuildID in battle.guilds) {
                         // Not with find, because if I push the result of newGuild in guildsInDB, it might have an error cause another battle had the same guildID not in array
@@ -205,12 +205,13 @@ setInterval( async() => {
 //     console.log(req.body)
 //     const battleData = req.body.battleData
 // })
+app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
+
 app.use('/battles/:offset', middlewares.battlesRedisMDW)
 
-app.use('/battles/:offset/:guildName', middlewares.battlesRedisMDW)
+// app.use('/battles/:offset/:guildName', middlewares.battlesRedisMDW)
 
-app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
-app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
+// app.use('/battles/:offset/:guildName', middlewares.battlesGuildMDW)
 
 // app.use('/battles/:offset', middlewares.battlesMinPlayers)
 // app.use('/battles/:offset', middlewares.battlesSortMDW) // Cache here ?
