@@ -19,7 +19,7 @@
         <td v-if="showStats">{{player.healingDone.length > 0 ? formatNumber(sumArray(player.healingDone).toFixed(0)) : ''}}</td> <td v-else></td>
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
-        <td v-if="showDeathFame"> <a v-if="player.eventDeath" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId -->
+        <td v-if="showDeathFame">  <a v-if="player.deathFame" target="_blank" :href="`https://albiononline.com/en/killboard/kill/${player.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId <a v-if="player.deathFame.length" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{player.deathFame}}</a>-->
 
     </tr>
 </template>
@@ -60,7 +60,12 @@ export default {
       const regex = '^[^?]+'
       const quality = '[^=]*$'
       return `${store.quality[weapon.match(quality)[0]]} ${weapon.match(regex)[0]}`
-    }
+    },
+  },
+  mounted () {
+    
+    this.player.deathFame = this.sumArray(this.player.deathFame)
+
   }
 }
 </script>

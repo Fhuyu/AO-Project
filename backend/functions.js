@@ -1,3 +1,4 @@
+const Guild = require('./models/Guild')
 module.exports = {
     battleTreatment : function (battle) {
         for (const guild in battle.guilds) {
@@ -41,6 +42,8 @@ module.exports = {
         battle.players[player.id].mount = eventDeath.Victim.Equipment.Mount && eventDeath.Victim.Equipment.Mount.Type ?`${eventDeath.Victim.Equipment.Mount.Type}?quality=${eventDeath.Victim.Equipment.Mount.Quality}` : ''
         battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
         battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
+        battle.players[player.id].EventId = eventDeath.EventId
+        console.log('event death ID', battle.players[player.id].EventId)
         
         // ------- KILLER ITEM - IP - DEATHFAME
         battle.players[eventDeath.Killer.Id].weapon = eventDeath.Killer.Equipment.MainHand && eventDeath.Killer.Equipment.MainHand.Type ? `${eventDeath.Killer.Equipment.MainHand.Type}?quality=${eventDeath.Killer.Equipment.MainHand.Quality}` : ''
@@ -64,6 +67,20 @@ module.exports = {
             battle.players[member.Id].weapon = member.Equipment.MainHand && member.Equipment.MainHand.Type ? `${member.Equipment.MainHand.Type}?quality=${member.Equipment.MainHand.Quality}` : ''
         }) 
         return battle
+    },
+    async registerNewGuild (guilds, guildsIDInDB) {
+        for (const currentGuildID in guilds) {
+            // Not with find, because if I push the result of newGuild in guildsInDB, it might have an error cause another battle had the same guildID not in array
+            let guildFound = guildsIDInDB.includes(currentGuildID)
+            if (!guildFound) {
+                guildsIDInDB.push(currentGuildID)
+                console.log('need to set guild', currentGuildID)
+                 await new Guild({
+                    guildID: currentGuildID,
+                    guildName: guilds[currentGuildID].name.toUpperCase(),
+                }).save()
+            }
+        }
     }
 
 }

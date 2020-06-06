@@ -137,7 +137,7 @@
                     <td uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td>
                     <td> Item Power </td>
                     <td> Kill Fame </td>
-                    <td uk-tooltip="Only first death" v-if="showDeathFame"> Death Fame* </td>
+                    <td uk-tooltip="Total death fame / Link on first death" v-if="showDeathFame"> Death Fame* </td>
                 </tr>
               </thead>
             <tbody>
@@ -301,7 +301,10 @@ export default {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
     treatmentPlayerEventDeath (playerID) {
+        console.log('in')
         if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
+        console.log('innn')
+
           // ------- VICTIM ITEM
           this.battle.players[playerID].weapon = `${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Quality}`
           // ------- VICTIM MOUNT

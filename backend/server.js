@@ -67,20 +67,19 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     try {
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
         .then(response => {
-            const eventdeath = response.data // RECUPERER QUE L EVENT DEATH UTILE VU QUE LE FOR EACH EST DANS LE BACK
+            const eventdeath = response.data 
             playerEventDeath = []
             eventdeath.forEach(async(eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
                     playerEventDeath.push(eventDeath) // In case someone died several times - to calc total deathfame
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
                 }
-
                 if (battle.totalKills === battle.refreshStats.length) {
                     battle.fullEventDeath = true
                     await Battle.updateOne({ battleID: battle.id }, {
@@ -99,13 +98,13 @@ setInterval( async() => {
     // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
     // console.log('minutes -----------', minutes)
-    // console.log('fetching---', fetching)
+    console.log('fetching---', fetching)
 
     if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
         fetching = true
 
-        // ----------- TO OPTIMIZE
+        // ----------- TO OPTIMIZE with aggregrate ?
         const guildsInDB = await Guild.find()
         let guildsIDInDB = []
         guildsInDB.forEach( guild => guildsIDInDB.push(guild.guildID))
@@ -128,32 +127,20 @@ setInterval( async() => {
 
                     await new Battle({
                         battleID: battle.id,
-                        battleStartTime: battle.startTime,
                         battleTotalPlayers: Object.keys(battle.players).length,
                         battleData : battle
                     })
                     .save()
-                    //.then( battle => console.log('battle registered', battle.battleData[0].id))
+                    .then( battle => console.log('battle registered', battle.battleData[0].id))
 
-                    for (const currentGuildID in battle.guilds) {
-                        // Not with find, because if I push the result of newGuild in guildsInDB, it might have an error cause another battle had the same guildID not in array
-                        // let guildFound = guildsInDB.find(guild => guild.guildID === currentGuildID)
-                        let guildFound = guildsIDInDB.includes(currentGuildID)
-                        if (!guildFound) {
-                            guildsIDInDB.push(currentGuildID)
-                            // console.log('need to set guild', currentGuildID)
-                            const newGuild = await new Guild({
-                                guildID: currentGuildID,
-                                guildName: battle.guilds[currentGuildID].name.toUpperCase(),
-                            }).save()
-                        }
-                    }
+                    functions.registerNewGuild(battle.guilds, guildsIDInDB)
+                    
                     // EVENTDEATH BATTLE-ID
                     for (const player in battle.players) {
                         if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) {
                             battle.refreshStats.push(player)
                         } else if (battle.players[player].deaths > 0) {
-                            deathPlayer (battle, battle.players[player]) 
+                            // deathPlayer (battle, battle.players[player]) 
                         }
                     }
                 }
