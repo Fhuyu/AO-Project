@@ -1,53 +1,37 @@
-const redis = require("redis");
-
-const port_redis = process.env.PORT || 6379;
-const redis_client = redis.createClient(port_redis);
+// const redis = require("redis");
+// const port_redis = process.env.PORT || 6379;
+// const redis_client = redis.createClient(port_redis);
 
 const mongoose = require('mongoose')
 const Battle = require('./models/Battle')
 const Guild = require('./models/Guild')
 
 module.exports = {
-    battlesRedisMDW: async function (req, res, next) {
-        const offsetNumber = parseInt(req.params.offset) + 50
-        console.log('nbplayer', req.query.minBattlePlayers)
-        if (req.guildID) {
-
-            let query = {}
-            let guildTosearch = "battleData.guilds." + req.guildID
-            query[guildTosearch] = {$exists: true }
-            query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
-
-            req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
-        } else {
-            req.dataParse = await Battle.find({ battleTotalPlayers: { $gt: req.query.minBattlePlayers } }).sort({battleID:-1}).limit(offsetNumber)
-        }
-
-        next()
-    },
     guildIdMDW: async function (req, res, next) {
         guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
         console.log(req.params.guildName)
         req.guildID = guilds[0].guildID
         next();
     },
-    // battlesGuildMDW: function (req, res, next) {
-    //     if (req.dataParse) {
-    //         req.dataParse = req.dataParse.filter((battle)=> battle.battleData[0].guilds[req.guildID]); // REDO
-    //     }
-    //     next();
-    // },
-    // battlesMinPlayers: function (req, res, next) {
-    //     console.log('minplayers :', req.query.minBattlePlayers)
-    //     if (req.dataParse && req.query.minBattlePlayers > 0) {
-    //         req.dataParse = req.dataParse.filter((battle)=> battle.battleTotalPlayers > parseInt(req.query.minBattlePlayers))
-    //     }
-    //     next();
-    // },
+
+    battlesMDW: async function (req, res, next) {
+        console.log('nbplayer', req.query.minBattlePlayers)
+
+        const offsetNumber = parseInt(req.params.offset) + 50
+        let query = {}
+        
+        if (req.guildID) {
+            let guildTosearch = "battleData.guilds." + req.guildID
+            query[guildTosearch] = {$exists: true }
+        }
+        query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
+
+        req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
+        next()
+    },
+
     battlesOffsetMDW: function (req, res, next) {
         if (req.dataParse) {
-            // console.log('----------------')
-            // console.log('battlesOffsetMDW')
             console.log('offset', parseInt(req.params.offset))
             console.log('----')
             if (!(req.dataParse.length < parseInt(req.params.offset))) {
@@ -57,9 +41,6 @@ module.exports = {
                     }
                 )
             }
-            // if (req.guildID && req.dataParse.length < parseInt(req.params.offset)) {
-            //     req.data = ['empty']
-            // }
         }    
         next();
     },
