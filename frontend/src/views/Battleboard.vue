@@ -9,21 +9,42 @@
   </div>
   
   <div v-else class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
+
+    <div class="uk-margin">
+        
+    </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
+      <div>
+      <div uk-form-custom="target: > * > span:first-child">
+            <select v-model="searchType" class="uk-select" id="form-stacked-select">
+                <option value="guild">Guild</option>
+                <option value="alliance">Alliance</option>
+                <option value="player">Player</option>
+            </select>
+            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                <span></span>
+                <span uk-icon="icon: chevron-down"></span>
+            </button>
+        </div>
       <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
           <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
           <input class="uk-search-input uk-form-width-medium" type="search" v-model="searchGuildName" placeholder="Search guild name">
       </form>
+      </div>
       <div>
         <form class="uk-form-horizontal">
-          <div class="uk-form-controls">
-            <select class="uk-select uk-form-width-medium uk-form-small" v-model="minBattlePlayers"> <!-- @change="onChangeFilterPlayer"  -->
-              <option value="0">0 + players</option>
+          <div uk-form-custom="target: > * > span:first-child">
+            <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers">
+                <option value="0">0 + players</option>
               <option value="20">20 + players</option>
               <option value="50">50 + players</option>
               <option value="100">100 + players</option>
             </select>
-          </div>
+            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                <span></span>
+                <span uk-icon="icon: chevron-down"></span>
+            </button>
+        </div>
         </form>
       </div>
     </div>
@@ -117,6 +138,7 @@ export default {
     return {
       battles: [],
       searchGuildName: this.$route.params.guildName,
+      searchType : 'guild',
       searchPlayerName: null,
       error404: false,
       currentOffset: null,
@@ -131,26 +153,21 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
-              searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
+              searchType : this.searchType
             }
           }
         ) 
         .catch((error) => {
           this.error404 = true
         });
-      } /* else if (this.searchPlayerName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/player/${this.searchPlayerName}`)
-        .catch((error) => {
-          this.error404 = true
-        });
-      } */ else {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`, 
+      } else {
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
-              searchType : 'guild' // TO EDIT WHEN ALLIANCE / PLAYER
+              searchType : this.searchType // NOT USEFULL
             }
           }
         )
@@ -201,11 +218,6 @@ export default {
       this.searchPlayerName = null,
       this.onClickSearchGuildPlayer = true
     },
-    // launchPlayerSearch: function (guildName) {
-    //   console.log('search player')
-    //   this.searchGuildName = null,
-    //   this.onClickSearchGuildPlayer = true
-    // },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
     },
@@ -230,10 +242,6 @@ export default {
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
-    // onChangeFilterPlayer () { // NB PLAYER PER BATTLE
-    //   this.sortedByPlayersBattle = this.battles.filter( battle =>  Object.keys(battle.players).length >= parseInt(this.minBattlePlayers)
-    //   )
-    // }
 
   },
   mounted () {
@@ -273,11 +281,9 @@ export default {
           this.offsetLoading = false
           this.initialLoader = false
         })
-          // this.onChangeFilterPlayer()
       })
     },
     currentOffset: function () {
-      // console.log(this.$route.params.guildName)
       this.offsetLoading = true
       this.fetchData()
       .then(res => {
@@ -306,14 +312,13 @@ export default {
           this.offsetLoading = false
           this.initialLoader = false
         })
-          // this.onChangeFilterPlayer()
       })
     },
     onClickSearchGuildPlayer: function () {
       this.$router.push({ path: `/${this.searchGuildName}` })
-      // console.log(this.$route)
-
+      
       this.offsetLoading = true
+      this.minBattlePlayers = 0
       this.fetchData()
       .then(res => {
         this.battles = res.data
@@ -341,7 +346,6 @@ export default {
           this.offsetLoading = false
           this.onClickSearchGuild = false // LOOP ON HIMSELF
         })
-          // this.onChangeFilterPlayer()
       })
     }
   }

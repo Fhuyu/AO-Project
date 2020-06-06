@@ -212,7 +212,7 @@ export default {
   methods: {
     async fetchData () {
       try {
-          return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
+          return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
       } catch {
           this.error404 = true
       }
@@ -220,7 +220,7 @@ export default {
 
     async playerDead (playerId) {
       try {
-        await axios.get(`https://handholdreport.com/api/player/${playerId}`) // METTRE L'ID DE LA BATTLE
+        await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
         .then(response => {
           const eventdeath = response.data
           eventdeath.forEach(eventDeath => {
