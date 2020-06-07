@@ -67,24 +67,25 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
-    // console.log('launch playerdead', battle.id, player.id)
+    console.log('launch playerdead', battle.id, player.id)
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
-        .then(async response => {
+        .then( async response => {
             const eventdeath = response.data 
-            eventdeath.forEach((eventDeath) => {
+            eventdeath.forEach(async (eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
+                    battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
+                    await Battle.updateOne({ battleID: battle.id }, {
+                        battleData: battle
+                    })
                 }
             })
-            battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
-            await Battle.updateOne({ battleID: battle.id }, {
-                battleData: battle
-            })
+            
             // > in case we re launch playerDead from 2nd setInterval
-            if (battle.succeedFetch + battle.failedFetch === battle.totalKills || battle.succeedFetch + battle.failedFetch > battle.totalKills) {
+            if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
                 battle.fullEventDeath = true
                 delete battle.succeedFetch
                 delete battle.failedFetch

@@ -40,27 +40,27 @@ module.exports = {
             battle.KillArea = eventDeath.KillArea
 
                 // ------- VICTIM ITEM - IP - DEATHFAME
-            battle.players[player.id].weapon = eventDeath.Victim.Equipment.MainHand && eventDeath.Victim.Equipment.MainHand.Type ? `${eventDeath.Victim.Equipment.MainHand.Type}?quality=${eventDeath.Victim.Equipment.MainHand.Quality}` : ''
+            battle.players[player.id].weapon = eventDeath.Victim.Equipment.MainHand && eventDeath.Victim.Equipment.MainHand.Type ? `${eventDeath.Victim.Equipment.MainHand.Type}?quality=${eventDeath.Victim.Equipment.MainHand.Quality}` : battle.players[player.id].weapon
             battle.players[player.id].mount = eventDeath.Victim.Equipment.Mount && eventDeath.Victim.Equipment.Mount.Type ?`${eventDeath.Victim.Equipment.Mount.Type}?quality=${eventDeath.Victim.Equipment.Mount.Quality}` : ''
-            battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
+            battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0) > battle.players[player.id].itempower ? eventDeath.Victim.AverageItemPower.toFixed(0) : battle.players[player.id].itempower
             battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
             battle.players[player.id].EventId = eventDeath.EventId
             
             // ------- KILLER ITEM - IP - DEATHFAME
-            battle.players[eventDeath.Killer.Id].weapon = eventDeath.Killer.Equipment.MainHand && eventDeath.Killer.Equipment.MainHand.Type ? `${eventDeath.Killer.Equipment.MainHand.Type}?quality=${eventDeath.Killer.Equipment.MainHand.Quality}` : ''
-            battle.players[eventDeath.Killer.Id].mount = eventDeath.Killer.Equipment.Mount && eventDeath.Killer.Equipment.Mount.Type ? `${eventDeath.Killer.Equipment.Mount.Type}?quality=${eventDeath.Killer.Equipment.Mount.Quality}` : ''
-            battle.players[eventDeath.Killer.Id].itempower = eventDeath.Killer.AverageItemPower.toFixed(0)
+            battle.players[eventDeath.Killer.Id].weapon = eventDeath.Killer.Equipment.MainHand && eventDeath.Killer.Equipment.MainHand.Type ? `${eventDeath.Killer.Equipment.MainHand.Type}?quality=${eventDeath.Killer.Equipment.MainHand.Quality}` : battle.players[eventDeath.Killer.Id].weapon
+            battle.players[eventDeath.Killer.Id].mount = eventDeath.Killer.Equipment.Mount && eventDeath.Killer.Equipment.Mount.Type ? `${eventDeath.Killer.Equipment.Mount.Type}?quality=${eventDeath.Killer.Equipment.Mount.Quality}` : battle.players[eventDeath.Killer.Id].mount
+            battle.players[eventDeath.Killer.Id].itempower = eventDeath.Killer.AverageItemPower.toFixed(0) > battle.players[eventDeath.Killer.Id].itempower ? eventDeath.Killer.AverageItemPower.toFixed(0) : battle.players[eventDeath.Killer.Id].itempower
 
             // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
             eventDeath.Participants.forEach( participant => {
                 // console.log(battle.players[participant.Id])
                 if (battle.players[participant.Id]) {
-                    battle.players[participant.Id].weapon = participant.Equipment.MainHand && participant.Equipment.MainHand.Type ? `${participant.Equipment.MainHand.Type}?quality=${participant.Equipment.MainHand.Quality}` : ''
-                    battle.players[participant.Id].mount = participant.Equipment.Mount && participant.Equipment.Mount.Type ? `${participant.Equipment.Mount.Type}?quality=${participant.Equipment.Mount.Quality}` : ''
+                    battle.players[participant.Id].weapon = participant.Equipment.MainHand && participant.Equipment.MainHand.Type ? `${participant.Equipment.MainHand.Type}?quality=${participant.Equipment.MainHand.Quality}` : battle.players[participant.Id].weapon
+                    battle.players[participant.Id].mount = participant.Equipment.Mount && participant.Equipment.Mount.Type ? `${participant.Equipment.Mount.Type}?quality=${participant.Equipment.Mount.Quality}` : battle.players[participant.Id].mount
                     battle.players[participant.Id].assistance += 1
                     battle.players[participant.Id].damageDone.push(participant.DamageDone)
                     battle.players[participant.Id].healingDone.push(participant.SupportHealingDone)
-                    battle.players[participant.Id].itempower = participant.AverageItemPower.toFixed(0)
+                    battle.players[participant.Id].itempower = participant.AverageItemPower.toFixed(0) > battle.players[participant.Id].itempower ? participant.AverageItemPower.toFixed(0) : battle.players[participant.Id].itempower
                 }
                 
             })

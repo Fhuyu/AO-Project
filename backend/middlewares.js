@@ -16,6 +16,7 @@ module.exports = {
 
     battlesMDW: async function (req, res, next) {
         console.log('nbplayer', req.query.minBattlePlayers)
+        req.query.minBattlePlayers = req.query.minBattlePlayers === undefined ? 0 : req.query.minBattlePlayers
 
         const offsetNumber = parseInt(req.params.offset) + 50
         let query = {}
