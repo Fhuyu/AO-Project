@@ -70,7 +70,7 @@ let lastFecthTime = null
 const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
-    console.log('launch playerdead', battle.id, player.id)
+    // console.log('launch playerdead', battle.id, player.id)
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
         .then( async response => {
             const eventdeath = response.data 

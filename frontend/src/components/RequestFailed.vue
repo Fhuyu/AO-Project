@@ -1,8 +1,10 @@
 <template>
   <div class="errormessage">
-    <h1> OOPS ! An error occured. </h1> 
-    <h3>Please refresh this page </h3>
+    <div class="uk-card uk-card-primary uk-card-body">
+    <h3 class="uk-card-title">OOPS ! An error occured. </h3> 
+    <h3>Please check your guild name </h3>
     <!-- <router-link :to="killboardURL()"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link> -->
+  </div>
   </div>
 </template>
 

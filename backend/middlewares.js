@@ -8,9 +8,14 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     guildIdMDW: async function (req, res, next) {
-        guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
-        console.log(req.params.guildName)
-        req.guildID = guilds[0].guildID
+        try {
+            guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
+            console.log(req.params.guildName)
+            req.guildID = guilds[0].guildID
+        } catch {
+            console.log('error')
+        }
+        
         next();
     },
 

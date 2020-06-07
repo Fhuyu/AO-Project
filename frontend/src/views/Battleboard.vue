@@ -2,8 +2,10 @@
 <div class="battleboard" uk-grid>
   <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
       <h1 style="color:white;" v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
-      <h1 style="color:white;">Loading last battles</h1>
-      <div v-if="!error404" uk-spinner="ratio: 3"></div>
+      <div  v-if="!error404">
+        <h1 style="color:white;">Loading last battles</h1>
+        <div uk-spinner="ratio: 3"></div>
+      </div>
       <RequestFailed v-if="error404">
       </RequestFailed>
   </div>
@@ -153,7 +155,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType
@@ -164,7 +166,7 @@ export default {
           this.error404 = true
         });
       } else {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`, 
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType // NOT USEFULL
