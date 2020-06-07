@@ -67,7 +67,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     // console.log('launch playerdead', battle.id, player.id)
@@ -116,7 +116,7 @@ setInterval( async() => {
             }
         }
     })
-}, 20000);
+}, 30000);
 setInterval( async() => { 
     // lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
