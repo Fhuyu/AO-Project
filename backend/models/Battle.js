@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 const battleSchema = new Schema({
   battleID: { type: Number, unique: true },
-  battleStartTime: { type: Date},
   battleTotalPlayers : { type: Number},
   battleData: {type: [Object], blackbox: true },
 })

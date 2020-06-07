@@ -67,29 +67,29 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
     try {
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
-        .then(response => {
+        .then(async response => {
             const eventdeath = response.data 
             playerEventDeath = []
-            eventdeath.forEach(async(eventDeath) => {
+            eventdeath.forEach((eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
                     playerEventDeath.push(eventDeath) // In case someone died several times - to calc total deathfame
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
                 }
-                if (battle.totalKills === battle.refreshStats.length) {
-                    battle.fullEventDeath = true
-                    await Battle.updateOne({ battleID: battle.id }, {
-                        battleData: battle
-                    });
-                }
             })
+            battle.succeedFetch += parseInt(player.deaths)
+            battle.fullEventDeath = true
+            await Battle.updateOne({ battleID: battle.id }, {
+                battleData: battle
+            });
+
         })
-    } catch {
-        
+    } catch {  
+        battle.failedFetch += parseInt(player.deaths)
     }    
 }
 
@@ -121,8 +121,7 @@ setInterval( async() => {
             battlesData.forEach( async (battle) => {
                 const battleInDB = await Battle.find({ battleID : battle.id}).limit(1)
                 if (!battleInDB.length) {
-                    battle.fullEventDeath = false
-                    battle.refreshStats = []
+                    // battle.fullEventDeath = false
                     battle = functions.battleTreatment(battle)
 
                     await new Battle({
@@ -134,13 +133,11 @@ setInterval( async() => {
                     .then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     functions.registerNewGuild(battle.guilds, guildsIDInDB)
-                    
+
                     // EVENTDEATH BATTLE-ID
                     for (const player in battle.players) {
-                        if (battle.players[player].deaths > 0 && battle.refreshStats.includes(player)) {
-                            battle.refreshStats.push(player)
-                        } else if (battle.players[player].deaths > 0) {
-                            // deathPlayer (battle, battle.players[player]) 
+                        if (battle.players[player].deaths > 0) {
+                            deathPlayer (battle, battle.players[player]) 
                         }
                     }
                 }
@@ -157,7 +154,7 @@ setInterval( async() => {
         }
     })
 }
-}, 10000);
+}, 20000);
 
 // app.post('/updateBattle', function(req, res) {
 //     console.log(req.body)
@@ -172,8 +169,6 @@ app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
     } else {
-        console.log('fetching')
-        console.log("offset", req.params.offset)
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 60000 })
             .then((res) => res.json())

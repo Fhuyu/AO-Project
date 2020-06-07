@@ -14,9 +14,8 @@
         <td style="text-align:left;">{{player.name}}</td>
         <td>{{player.kills}}</td>
         <td>{{player.deaths}}</td>
-        <td>{{player.assistance}}</td>
-        <!-- <td v-if="showStats">{{sumArray(player.damageDone).toFixed(0)}}</td> <td v-else></td> -->
-        <td v-if="showStats">{{player.healingDone.length > 0 ? formatNumber(sumArray(player.healingDone).toFixed(0)) : ''}}</td> <td v-else></td>
+         <td>{{player.assistance}}</td>
+        <!--<td v-if="showStats">{{player.healingDone.length > 0 ? formatNumber(sumArray(player.healingDone).toFixed(0)) : ''}}</td> <td v-else></td> -->
         <td v-if="showStats">{{player.itempower}}</td> <td v-else></td>
         <td> {{formatNumber(player.killFame)}} </td>
         <td v-if="showDeathFame">  <a v-if="player.deathFame" target="_blank" :href="`https://albiononline.com/en/killboard/kill/${player.EventId}`">{{formatNumber(player.deathFame)}}</a> </td> <!-- player.eventDeath.EventId <a v-if="player.deathFame.length" :href="`https://albiononline.com/en/killboard/kill/${player.eventDeath.EventId}`">{{player.deathFame}}</a>-->

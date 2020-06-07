@@ -14,8 +14,8 @@
         
     </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <div>
-      <div uk-form-custom="target: > * > span:first-child">
+      <!--<div>
+       <div uk-form-custom="target: > * > span:first-child">
             <select v-model="searchType" class="uk-select" id="form-stacked-select">
                 <option value="guild">Guild</option>
                 <option value="alliance">Alliance</option>
@@ -25,26 +25,26 @@
                 <span></span>
                 <span uk-icon="icon: chevron-down"></span>
             </button>
-        </div>
+        </div> -->
       <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
           <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
-          <input class="uk-search-input uk-form-width-medium" type="search" v-model="searchGuildName" placeholder="Search guild name">
+          <input class="uk-search-input uk-form-width-medium" type="search" v-model="searchGuildName" placeholder="Search GUILD name">
       </form>
-      </div>
+      <!-- </div> -->
       <div>
         <form class="uk-form-horizontal">
-          <div uk-form-custom="target: > * > span:first-child">
+          <!-- <div uk-form-custom="target: > * > span:first-child"> -->
             <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers">
                 <option value="0">0 + players</option>
               <option value="20">20 + players</option>
               <option value="50">50 + players</option>
               <option value="100">100 + players</option>
             </select>
-            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+            <!--<button class="uk-button uk-button-default" type="button" tabindex="-1">
                 <span></span>
                 <span uk-icon="icon: chevron-down"></span>
             </button>
-        </div>
+         </div> -->
         </form>
       </div>
     </div>

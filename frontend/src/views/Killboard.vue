@@ -68,23 +68,6 @@
         <KillboardOrderBy style="text-align: center;" :showStats="showStats" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
         </KillboardOrderBy>
 
-        <div class="uk-grid-collapse uk-child-width-expand@s uk-text-center uk-margin-large-top" uk-grid>
-            <div>
-                <div class="uk-padding"></div>
-            </div>
-            <div>
-                <div class="uk-padding-small uk-light">
-                    <div class="loading_bar">
-                        <div v-if="refreshStats.length" class="percent_bar" :style="'width:' + Object.keys(this.refreshStats).length *100 / this.battle.totalKills + '%;' ">
-                        </div>
-                    </div>
-                </div>
-                <span v-if="refreshStats.length">{{(Object.keys(this.refreshStats).length *100 / this.battle.totalKills).toFixed(1)}} %</span>
-            </div>
-            <div>
-                <div class="uk-padding"></div>
-            </div>
-        </div>
     </div>
   </div>
   <div v-else class="uk-margin-auto" style="text-align:center;"> <!--  -->
@@ -133,8 +116,7 @@
                     <td>Kills</td>
                     <td>Deaths</td>
                     <td>Assist</td>
-                    <!-- <td>Damages</td> -->
-                    <td uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td>
+                    <!-- <td uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td> -->
                     <td> Item Power </td>
                     <td> Kill Fame </td>
                     <td uk-tooltip="Total death fame / Link on first death" v-if="showDeathFame"> Death Fame* </td>
@@ -175,7 +157,6 @@ export default {
     return {
       battle: [],
       totalPlayer: 0,
-      refreshStats: [],
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
       bestPlayerAssistance: { id: '', assistance: 0 },
@@ -215,46 +196,6 @@ export default {
           return await axios.get(`http://localhost:5000/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
       } catch {
           this.error404 = true
-      }
-    },
-
-    async playerDead (playerId) {
-      try {
-        await axios.get(`http://localhost:5000/player/${playerId}`) // METTRE L'ID DE LA BATTLE
-        .then(response => {
-          const eventdeath = response.data
-          eventdeath.forEach(eventDeath => {
-            if (eventDeath.BattleId === this.battle.id) {
-                this.battle.players[playerId].eventDeath = eventDeath
-                this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
-                this.treatmentPlayerEventDeath(playerId)
-            } 
-              if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-                  this.battle.fullEventDeath = true
-                  this.battle.refreshStats = this.refreshStats
-                  /* axios.post('http://localhost:5000/updateBattle', {
-                      battleData : this.battle
-                    })
-                    .then(function (response) {
-                      console.log(response);
-                    }) */
-                  // NEED TO SEND TO SERVER  fulleventdeath + refreshstat
-              }
-          })
-        })
-      } catch {
-          this.refreshStats.push(playerId) // ONLY FOR LOADING BAR 
-          // if (this.battle.totalKills === Object.keys(this.refreshStats).length) {
-          //         this.showWeapon = true
-          //     }
-      }
-
-    },
-    getPlayerDeath () {
-      for (const playerID in this.battle.players) {
-        if (this.battle.players[playerID].deaths > 0) {
-          this.playerDead(playerID)
-        }
       }
     },
     sumArray (array) {
@@ -300,46 +241,7 @@ export default {
     NbColumn () {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
-    treatmentPlayerEventDeath (playerID) {
-        console.log('in')
-        if (this.battle.players[playerID] && this.battle.players[playerID].eventDeath) { // In case one ID from refreshstats had an error
-        console.log('innn')
-
-          // ------- VICTIM ITEM
-          this.battle.players[playerID].weapon = `${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Victim.Equipment.MainHand.Quality}`
-          // ------- VICTIM MOUNT
-          this.battle.players[playerID].mount = `${this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Victim.Equipment.Mount.Quality}`
-          // ------- VICTIM IP
-          this.battle.players[playerID].itempower = this.battle.players[playerID].eventDeath.Victim.AverageItemPower.toFixed(0)
-          // this.battle.players[playerID].itempower = this.battle.players[playerID].itempower.toFixed(0)
-          // ------- Death IP
-          this.battle.players[playerID].deathFame = this.battle.players[playerID].eventDeath.Victim.DeathFame
-
-          // ------- PARTICIPANT WEAPON / IP / DMG / HEAL / ASSIST
-          for (const participant in this.battle.players[playerID].eventDeath.Participants) {
-            const participantId = this.battle.players[playerID].eventDeath.Participants[participant].Id
-
-            if (this.battle.players[participantId]) {
-              this.battle.players[participantId].assistance += 1
-              // this.battle.players[participantId].damageDone.push(this.battle.players[playerID].eventDeath.Participants[participant].DamageDone)
-              const heal = this.battle.players[playerID].eventDeath.Participants[participant].SupportHealingDone
-              if (!this.battle.players[participantId].healingDone.includes(heal)) this.battle.players[participantId].healingDone.push(heal)
-              this.battle.players[participantId].weapon = `${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.MainHand.Quality}`
-              this.battle.players[participantId].mount = `${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Participants[participant].Equipment.Mount.Quality}`
-              this.battle.players[participantId].itempower = this.battle.players[playerID].eventDeath.Participants[participant].AverageItemPower
-              this.battle.players[participantId].itempower = this.battle.players[participantId].itempower.toFixed(0)
-            }
-          }
-          const killerId = this.battle.players[playerID].eventDeath.Killer.Id
-          this.battle.players[killerId].weapon = `${this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Type}?quality=${this.battle.players[playerID].eventDeath.Killer.Equipment.MainHand.Quality}`
-          this.battle.players[killerId].mount = `${this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Type}?quality=${this.battle.players[playerID].eventDeath.Killer.Equipment.Mount.Quality}`
-          this.battle.players[killerId].itempower = this.battle.players[playerID].eventDeath.Killer.AverageItemPower.toFixed(0)
-          
-          this.battle.players[playerID].eventDeath.GroupMembers.forEach( member => {
-            this.battle.players[member.Id].weapon = member.Equipment.MainHand && member.Equipment.MainHand.Type ? `${member.Equipment.MainHand.Type}?quality=${member.Equipment.MainHand.Quality}` : ''
-          })
-        }
-        
+    treatmentPlayerEventDeath () {       
       // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
       for (const alliance in this.battle.alliances) {
         this.battle.alliances[alliance].players = [] //HERE
@@ -377,7 +279,6 @@ export default {
     this.fetchData()
       .then(res => {
         this.battle = res.data // EVENT NOT USEFULL
-        this.refreshStats = this.battle.refreshStats ? this.battle.refreshStats : []
         this.totalPlayer = Object.keys(this.battle.players).length
 
         for (const player in this.battle.players) {
@@ -414,13 +315,7 @@ export default {
 
         
         this.onClickOrderBy('killFame', 'desc')
-        if (this.fullEventDeath === true) {
-          this.battle.refreshStats.forEach( playerID => {
-            this.treatmentPlayerEventDeath(playerID)
-          })
-        } else {
-          this.getPlayerDeath()
-        }
+            this.treatmentPlayerEventDeath()
         this.battle.sortedTopTableAlliances.forEach( alliance => {
         alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
       })

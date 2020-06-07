@@ -1,13 +1,15 @@
 const Guild = require('./models/Guild')
 module.exports = {
     battleTreatment : function (battle) {
+        battle.succeedFetch = 0
+        battle.failedFetch = 0
+
         for (const guild in battle.guilds) {
             if (!battle.guilds[guild].allianceId) {
                 battle.alliances[guild] = battle.guilds[guild]
                 battle.guilds[guild].allianceId = guild
             }
         }
-        // IN FRONT ?
         for (const alliance in battle.alliances) {
             battle.alliances[alliance].players = []
             battle.alliances[alliance].listItemPower = []
@@ -34,7 +36,6 @@ module.exports = {
         return battle
     },
     battleEventDeathTreatment : function (battle, player, eventDeath) {
-        battle.refreshStats.push(player.id)
         battle.KillArea = eventDeath.KillArea
 
             // ------- VICTIM ITEM - IP - DEATHFAME
@@ -43,7 +44,6 @@ module.exports = {
         battle.players[player.id].itempower = eventDeath.Victim.AverageItemPower.toFixed(0)
         battle.players[player.id].deathFame.push(eventDeath.Victim.DeathFame)
         battle.players[player.id].EventId = eventDeath.EventId
-        console.log('event death ID', battle.players[player.id].EventId)
         
         // ------- KILLER ITEM - IP - DEATHFAME
         battle.players[eventDeath.Killer.Id].weapon = eventDeath.Killer.Equipment.MainHand && eventDeath.Killer.Equipment.MainHand.Type ? `${eventDeath.Killer.Equipment.MainHand.Type}?quality=${eventDeath.Killer.Equipment.MainHand.Quality}` : ''
@@ -74,7 +74,7 @@ module.exports = {
             let guildFound = guildsIDInDB.includes(currentGuildID)
             if (!guildFound) {
                 guildsIDInDB.push(currentGuildID)
-                console.log('need to set guild', currentGuildID)
+                // console.log('need to set guild', currentGuildID)
                  await new Guild({
                     guildID: currentGuildID,
                     guildName: guilds[currentGuildID].name.toUpperCase(),
