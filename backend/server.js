@@ -67,38 +67,61 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 let lastFecthTime = null
-const offset = [0, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
-    try {
+    // console.log('launch playerdead', battle.id, player.id)
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
         .then(async response => {
             const eventdeath = response.data 
-            playerEventDeath = []
             eventdeath.forEach((eventDeath) => {
                 if (eventDeath.BattleId === battle.id) {
-                    playerEventDeath.push(eventDeath) // In case someone died several times - to calc total deathfame
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
                 }
             })
-            battle.succeedFetch += parseInt(player.deaths)
-            battle.fullEventDeath = true
+            battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
             await Battle.updateOne({ battleID: battle.id }, {
                 battleData: battle
-            });
-
+            })
+            // > in case we re launch playerDead from 2nd setInterval
+            if (battle.succeedFetch + battle.failedFetch === battle.totalKills || battle.succeedFetch + battle.failedFetch > battle.totalKills) {
+                battle.fullEventDeath = true
+                delete battle.succeedFetch
+                delete battle.failedFetch
+                await Battle.updateOne({ battleID: battle.id }, {
+                    battleData: battle
+                })
+            }
+            
         })
-    } catch {  
-        battle.failedFetch += parseInt(player.deaths)
-    }    
-}
+        .catch(function (error) {
+            battle.failedFetch += parseInt(player.deaths)
+        })
+        
 
+}
 setInterval( async() => { 
-    lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
+    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 11 }}).sort({battleID:-1}).limit(100)
+    // console.log('checkbattle length', checkBattle.length)
+    checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
+    // console.log('checkbattle length after fiilter', checkBattle.length)
+    checkBattle.forEach( battleDB => {
+        // console.log(battleDB.battleID)
+        const battle = battleDB.battleData[0]
+        for (const player in battle.players) {
+            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
+            if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
+                deathPlayer (battle, battle.players[player]) 
+            }
+        }
+    })
+}, 20000);
+setInterval( async() => { 
+    // lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
 
     // console.log('minutes -----------', minutes)
-    console.log('fetching---', fetching)
+    // console.log('fetching---', fetching)
 
     if ((!fetching)) { // minutes === null && !fetching) || (minutes >= 1 && 
         let fetchDone = 0
@@ -130,7 +153,7 @@ setInterval( async() => {
                         battleData : battle
                     })
                     .save()
-                    .then( battle => console.log('battle registered', battle.battleData[0].id))
+                    // .then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     functions.registerNewGuild(battle.guilds, guildsIDInDB)
 
@@ -154,7 +177,7 @@ setInterval( async() => {
         }
     })
 }
-}, 20000);
+}, 40000);
 
 // app.post('/updateBattle', function(req, res) {
 //     console.log(req.body)
