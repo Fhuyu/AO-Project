@@ -2,30 +2,33 @@
 <div class="killboard">
   <div v-if="totalPlayer > 1" class="before_basic_load">
     <!-- POUR CACHER LE PREMIER CHARGEMENT -->
+    <h1>{{versus[0] + ' vs ' + versus[1] + ' vs ' + versus[2]}}</h1>
+    <h3>{{battle.KillArea.replace(/_/g, " ")}}</h3>
+    <h1>{{readableDate(battle.startTime)}}</h1>
     <div class="uk-container-xlarge uk-margin-auto">
 
         <h3 style="text-align:center;">BATTLE STATS</h3>
-        <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
+        <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
 
             <thead>
-                <th>ALLIANCE</th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">PLAYERS
+                <th style="font-weight: bold;">ALLIANCE</th>
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">PLAYERS
                     <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'players' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">KILLS
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'kills', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">KILLS
                     <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'kills' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">DEATHS
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'deaths', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">DEATHS
                     <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'deaths' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">KILLFAME
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'killFame', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">KILLFAME
                     <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'killFame' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
-                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'itempower', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;">AVERAGE IP
+                <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'itempower', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">AVERAGE IP
                     <span v-if="currentTopTableSort === 'itempower' && currentTopTableSortDir === 'desc'" uk-icon="arrow-up"></span>
                     <span v-if="currentTopTableSort === 'itempower' && currentTopTableSortDir === 'asc'" uk-icon="arrow-down"></span>
                 </th>
@@ -65,7 +68,7 @@
         <RequestFailed v-if="error404" :killboardID="battle.id">
         </RequestFailed>
 
-        <KillboardOrderBy style="text-align: center;" :showStats="showStats" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
+        <KillboardOrderBy style="text-align: center;" :showStats="showStats" :columnClass="columnClass" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
         </KillboardOrderBy>
 
     </div>
@@ -79,18 +82,19 @@
         <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.sortedalliances" :key="indexa">
             <a class="uk-accordion-title guild_header" href="#">
+              <h3 class="alliance_table_header">{{ alliance.name }}</h3>
+
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
-              <th>ALLIANCE</th>
               <th>GUILDS</th>
               <th>PLAYERS</th>
               <th>KDA</th>
               <th>KILLFAME</th>
+              <th>DEATHFAME</th>
               <th>AVERAGE IP</th>
             </thead>
             <tbody>
               <tr>
-                <td>{{ alliance.name }}</td>
                 <td>
                   <span v-for="(guild, indexg) in alliance.guilds" :key="indexg">
                     {{guild}} <br />
@@ -99,6 +103,7 @@
                 <td> {{ alliance.players.length }} </td>
                 <td>{{ alliance.kills }} / {{ alliance.deaths }}</td>
                 <td>{{ formatNumber(alliance.killFame) }}</td>
+                <td>{{ alliance.name }}</td>
                 <td v-if="showStats && alliance.listItemPower.length">{{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</td>
               </tr>
             </tbody>
@@ -156,6 +161,7 @@ export default {
   data: function () {
     return {
       battle: [],
+      versus: [],
       totalPlayer: 0,
       bestPlayerKillfame: { id: '', killfame: 0 },
       bestPlayerKill: { id: '', kill: 0 },
@@ -241,6 +247,13 @@ export default {
     NbColumn () {
       return this.columnClass ? "uk-width-2-5@m uk-width-1-2@s uk-margin-auto twocolumn" : "uk-width-1-3@l uk-width-2-5@m uk-width-1-2@s"
     },
+    readableDate: function (date) {
+      return `${date.slice(0, 10)} ${date.slice(11, 19)}`
+    },
+    // allianceTotalDeathfame (alliance) {
+    //   alliance.players.reduce( player => )
+
+    // },
     treatmentPlayerEventDeath () {       
       // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
       for (const alliance in this.battle.alliances) {
@@ -315,7 +328,9 @@ export default {
 
         
         this.onClickOrderBy('killFame', 'desc')
-            this.treatmentPlayerEventDeath()
+        this.versus.push(this.battle.sortedTopTableAlliances[0].name, this.battle.sortedTopTableAlliances[1].name, this.battle.sortedTopTableAlliances[2].name)
+        console.log(this.versus)
+        this.treatmentPlayerEventDeath()
         this.battle.sortedTopTableAlliances.forEach( alliance => {
         alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
       })
