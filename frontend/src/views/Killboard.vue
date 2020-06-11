@@ -2,12 +2,14 @@
 <div class="killboard">
   <div v-if="totalPlayer > 1" class="before_basic_load">
     <!-- POUR CACHER LE PREMIER CHARGEMENT -->
-    <h1>{{versus[0] + ' vs ' + versus[1] + ' vs ' + versus[2]}}</h1>
-    <h3>{{battle.KillArea.replace(/_/g, " ")}}</h3>
-    <h1>{{readableDate(battle.startTime)}}</h1>
+    
+    
     <div class="uk-container-xlarge uk-margin-auto">
-
-        <h3 style="text-align:center;">BATTLE STATS</h3>
+      <div style="text-align:center">
+      <h1 style="color:white;"><span style="color:rgb(25, 96, 12)">{{versus[0]}}</span> <span style="color:#666">vs</span> <span style="color:rgb(109, 40, 13)">{{versus[1]}} </span> 
+      <span v-if="versus.length > 2"> <span style="color:#666"> vs</span> {{versus[2]}}</span></h1>
+      <span style="color:#f1f1f1">{{battle.KillArea.replace(/_/g, " ")}} | {{readableDate(battle.startTime)}}</span>
+    </div>
         <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
 
             <thead>
@@ -82,7 +84,7 @@
         <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.sortedalliances" :key="indexa">
             <a class="uk-accordion-title guild_header" href="#">
-              <h3 class="alliance_table_header">{{ alliance.name }}</h3>
+              <h3 class="alliance_table_header" style="color:#dddddd">{{ alliance.name }}</h3>
 
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
             <thead>
@@ -103,7 +105,7 @@
                 <td> {{ alliance.players.length }} </td>
                 <td>{{ alliance.kills }} / {{ alliance.deaths }}</td>
                 <td>{{ formatNumber(alliance.killFame) }}</td>
-                <td>{{ alliance.name }}</td>
+                <td>...</td>
                 <td v-if="showStats && alliance.listItemPower.length">{{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</td>
               </tr>
             </tbody>
@@ -328,8 +330,8 @@ export default {
 
         
         this.onClickOrderBy('killFame', 'desc')
-        this.versus.push(this.battle.sortedTopTableAlliances[0].name, this.battle.sortedTopTableAlliances[1].name, this.battle.sortedTopTableAlliances[2].name)
-        console.log(this.versus)
+        this.versus.push(this.battle.sortedTopTableAlliances[0].name, this.battle.sortedTopTableAlliances[1].name)
+        if (this.battle.sortedTopTableAlliances.length > 2) this.versus.push(this.battle.sortedTopTableAlliances[2].name)
         this.treatmentPlayerEventDeath()
         this.battle.sortedTopTableAlliances.forEach( alliance => {
         alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
