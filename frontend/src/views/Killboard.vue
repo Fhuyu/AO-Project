@@ -81,7 +81,7 @@
   </div>
 
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">
-        <li style="padding-right:20px" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
+        <li style="padding-right:20px; margin: 0 0.5%;" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.sortedalliances" :key="indexa">
             <a class="uk-accordion-title guild_header" href="#">
               <h3 class="alliance_table_header" style="color:#dddddd">{{ alliance.name }}</h3>
@@ -105,7 +105,7 @@
                 <td> {{ alliance.players.length }} </td>
                 <td>{{ alliance.kills }} / {{ alliance.deaths }}</td>
                 <td>{{ formatNumber(alliance.killFame) }}</td>
-                <td>...</td>
+                <td> {{formatNumber(sumArray(allianceTotalDeathfame(alliance)))}}</td>
                 <td v-if="showStats && alliance.listItemPower.length">{{(sumArray(alliance.listItemPower) / alliance.listItemPower.length).toFixed(0)}}</td>
               </tr>
             </tbody>
@@ -252,10 +252,9 @@ export default {
     readableDate: function (date) {
       return `${date.slice(0, 10)} ${date.slice(11, 19)}`
     },
-    // allianceTotalDeathfame (alliance) {
-    //   alliance.players.reduce( player => )
-
-    // },
+    allianceTotalDeathfame (alliance) {
+      return alliance.players.map( player => player.deathFame);
+    },
     treatmentPlayerEventDeath () {       
       // CLEAN PLAYERS IN ALLIANCES TO UPDATED THEM WITH NEW STATS (IP, WEAPON ...)
       for (const alliance in this.battle.alliances) {

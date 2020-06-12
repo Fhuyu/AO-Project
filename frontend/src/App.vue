@@ -7,7 +7,7 @@
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
         <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
       </router-link>
-      <p>Beta version - 0.3.5 | 
+      <p>Beta version - 0.3.6 | THE GREAT WAR HAS BEGUN |
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>

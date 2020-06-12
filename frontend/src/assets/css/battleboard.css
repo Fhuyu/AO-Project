@@ -15,11 +15,47 @@
     background: none;
 }
 /* ---------------- SEARCH INPUT ---------------- */
-.search.guild {
-    width: 50%;
-    margin-right: 10px;
+.form_search svg{
+    color:black!important;
+    height: 48px;
+    line-height: 48px;
+    background:white;
 }
-
+.form_search button svg{
+    height: 20px;
+}
+.form_search button {
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 44px;
+    font-size: 16px;
+    border-color: transparent;
+    background-color: transparent;
+    color: #ca9372;
+    margin-left: 5px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+.form_search .select_div {
+    height:48px;
+    background:white;
+    vertical-align: top;
+    vertical-align:middle;
+}
+.form_search input{
+    padding-left: 8px;
+    padding-right: 8px;
+    /* width: 100%; */
+    height: 48px;
+    line-height: 48px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #333;
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    vertical-align:middle;
+}
 .result {
     margin:auto;
 }

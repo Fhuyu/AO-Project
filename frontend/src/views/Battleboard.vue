@@ -16,21 +16,20 @@
         
     </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <!--<div>
-       <div uk-form-custom="target: > * > span:first-child">
-            <select v-model="searchType" class="uk-select" id="form-stacked-select">
+      <form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
+        <div class="select_div" uk-form-custom="target: > * > span:first-child">
+            <select>
                 <option value="guild">Guild</option>
                 <option value="alliance">Alliance</option>
-                <option value="player">Player</option>
             </select>
-            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+            <button class="" type="button" tabindex="-1">
                 <span></span>
                 <span uk-icon="icon: chevron-down"></span>
             </button>
-        </div> -->
-      <form class="uk-search uk-search-default" @submit.prevent="launchGuildSearch(searchGuildName)">
-          <a @click.prevent="launchGuildSearch(searchGuildName)" class="uk-search-icon-flip" uk-search-icon></a>
-          <input class="uk-search-input uk-form-width-medium" type="search" v-model="searchGuildName" placeholder="Search GUILD name">
+        </div>
+          <input class="" type="search" v-model="searchGuildName" placeholder="Search GUILD name">
+          <span @click.prevent="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5" style="cursor:pointer"></span>
+          <!-- <a @click.prevent="launchGuildSearch(searchGuildName)" class="" uk-search-icon></a> -->
       </form>
       <!-- </div> -->
       <div>
