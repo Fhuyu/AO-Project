@@ -17,35 +17,30 @@
     </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
       <div class="form_global_search">
-        <form class="form_search" @submit="launchGuildSearch(searchGuildName)">
+        <form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
             <div class="select_div" uk-form-custom="target: > * > span:first-child">
-                <select v-model="searchType">
+                <select v-model="searchType" @change="cleanName">
                     <option value="guild">Guild</option>
                     <option value="alliance">Alliance</option>
+                    <option value="player">Player</option>
                 </select>
                 <button class="" type="button" tabindex="-1">
                     <span></span>
                     <span uk-icon="icon: chevron-down"></span>
                 </button>
             </div>
-              <input class="" type="search" v-model="searchGuildName"  placeholder="Search GUILD name">
+              <input class="" v-model="searchGuildName"  :placeholder="searchType === 'guild' ? 'Search Guild Name' :'EXACT name (uppercase...)'">
               <span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
           </form>
         </div>
       <div>
         <form class="uk-form-horizontal">
-          <!-- <div uk-form-custom="target: > * > span:first-child"> -->
             <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers" @change="launchMinbattleSearch">
                 <option value="0">0 + players</option>
               <option value="20">20 + players</option>
               <option value="50">50 + players</option>
               <option value="100">100 + players</option>
             </select>
-            <!--<button class="uk-button uk-button-default" type="button" tabindex="-1">
-                <span></span>
-                <span uk-icon="icon: chevron-down"></span>
-            </button>
-         </div> -->
         </form>
       </div>
     </div>
@@ -139,7 +134,7 @@ export default {
     return {
       battles: [],
       searchGuildName: this.$route.params.guildName,
-      searchType : 'guild',
+      searchType : this.$route.query.search ? this.$route.query.search : 'guild',
       error404: false,
       currentOffset: null,
       initialLoader: false,
@@ -214,13 +209,20 @@ export default {
         battle.guilds[guild].numbers = guildNumber[guild]
       }
     },
+    cleanName: function () {
+      this.searchGuildName = ''
+    },
     launchGuildSearch: function (guildName) {
-      this.$router.push({ path: `/${this.searchGuildName}` })
+      console.log(this.$router.history)
+      // this.$router.replace({ path: `${this.searchType}/${this.searchGuildName}` })
+      this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
       this.currentOffset = 0
       this.minBattlePlayers = 0
       this.launchNewSearch()
     },
     launchMinbattleSearch: function () {
+      
+      if(this.searchGuildName) this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
       console.log('minbattleplayer', this.minBattlePlayers)
       this.currentOffset = 0
       this.launchNewSearch()

@@ -7,7 +7,7 @@
         <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
         <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
       </router-link>
-      <p>Beta version - 0.3.6 | THE GREAT WAR HAS BEGUN |
+      <p>Beta version - 0.3.7 | THE GREAT WAR HAS BEGUN |
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
@@ -15,11 +15,11 @@
               <button class="uk-modal-close-default" type="button" uk-close></button>
               All details on HandHoldReport Discord : <a href="https://discord.gg/eQnTDFn" target="_blank"><img style="width:20px;" src="./assets/discord.png" alt="discord" /></a>
               <h2 class="uk-modal-title">Incoming</h2>
-                  <b>Battleboard : Alliance + Player search</b><br />
                   Battleboard : Save guild research to be able to click back from killboard<br />
                   Battleboard : Highlight searched guild & player<br />
                   Website : General design (Logo / Color)<br />
               <h2 class="uk-modal-title">Done</h2>
+                  20-06-13 : Battleboard : Alliance + Player search (Exact name with uppercase)<br />
                   20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />
                   20-06-04 : Battleboard : Loading battles is faster<br />
                   20-06-02 : New Database on duty ! Data Optimized<br />

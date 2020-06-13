@@ -184,8 +184,17 @@ setInterval( async() => {
 //     console.log(req.body)
 //     const battleData = req.body.battleData
 // })
-
+/* app.use('/battles/:offset/:guildName', (req,res,next) => {
+    if (req.query.searchType === 'guild') {
+        middlewares.guildIdMDW(req,res,next)
+    }
+        
+    next()
+}) */
 app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
+// app.use('/battles/:offset/:guildName', middlewares.allianceMDW)
+// app.use('/battles/:offset/:guildName', middlewares.playerMDW)
+
 app.use('/battles/:offset', middlewares.battlesMDW)
 app.use('/battles/:offset', middlewares.battlesOffsetMDW)
 
@@ -207,7 +216,7 @@ app.get('/battles/:offset', cors(), (req, res) => {
 
 
 app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
-    if (req.data && req.guildID) {
+    if (req.data) {
         res.send(req.data)
     } else {
         guildIDReq = req.guildID

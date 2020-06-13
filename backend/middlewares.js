@@ -8,37 +8,30 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     guildIdMDW: async function (req, res, next) {
-        try {
-            if (req.query.searchType === 'guild') {
-                console.log('guild')
+        if (req.query.searchType === 'guild') {
+            try {
                 guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
-                console.log(req.params.guildName)
                 req.guildID = guilds[0].guildID
-            } else if (req.query.searchType === 'alliance') {
-                console.log('alli')
-                console.log(req.params.guildName)
-                const allianceName = req.params.guildName.toUpperCase()
-                let query = '{"$where": "function() { for (var field in this.battleData[0].alliances) { if (this.battleData[0].alliances[field].name == (\'' + allianceName + '\')) return true}return false}"}'
-                query = JSON.parse(query)
-                query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
-
-                let aa = await Battle.find(query).sort({battleID:-1}).limit(1)
-                console.log(aa)
+                console.log(req.guildID)
+            } catch (er) {
+                console.log('error', er)
             }
-            /* {$where: function() { 
-                for (var field in this.battleData[0].alliances) { 
-                    if (this.battleData[0].alliances[field].name == ) return true;
-                }
-                return false;
-            }} */
-            
-        } catch (er) {
-            console.log('error', er)
-        }
-        
+        } else if (req.query.searchType === 'alliance') {
+            req.allianceName = req.params.guildName   
+        } else if (req.query.searchType === 'player') {
+            req.playerName = req.params.guildName    
+        }         
         next();
     },
-
+/*     allianceMDW: function (req, res, next) {
+        console.log(req.params)
+        next();
+    },
+    playerMDW: function (req, res, next) {
+        console.log(req.params)
+        req.playerName = req.params.guildName          
+        next();
+    }, */
     battlesMDW: async function (req, res, next) {
         req.query.minBattlePlayers = req.query.minBattlePlayers === undefined ? 0 : req.query.minBattlePlayers
         console.log('nbplayer', req.query.minBattlePlayers)
@@ -46,11 +39,19 @@ module.exports = {
         const offsetNumber = parseInt(req.params.offset) + 50
         let query = {}
         
-        if (req.guildID) {
-            console.log('in guild')
+        if (req.query.searchType === 'guild' && req.guildID) {
             let guildTosearch = "battleData.guilds." + req.guildID
             query[guildTosearch] = {$exists: true }
+        } else if (req.query.searchType === 'alliance') {
+            console.log('alliance is', req.allianceName)
+            query = '{"$where": "function() { for (var field in this.battleData[0].alliances) { if (this.battleData[0].alliances[field].name == (\'' + req.allianceName + '\')) return true}return false}"}'
+            query = JSON.parse(query)
+        } else if (req.query.searchType === 'player') {
+            console.log('player is', req.playerName)
+            query = '{"$where": "function() { for (var field in this.battleData[0].players) { if (this.battleData[0].players[field].name == (\'' + req.playerName + '\')) return true}return false}"}'
+            query = JSON.parse(query)
         }
+        
         query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
 
         req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
@@ -68,7 +69,7 @@ module.exports = {
                     }
                 )
             }
-        }    
+        }
         next();
     },
 
