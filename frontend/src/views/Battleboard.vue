@@ -148,7 +148,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`https://handholdreport.com/api//battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType
@@ -159,7 +159,7 @@ export default {
           this.error404 = true
         });
       } else {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`, 
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`, 
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType // NOT USEFULL
@@ -213,17 +213,13 @@ export default {
       this.searchGuildName = ''
     },
     launchGuildSearch: function (guildName) {
-      console.log(this.$router.history)
-      // this.$router.replace({ path: `${this.searchType}/${this.searchGuildName}` })
       this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
       this.currentOffset = 0
       this.minBattlePlayers = 0
       this.launchNewSearch()
     },
     launchMinbattleSearch: function () {
-      
       if(this.searchGuildName) this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
-      console.log('minbattleplayer', this.minBattlePlayers)
       this.currentOffset = 0
       this.launchNewSearch()
     },
