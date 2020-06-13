@@ -9,24 +9,45 @@ const Guild = require('./models/Guild')
 module.exports = {
     guildIdMDW: async function (req, res, next) {
         try {
-            guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
-            console.log(req.params.guildName)
-            req.guildID = guilds[0].guildID
-        } catch {
-            console.log('error')
+            if (req.query.searchType === 'guild') {
+                console.log('guild')
+                guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
+                console.log(req.params.guildName)
+                req.guildID = guilds[0].guildID
+            } else if (req.query.searchType === 'alliance') {
+                console.log('alli')
+                console.log(req.params.guildName)
+                const allianceName = req.params.guildName.toUpperCase()
+                let query = '{"$where": "function() { for (var field in this.battleData[0].alliances) { if (this.battleData[0].alliances[field].name == (\'' + allianceName + '\')) return true}return false}"}'
+                query = JSON.parse(query)
+                query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
+
+                let aa = await Battle.find(query).sort({battleID:-1}).limit(1)
+                console.log(aa)
+            }
+            /* {$where: function() { 
+                for (var field in this.battleData[0].alliances) { 
+                    if (this.battleData[0].alliances[field].name == ) return true;
+                }
+                return false;
+            }} */
+            
+        } catch (er) {
+            console.log('error', er)
         }
         
         next();
     },
 
     battlesMDW: async function (req, res, next) {
-        console.log('nbplayer', req.query.minBattlePlayers)
         req.query.minBattlePlayers = req.query.minBattlePlayers === undefined ? 0 : req.query.minBattlePlayers
+        console.log('nbplayer', req.query.minBattlePlayers)
 
         const offsetNumber = parseInt(req.params.offset) + 50
         let query = {}
         
         if (req.guildID) {
+            console.log('in guild')
             let guildTosearch = "battleData.guilds." + req.guildID
             query[guildTosearch] = {$exists: true }
         }
