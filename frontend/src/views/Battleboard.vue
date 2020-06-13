@@ -16,26 +16,26 @@
         
     </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
-        <div class="select_div" uk-form-custom="target: > * > span:first-child">
-            <select>
-                <option value="guild">Guild</option>
-                <option value="alliance">Alliance</option>
-            </select>
-            <button class="" type="button" tabindex="-1">
-                <span></span>
-                <span uk-icon="icon: chevron-down"></span>
-            </button>
+      <div class="form_global_search">
+        <form class="form_search" @submit="launchGuildSearch(searchGuildName)">
+            <div class="select_div" uk-form-custom="target: > * > span:first-child">
+                <select v-model="searchType">
+                    <option value="guild">Guild</option>
+                    <option value="alliance">Alliance</option>
+                </select>
+                <button class="" type="button" tabindex="-1">
+                    <span></span>
+                    <span uk-icon="icon: chevron-down"></span>
+                </button>
+            </div>
+              <input class="" type="search" v-model="searchGuildName"  placeholder="Search GUILD name">
+              <span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
+          </form>
         </div>
-          <input class="" type="search" v-model="searchGuildName" placeholder="Search GUILD name">
-          <span @click.prevent="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5" style="cursor:pointer"></span>
-          <!-- <a @click.prevent="launchGuildSearch(searchGuildName)" class="" uk-search-icon></a> -->
-      </form>
-      <!-- </div> -->
       <div>
         <form class="uk-form-horizontal">
           <!-- <div uk-form-custom="target: > * > span:first-child"> -->
-            <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers">
+            <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers" @change="launchMinbattleSearch">
                 <option value="0">0 + players</option>
               <option value="20">20 + players</option>
               <option value="50">50 + players</option>
@@ -140,7 +140,6 @@ export default {
       battles: [],
       searchGuildName: this.$route.params.guildName,
       searchType : 'guild',
-      searchPlayerName: null,
       error404: false,
       currentOffset: null,
       initialLoader: false,
@@ -216,8 +215,15 @@ export default {
       }
     },
     launchGuildSearch: function (guildName) {
-      this.searchPlayerName = null,
-      this.onClickSearchGuildPlayer = true
+      this.$router.push({ path: `/${this.searchGuildName}` })
+      this.currentOffset = 0
+      this.minBattlePlayers = 0
+      this.launchNewSearch()
+    },
+    launchMinbattleSearch: function () {
+      console.log('minbattleplayer', this.minBattlePlayers)
+      this.currentOffset = 0
+      this.launchNewSearch()
     },
     killboardURL: function (battleID) {
       return 'killboard/' + battleID
@@ -238,117 +244,52 @@ export default {
     },
     onChangeOffset (offset) {
       this.currentOffset = offset
-      // this.fetchData()
     },
     formatNumber (num) {
       return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
     },
+    launchNewSearch () {
+      this.offsetLoading = true
+      this.fetchData()
+      .then(res => {
+        this.battles = res.data
+        this.battles.map(this.missGuild)
+        this.battles.map(this.guildsNumber)
+
+        this.battles.forEach(battle => {
+          battle.bestGuildFame = { id: '', killfame: 0 }
+          battle.bestGuildKill = { id: '', kills: 0 }
+          battle.sortedGuilds = []
+
+          for (const guild in battle.guilds) {
+            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
+            // --- BEST KILL FAME MEDALbattle.guilds[guild]
+            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
+              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
+              battle.bestGuildFame.id = battle.guilds[guild].id
+            } // --- BEST KILL MEDAL
+            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
+              battle.bestGuildKill.kills = battle.guilds[guild].kills
+              battle.bestGuildKill.id = battle.guilds[guild].id
+            }
+          }
+          this.OrderBy(battle, 'killFame', 'desc')
+          this.offsetLoading = false
+          this.initialLoader = false
+        })
+      })
+    }
 
   },
   mounted () {
     this.currentOffset = 0
     if (this.currentOffset === 0) this.initialLoader = true // Condition needed ?
-
     
   },
   watch: {
-    minBattlePlayers: function () {
-      console.log('minbattleplayer', this.minBattlePlayers)
-      this.offsetLoading = true
-      this.fetchData()
-      .then(res => {
-        this.battles = res.data
-        this.battles.map(this.missGuild)
-        this.battles.map(this.guildsNumber)
-
-        this.battles.forEach(battle => {
-          battle.bestGuildFame = { id: '', killfame: 0 }
-          battle.bestGuildKill = { id: '', kills: 0 }
-          battle.sortedGuilds = []
-
-          for (const guild in battle.guilds) {
-            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
-            // --- BEST KILL FAME MEDALbattle.guilds[guild]
-            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
-              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
-              battle.bestGuildFame.id = battle.guilds[guild].id
-            } // --- BEST KILL MEDAL
-            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
-              battle.bestGuildKill.kills = battle.guilds[guild].kills
-              battle.bestGuildKill.id = battle.guilds[guild].id
-            }
-          }
-          this.OrderBy(battle, 'killFame', 'desc')
-          this.offsetLoading = false
-          this.initialLoader = false
-        })
-      })
-    },
     currentOffset: function () {
-      this.offsetLoading = true
-      this.fetchData()
-      .then(res => {
-        this.battles = res.data
-        this.battles.map(this.missGuild)
-        this.battles.map(this.guildsNumber)
-
-        this.battles.forEach(battle => {
-          battle.bestGuildFame = { id: '', killfame: 0 }
-          battle.bestGuildKill = { id: '', kills: 0 }
-          battle.sortedGuilds = []
-
-          for (const guild in battle.guilds) {
-            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
-            // --- BEST KILL FAME MEDALbattle.guilds[guild]
-            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
-              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
-              battle.bestGuildFame.id = battle.guilds[guild].id
-            } // --- BEST KILL MEDAL
-            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
-              battle.bestGuildKill.kills = battle.guilds[guild].kills
-              battle.bestGuildKill.id = battle.guilds[guild].id
-            }
-          }
-          this.OrderBy(battle, 'killFame', 'desc')
-          this.offsetLoading = false
-          this.initialLoader = false
-        })
-      })
+      this.launchNewSearch()
     },
-    onClickSearchGuildPlayer: function () {
-      this.$router.push({ path: `/${this.searchGuildName}` })
-      
-      this.offsetLoading = true
-      this.minBattlePlayers = 0
-      this.fetchData()
-      .then(res => {
-        this.battles = res.data
-        this.battles.map(this.missGuild)
-        this.battles.map(this.guildsNumber)
-
-        this.battles.forEach(battle => {
-          battle.bestGuildFame = { id: '', killfame: 0 }
-          battle.bestGuildKill = { id: '', kills: 0 }
-          battle.sortedGuilds = []
-
-          for (const guild in battle.guilds) {
-            battle.sortedGuilds.push(battle.guilds[guild]) // = this.battle.guilds ?
-            // --- BEST KILL FAME MEDALbattle.guilds[guild]
-            if (battle.guilds[guild].killFame > battle.bestGuildFame.killfame) {
-              battle.bestGuildFame.killfame = battle.guilds[guild].killFame
-              battle.bestGuildFame.id = battle.guilds[guild].id
-            } // --- BEST KILL MEDAL
-            if (battle.guilds[guild].kills > battle.bestGuildKill.kills) {
-              battle.bestGuildKill.kills = battle.guilds[guild].kills
-              battle.bestGuildKill.id = battle.guilds[guild].id
-            }
-          }
-          this.OrderBy(battle, 'killFame', 'desc')
-          this.offsetLoading = false
-          this.onClickSearchGuild = false // LOOP ON HIMSELF
-        })
-      })
-    }
   }
 }
 
