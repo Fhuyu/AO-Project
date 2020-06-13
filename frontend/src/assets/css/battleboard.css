@@ -46,6 +46,7 @@
 }
 .form_search input{
     max-height: 48px;
+    height:46px;
     line-height: 46px;
     background-color: #fff;
     font-size: 14px;
