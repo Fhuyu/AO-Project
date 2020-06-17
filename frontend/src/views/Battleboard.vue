@@ -17,9 +17,26 @@
     </div>
     <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
       <div class="form_global_search">
+        
+<!-- <div class="uk-inline">
+        <button class="uk-button uk-button-default" type="button"><span uk-icon="icon:  triangle-down"></span></button>
+        <div uk-dropdown="mode: click; boundary: ! .uk-button-group; boundary-align: true;">
+            <ul class="uk-nav uk-dropdown-nav">
+                <li class="uk-active"><a href="#">Active</a></li>
+                <li><a href="#">Item</a></li>
+                <li class="uk-nav-header">Header</li>
+                <li><a href="#">Item</a></li>
+                <li><a href="#">Item</a></li>
+                <li class="uk-nav-divider"></li>
+                <li><a href="#">Item</a></li>
+            </ul>
+        </div>
+    </div> -->
+
+
         <form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
             <div class="select_div" uk-form-custom="target: > * > span:first-child">
-                <select v-model="searchType" @change="cleanName">
+                <select v-model="searchType" @change="cleanName" class="uk-select">
                     <option value="guild">Guild</option>
                     <option value="alliance">Alliance</option>
                     <option value="player">Player</option>
@@ -33,9 +50,10 @@
               <span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
           </form>
         </div>
+        
       <div>
         <form class="uk-form-horizontal">
-            <select class="uk-select" id="form-stacked-select" v-model="minBattlePlayers" @change="launchMinbattleSearch">
+            <select class="uk-select playerFilter" v-model="minBattlePlayers" @change="launchMinbattleSearch">
                 <option value="0">0 + players</option>
               <option value="20">20 + players</option>
               <option value="50">50 + players</option>
@@ -45,6 +63,7 @@
       </div>
     </div>
     <!-- PAGINATION -->
+
     <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" :searchGuildName="searchGuildName" @changeOffset="onChangeOffset"></Pagination>
 
     <RequestFailed v-if="error404">

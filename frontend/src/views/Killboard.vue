@@ -2,9 +2,14 @@
 <div class="killboard">
   <div v-if="totalPlayer > 1" class="before_basic_load">
     <!-- POUR CACHER LE PREMIER CHARGEMENT -->
-    
-    
+  
     <div class="uk-container-xlarge uk-margin-auto">
+      <Handhold :alliances="battle.sortedTopTableAlliances" v-on:changeHeaderView="changeHeaderViewToHandHoldTable">
+      </Handhold>
+
+      <HandholdTable v-if="headerView === 'handholdTable'" :winnerHandhold="handhold.winner" :loserHandhold="handhold.loser" :othersHandhold="handhold.others">
+      </HandholdTable>
+      
       <div style="text-align:center">
       <h1 style="color:white;"><span style="color:rgb(25, 96, 12)">{{versus[0]}}</span> <span style="color:#666">vs</span> <span style="color:rgb(109, 40, 13)">{{versus[1]}} </span> 
       <span v-if="versus.length > 2"> <span style="color:#666"> vs</span> {{versus[2]}}</span></h1>
@@ -79,7 +84,7 @@
       <h1 style="color:white;">Loading initial statistics</h1>
       <span uk-spinner="ratio: 3"></span>
   </div>
-
+  
     <ul uk-grid="masonry: true"  :uk-accordion="` multiple: true ${isCollapse}`" class="uk-grid-collapse killboard_guilds">
         <li style="padding-right:20px; margin: 0 0.5%;" class="uk-open uk-card uk-card-default uk-margin-small-bottom" :class="NbColumn()"
           v-for="(alliance, indexa) in battle.sortedalliances" :key="indexa">
@@ -148,8 +153,8 @@
             </div>
         </li>
     </ul>
-<a href="#" uk-totop uk-scroll></a>
-  </div>
+    <a href="#" uk-totop uk-scroll></a>
+</div>
 </template>
 
 <script>
@@ -157,6 +162,8 @@ import axios from 'axios'
 import RequestFailed from "@/components/RequestFailed"
 import KillboardOrderBy from "@/components/KillboardOrderBy"
 import KillboardPlayersList from "@/components/KillboardPlayersList"
+import Handhold from "@/components/Handhold"
+import HandholdTable from "@/components/HandholdTable"
 
 export default {
   name: 'Battle',
@@ -171,7 +178,6 @@ export default {
       bestPlayerIP: { id: '', itempower: 0 },
       bestAlliance: null,
       loserAlliance: null,
-      showWeapon: null,
       showStats: false,
       showDeathFame: false,
       columnClass: false,
@@ -180,13 +186,21 @@ export default {
       error404: false,
       currentTopTableSort: '',
       currentTopTableSortDir: 'desc',
-       
+      headerView : 'allianceTable',
+      handhold : {
+        winner : [],
+        loser : [],
+        others : []
+
+      }
     }
   },
   components: {
     RequestFailed,
     KillboardOrderBy,
     KillboardPlayersList,
+    Handhold,
+    HandholdTable,
   },
   computed: {
     searchPlayerAnchor : function () {
@@ -199,6 +213,12 @@ export default {
     },
   },
   methods: {
+    changeHeaderViewToHandHoldTable (winnerHandhold, loserHandhold, othersHandhold) {
+      this.headerView = 'handholdTable'
+      this.handhold.winner = this.battle.sortedTopTableAlliances.filter( alliance => winnerHandhold.includes(alliance.id))
+      this.handhold.loser = this.battle.sortedTopTableAlliances.filter( alliance => loserHandhold.includes(alliance.id))
+      this.handhold.others = this.battle.sortedTopTableAlliances.filter( alliance => othersHandhold.includes(alliance.id))
+    },
     async fetchData () {
       try {
           return await axios.get(`https://handholdreport.com/api/killboard/${this.$route.params.id}`) //https://handholdreport.com/api
@@ -287,7 +307,8 @@ export default {
         alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
       })
       this.showStats = true
-    }
+    },
+
   },
   mounted () {
     this.fetchData()

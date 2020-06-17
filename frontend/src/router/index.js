@@ -23,6 +23,11 @@ const routes = [
     path: '/sort/:id',
     name: 'Sort',
     component: () => import(/* webpackChunkName: "sort" */ '../views/Sort.vue')
+  },
+  {
+    path: '/handhold/:id',
+    name: 'Sort',
+    component: () => import(/* webpackChunkName: "sort" */ '../components/Handhold.vue')
   }
 ]
 
