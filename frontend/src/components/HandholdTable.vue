@@ -2,6 +2,7 @@
   <div>
     <div class="uk-child-width-1-3@s" uk-grid>
         <div class="winning side">
+          <h4 style="text-align:center;color: #f2f2f2;">{{handhold.side1}}</h4>
           <table v-if="winnerHandhold.length" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
@@ -23,7 +24,7 @@
                     <td>{{ handholdGlobalColumn(winnerHandhold, 'kills')}}</td><!-- kills -->
                     <td>{{ handholdGlobalColumn(winnerHandhold, 'deaths')}}</td>
                     <td>{{ formatNumber(handholdGlobalColumn(winnerHandhold, 'killFame')) }}</td>
-                    <td>{{ (handholdGlobalColumn(winnerHandhold, 'itempower')).toFixed(0) }}</td>
+                    <td> {{ (handholdGlobalColumn(winnerHandhold, 'itempower') / winnerHandhold.length).toFixed(0) }} </td>
                 </tr>
                 <tr class="global" v-for="(alliance, index) in winnerHandhold" :key="index">
                     <td>{{ alliance.name }}</td>
@@ -38,6 +39,7 @@
         </table>
       </div>
       <div class="loser side" v-if="loserHandhold.length">
+          <h4 style="text-align:center;color: #f2f2f2;">{{handhold.side2}}</h4>
           <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
@@ -55,6 +57,7 @@
             <tbody>
                 <tr class="global_battle">
                     <td></td>
+                    <!-- <td>{{ handholdGlobalColumn(loserHandhold, 'kills')}}</td> -->
                     <td>{{ totalPlayers.loser.length ? totalPlayers.loser.length > 1 ?  totalPlayers.loser.reduce( (a,b) => a + b) : totalPlayers.loser[0] : ''}}</td>
                     <td>{{ handholdGlobalColumn(loserHandhold, 'kills')}}</td>
                     <td> {{handholdGlobalColumn(loserHandhold, 'deaths')}}</td>
@@ -74,6 +77,7 @@
         </table>
       </div>
        <div class="other side" v-if="othersHandhold.length">
+          <h4 style="text-align:center;color: #f2f2f2;">{{handhold.side3}}</h4>
           <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
@@ -117,7 +121,7 @@
 
 export default {
   name: 'Handhold',
-  props: ['winnerHandhold', 'loserHandhold', 'othersHandhold'],
+  props: ['handhold','winnerHandhold', 'loserHandhold', 'othersHandhold'],
   data: function () {
     return {
       totalPlayers : {
@@ -151,22 +155,7 @@ export default {
 </script>
 
 <style scoped>
-.win {
-  color: green;
-}
-#win div {
-  background-color: green;
-}
-.lose {
-  color: red;
-}
-#lose div {
-  background-color: red;
-}
-.other {
-  color: grey;
-}
-#other div {
-  background-color: grey;
+.loserside table {
+  border-left: 5px solid red;
 }
 </style>

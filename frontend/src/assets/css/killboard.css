@@ -38,9 +38,30 @@ div.stat.player[class*='alliance-']{
     background-color: red;
 }
 /* ---------- STAT TABLE ------------ */
+.night .global.win {
+    background:#19600c!important;
+}
+.day .global.win {
+    background:#96ce6b!important;
+}
+.night .global.lose {
+    background:#6d280d!important;
+}
+.day .global.lose {
+    background:#ea8252!important
+}
 .night .global_battle td {
     color: #DFA408;
     border-bottom: 1px solid #969696;
+    padding: 10px 0;
+    font-weight: bold;
+}
+.day .stat_battle {
+    background: #f2f2f2;
+}
+.day .global_battle td {
+    color: #a57c09;
+    border-bottom: 1px solid #f2f2f2;
     padding: 10px 0;
     font-weight: bold;
 }

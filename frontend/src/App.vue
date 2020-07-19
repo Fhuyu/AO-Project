@@ -4,10 +4,9 @@
     </div>
     <div id="header">
       <router-link to='/' style="text-decoration: none;">
-        <!-- <img style="position: absolute;left: 30%;" src="./assets/handhold.png" alt="logo" /> -->
         <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
       </router-link>
-      <p>Beta version - 0.3.7 | THE GREAT WAR HAS BEGUN |
+      <p>Beta version - 0.4.0 | 
 
       <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
       <div id="modal-close-default" uk-modal>
@@ -19,7 +18,8 @@
                   Battleboard : Highlight searched guild & player<br />
                   Website : General design (Logo / Color)<br />
               <h2 class="uk-modal-title">Done</h2>
-                  20-06-13 : Battleboard : Alliance + Player search (Exact name with uppercase)<br />
+                  20-07-17 : Killboard : Handhold mode + Enable healing view<br />
+                  20-06-13 : Battleboard : Alliance + Player search (Exact name + Case sensitive)<br />
                   20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />
                   20-06-04 : Battleboard : Loading battles is faster<br />
                   20-06-02 : New Database on duty ! Data Optimized<br />
@@ -39,9 +39,22 @@
       </div> -->
     <router-view/>
     <div id="footer">
-      <p>Website under development. Wanna share your feedback ? <br />
+      <div>Website under development. Wanna share your feedback ? <br />
       <a href="https://discord.gg/eQnTDFn" target="_blank"><img id="discord" src="./assets/discord.png" alt="discord" /></a>
-      </p>
+      <form  action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="width: 130px;
+    height: 100px;
+    overflow: hidden;margin: 20px auto;">
+        <input type="hidden" name="cmd" value="_donations" />
+        <input type="hidden" name="business" value="ZRAWUYBSCPB8Q" />
+        <input type="hidden" name="item_name" value="Coffee & Server !" />
+        <input type="hidden" name="currency_code" value="EUR" />
+        <input type="image" style="width: 200px;margin: -40% -50%;" src="https://media.giphy.com/media/EqNfolceUiLPW/giphy.gif" border="0" name="submit" title="Send me one coffee with Paypal !" alt="Donate with PayPal button" />
+        <img alt="" border="0" src="https://www.paypal.com/en_FR/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+      </div>
+      
+
+
     </div>
 
   </div>

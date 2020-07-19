@@ -3,19 +3,25 @@
   <div v-if="totalPlayer > 1" class="before_basic_load">
     <!-- POUR CACHER LE PREMIER CHARGEMENT -->
   
-    <div class="uk-container-xlarge uk-margin-auto">
-      <Handhold :alliances="battle.sortedTopTableAlliances" v-on:changeHeaderView="changeHeaderViewToHandHoldTable">
+    <div class="uk-container-xlarge uk-margin-auto" style="position:relative;">
+      <div class="uk-margin" style="text-align: right;">
+      <button class="uk-button uk-button-primary" v-if="headerView !== 'handholdReview' && headerView !== 'handholdTable'" @click="headerView = 'handholdReview'" >HANDHOLD MODE</button>
+      <button class="uk-button uk-button-primary" v-if="headerView === 'handholdTable'" @click="headerView = 'handholdReview'" >EDIT HANDHOLD MODE</button>
+      <button class="uk-button uk-button-primary" style="margin-left: 20px; " v-if="headerView !== 'allianceTable'" @click="headerView = 'allianceTable'">GLOBAL STATS</button>
+    </div>
+      <Handhold v-show="headerView === 'handholdReview'" :alliances="battle.sortedTopTableAlliances" v-on:changeHeaderView="changeHeaderViewToHandHoldTable" :bestAlliance="bestAlliance">
       </Handhold>
 
-      <HandholdTable v-if="headerView === 'handholdTable'" :winnerHandhold="handhold.winner" :loserHandhold="handhold.loser" :othersHandhold="handhold.others">
+      <HandholdTable v-if="headerView === 'handholdTable'" :handhold="handhold" :winnerHandhold="handhold.winner" :loserHandhold="handhold.loser" :othersHandhold="handhold.others">
       </HandholdTable>
       
-      <div style="text-align:center">
+    <div style="text-align:center" v-if="headerView === 'allianceTable'">
       <h1 style="color:white;"><span style="color:rgb(25, 96, 12)">{{versus[0]}}</span> <span style="color:#666">vs</span> <span style="color:rgb(109, 40, 13)">{{versus[1]}} </span> 
       <span v-if="versus.length > 2"> <span style="color:#666"> vs</span> {{versus[2]}}</span></h1>
       <span style="color:#f1f1f1">{{battle.KillArea.replace(/_/g, " ")}} | {{readableDate(battle.startTime)}}</span>
     </div>
-        <table class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
+      
+        <table v-if="headerView === 'allianceTable'" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
 
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
@@ -50,7 +56,7 @@
                     <td></td>
                 </tr>
 
-                <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :style=" alliance.id === bestAlliance ? 'background:#19600c;' : alliance.id === loserAlliance ? 'background:#6d280d;' : ''">
+                <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :class=" alliance.id === bestAlliance ? 'win' : alliance.id === loserAlliance ? 'lose' : ''">
                     <td>{{ alliance.name }}</td>
                     <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
                     <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
@@ -128,7 +134,7 @@
                     <td>Kills</td>
                     <td>Deaths</td>
                     <td>Assist</td>
-                    <!-- <td uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td> -->
+                    <td v-if="showHeal" uk-tooltip="Heal applied on assistance, consider it as offensive healing">Heal*</td>
                     <td> Item Power </td>
                     <td> Kill Fame </td>
                     <td uk-tooltip="Total death fame / Link on first death" v-if="showDeathFame"> Death Fame* </td>
@@ -139,6 +145,7 @@
                 v-for="player in alliance.sortedPlayers"
                 :key="player.id"
                 :showStats="showStats"
+                :showHeal="showHeal"
                 :showDeathFame="showDeathFame"
                 :searchPlayerName="searchPlayerName"
                 :bestPlayerKillfame="bestPlayerKillfame"
@@ -213,11 +220,15 @@ export default {
     },
   },
   methods: {
-    changeHeaderViewToHandHoldTable (winnerHandhold, loserHandhold, othersHandhold) {
+    changeHeaderViewToHandHoldTable (winnerHandhold, loserHandhold, othersHandhold, side1, side2, side3) {
       this.headerView = 'handholdTable'
       this.handhold.winner = this.battle.sortedTopTableAlliances.filter( alliance => winnerHandhold.includes(alliance.id))
       this.handhold.loser = this.battle.sortedTopTableAlliances.filter( alliance => loserHandhold.includes(alliance.id))
       this.handhold.others = this.battle.sortedTopTableAlliances.filter( alliance => othersHandhold.includes(alliance.id))
+      this.handhold.side1 = side1
+      this.handhold.side2 = side2
+      this.handhold.side3 = side3
+      //add names
     },
     async fetchData () {
       try {
@@ -234,6 +245,7 @@ export default {
     },
     onClickOrderBy (currentSortName, currentSortDir) {
       this.showDeathFame = currentSortName === 'deathFame' ? true : false
+      this.showHeal = currentSortName === 'assistance' ? true : false
 
       for (const alliance in this.battle.alliances) {
           this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
@@ -257,10 +269,8 @@ export default {
             if (a[currentSortName] > b[currentSortName]) return 1 * modifier
             return 0
         })
-        if (allianceChanged === 'sortedTopTableAlliances') {
           this.currentTopTableSortDir = currentSortDir
           this.currentTopTableSort = currentSortName
-        }
     } ,
     onChangeColumn () {
       this.columnClass = !this.columnClass

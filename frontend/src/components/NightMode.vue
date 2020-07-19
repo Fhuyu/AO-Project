@@ -18,6 +18,7 @@ export default {
     methods: {
     switchMode: function () {
         this.currentMode = this.currentMode === 'night' ? 'day' : 'night'
+        // this.currentMode = !this.currentMode
         console.log('switched', this.currentMode)
         this.$emit('clicked', this.currentMode)
     },
