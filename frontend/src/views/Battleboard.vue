@@ -39,7 +39,7 @@
                 <select v-model="searchType" @change="cleanName" class="uk-select">
                     <option value="guild">Guild</option>
                     <option value="alliance">Alliance</option>
-                    <option value="player">Player</option>
+                    <!-- <option value="player">Player</option> -->
                 </select>
                 <button class="" type="button" tabindex="-1">
                     <span></span>
