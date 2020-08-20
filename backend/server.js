@@ -7,6 +7,11 @@ const axios = require("axios");
 
 const cors = require('cors') // https://github.com/expressjs/cors
 
+// var corsOptions = {
+//     origin: 'http://localhost:8080',
+//     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   }
+
 
 const mongoose = require('mongoose')
 const Battle = require('./models/Battle')
@@ -29,7 +34,7 @@ const port_redis = process.env.PORT || 6379;
 const port = process.env.PORT || 5000;
 
 //configure redis client on port 6379
-const redis_client = redis.createClient(port_redis);
+// const redis_client = redis.createClient(port_redis);
 
 //configure express server
 const app = express();
@@ -151,6 +156,7 @@ setInterval( async() => {
                     await new Battle({
                         battleID: battle.id,
                         battleTotalPlayers: Object.keys(battle.players).length,
+                        battleEndDate : battle.timeout,
                         battleData : battle
                     })
                     .save()
@@ -214,7 +220,6 @@ app.get('/battles/:offset', cors(), (req, res) => {
     }
 });
 
-
 app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
     if (req.data) {
         res.send(req.data)
@@ -253,6 +258,19 @@ app.get('/battles/:offset/:guildName', cors(), async (req, res) => {
 
     }
 })
+
+app.use('/attendance/:guildName', middlewares.guildIdMDW)
+app.use('/attendance/:guildName', middlewares.battlesMDW) // id Guilde + totalBattle > minimumplayer + date ?battlesAttendanceZergSize
+app.use('/attendance/:guildName', middlewares.battlesAttendanceZergSize)
+app.use('/attendance/:guildName', middlewares.battlesAttendanceZergPlayers)
+// Ajouter mdw qui tri le nombre de joueur de la guilde
+app.get('/attendance/:guildName', cors(), (req, res) => {
+    if (req.data) {
+        res.send(req.data)
+    } else {
+        res.status(404).send({ success: false, message: error.message });
+    }
+});
 
 app.use('/killboard/:id', middlewares.killboardMDW)
 app.get('/killboard/:id', cors(), (req, res) => {

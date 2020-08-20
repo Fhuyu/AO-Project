@@ -5,6 +5,11 @@ Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/attendance',
+    name: 'Attendance',
+    component: () => import(/* webpackChunkName: "battleboard" */ '../views/Attendance.vue')
+  },
+  {
     path: '/',
     name: 'Battleboard',
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/Battleboard.vue')
@@ -28,7 +33,8 @@ const routes = [
     path: '/handhold/:id',
     name: 'Sort',
     component: () => import(/* webpackChunkName: "sort" */ '../components/Handhold.vue')
-  }
+  },
+  
 ]
 
 const router = new VueRouter({

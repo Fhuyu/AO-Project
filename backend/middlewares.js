@@ -50,12 +50,52 @@ module.exports = {
             console.log('player is', req.playerName)
             query = '{"$where": "function() { for (var field in this.battleData[0].players) { if (this.battleData[0].players[field].name == (\'' + req.playerName + '\')) return true}return false}"}'
             query = JSON.parse(query)
-        }
-        
+        } // semaine milliseconde : < 604800000
+
         query['battleTotalPlayers'] = { $gt: req.query.minBattlePlayers }
 
-        req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
+        if (req.query.page === 'attendance') { 
+            // query = '{"$where": "function() { if((new Date() - newDate(this.battleData[0].timeout)) < 604800000) { return true } return false }"}'
+            query['battleEndDate'] = { $gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000) } // Less than one week
+            req.dataParse = await Battle.find(query).sort({battleID:-1})
+        } else {
+            req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
+        }
+        console.log('next', req.dataParse.length)
         next()
+    },
+
+    // ADD MDW FOR GUILD PLAYER NUMBER
+    battlesAttendanceZergSize: function (req, res, next) {
+        if (req.dataParse) {
+            req.data = req.dataParse.filter( battle => {
+                const playerPerGuild = Object.values(battle.battleData[0].players).filter( player => player.guildId === req.guildID)
+                return playerPerGuild.length > req.query.minBattlePlayers
+            })
+        }
+        next();
+    },
+    battlesAttendanceZergPlayers: function (req, res, next) {
+        if (req.data) {
+            let players = {}
+            req.data = req.data.forEach( battle => {
+                const playerPerGuild = Object.values(battle.battleData[0].players).filter( player => player.guildId === req.guildID)
+                // console.log(playerPerGuild) NEEDED WHEN WORKING
+                playerPerGuild.forEach( player => {
+                    players[player.id] = {
+                        name: player.name,
+                        killFame : players[player.id] ? players[player.id].killFame + player.killFame : player.killFame,
+                        kills : players[player.id] ? players[player.id].kills + player.kills : player.kills,
+                        deaths : players[player.id] ? players[player.id].deaths + player.deaths : player.deaths,
+                        // deathFame : players[player.id] ? players[player.id].deathFame.push(player.deathFame)  : player.deathFame,
+                        // itempower : players[player.id] ? players[player.id].itempower.push(player.itempower) : player.itempower ? [player.itempower] : [],
+                        attendance : players[player.id] ? players[player.id].attendance + 1 : 1,
+                    }
+                })
+            })
+            req.data = Object.values(players)
+        }
+        next();
     },
 
     battlesOffsetMDW: function (req, res, next) {
