@@ -1,6 +1,7 @@
 <template>
 <div class="battleboard" uk-grid>
-	<div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
+
+	<!-- <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
 		<h1 style="color:white;" v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
 		<div  v-if="!error404">
 		<h1 style="color:white;">Loading last battles</h1>
@@ -8,8 +9,13 @@
 		</div>
 		<RequestFailed v-if="error404">
 		</RequestFailed>
-	</div>
-	<div v-else class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
+	</div> -->
+
+	<div v-if="!initialLoader" class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
+	<BestWeeklyFame></BestWeeklyFame>
+
+
+
 		<div class="uk-child-width-1-3 uk-text-center uk-margin-medium uk-margin-medium-top" uk-grid>
 			<div class="form_global_search uk-text-left uk-width-auto@m">
 				<form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
@@ -124,12 +130,14 @@
 import axios from 'axios'
 import RequestFailed from "@/components/RequestFailed"
 import Pagination from "@/components/BattleboardPagination"
+import BestWeeklyFame from "@/components/BestWeeklyFame"
 
 export default {
   name: 'battles',
   components: {
     RequestFailed,
-    Pagination,
+	Pagination,
+	BestWeeklyFame,
   },
   data: function () {
     return {

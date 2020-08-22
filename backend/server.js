@@ -34,7 +34,7 @@ const port_redis = process.env.PORT || 6379;
 const port = process.env.PORT || 5000;
 
 //configure redis client on port 6379
-// const redis_client = redis.createClient(port_redis);
+const redis_client = redis.createClient(port_redis);
 
 //configure express server
 const app = express();
@@ -46,28 +46,27 @@ functions = require("./functions");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-/* const dayInMilliseconds = 1000 * 60 * 60 * 24;
+const dayInMilliseconds = 1000 * 60 * 60 * 24;
 setInterval( async() => { 
-    let topPvPArray = []
-    const topPvP = [
+    let topPvP = {}
+    const topPvPURI = [
         'https://gameinfo.albiononline.com/api/gameinfo/events/playerfame?range=week&limit=11&offset=0',
         'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0',
-        'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=month&limit=11&offset=0',
+        // 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=month&limit=11&offset=0',
         'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topplayers?range=week&limit=11&offset=0',
-        'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topguilds?range=week&limit=11&offset=0'
+        // 'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topguilds?range=week&limit=11&offset=0'
 
     ]
-    topPvP.forEach( async(top) => {
-        console.log('fetch', top)
+    topPvPURI.forEach( async(top) => {
+        // console.log('fetch', top)
         let response = await axios.get(top, { timeout: 120000 })
 
-        topPvPArray.push(response.data)
-        console.log(topPvPArray)
-        redis_client.setex(`top`, 1800, JSON.stringify(battlesData)); // 30min
-
+        topPvP[top] = response.data
+        // console.log(topPvP)
+        redis_client.setex(`top`, 7200, JSON.stringify(topPvP)); // 2h
     })
     // battles = await axios.get(url, { timeout: 120000 })
-}, 10000 ); */
+}, 10000 ); // 1h // 3600000
 
 let battles = null
 let fetching = false
@@ -197,6 +196,14 @@ setInterval( async() => {
         
     next()
 }) */
+
+app.get('/topFame', cors(), (req, res) => { 
+    redis_client.get('top', (err, response) => {
+        if (err)res.status(404).send({ success: false, message: err.message });
+        res.send(response)
+    })
+})
+
 app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 // app.use('/battles/:offset/:guildName', middlewares.allianceMDW)
 // app.use('/battles/:offset/:guildName', middlewares.playerMDW)
@@ -300,6 +307,7 @@ app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR F
             res.status(404).send({ success: false, message: error.message });
         });
 })
+
 
 
 app.listen(port);
