@@ -1,70 +1,50 @@
 <template>
 <div class="battleboard" uk-grid>
-  <div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
-      <h1 style="color:white;" v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
-      <div  v-if="!error404">
-        <h1 style="color:white;">Loading last battles</h1>
-        <div uk-spinner="ratio: 3"></div>
-      </div>
-      <RequestFailed v-if="error404">
-      </RequestFailed>
-  </div>
-  
-  <div v-else class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
-
-    <div class="uk-margin">
-        
-    </div>
-    <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
-      <div class="form_global_search">
-        
-<!-- <div class="uk-inline">
-        <button class="uk-button uk-button-default" type="button"><span uk-icon="icon:  triangle-down"></span></button>
-        <div uk-dropdown="mode: click; boundary: ! .uk-button-group; boundary-align: true;">
-            <ul class="uk-nav uk-dropdown-nav">
-                <li class="uk-active"><a href="#">Active</a></li>
-                <li><a href="#">Item</a></li>
-                <li class="uk-nav-header">Header</li>
-                <li><a href="#">Item</a></li>
-                <li><a href="#">Item</a></li>
-                <li class="uk-nav-divider"></li>
-                <li><a href="#">Item</a></li>
-            </ul>
-        </div>
-    </div> -->
-
-
-        <form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
-            <div class="select_div" uk-form-custom="target: > * > span:first-child">
-                <select v-model="searchType" @change="cleanName" class="uk-select">
-                    <option value="guild">Guild</option>
-                    <option value="alliance">Alliance</option>
-                    <!-- <option value="player">Player</option> -->
-                </select>
-                <button class="" type="button" tabindex="-1">
-                    <span></span>
-                    <span uk-icon="icon: chevron-down"></span>
-                </button>
-            </div>
-              <input class="" v-model="searchGuildName"  :placeholder="searchType === 'guild' ? 'Search Guild Name' :'EXACT name (uppercase...)'">
-              <span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
-          </form>
-        </div>
-        
-      <div>
-        <form class="uk-form-horizontal">
-            <select class="uk-select playerFilter" v-model="minBattlePlayers" @change="launchMinbattleSearch">
-                <option value="0">0 + players</option>
-              <option value="20">20 + players</option>
-              <option value="50">50 + players</option>
-              <option value="100">100 + players</option>
-            </select>
-        </form>
-      </div>
-    </div>
+	<div v-if="initialLoader" class="uk-margin-auto" style="text-align:center;"> 
+		<h1 style="color:white;" v-if="searchGuildName"> {{ searchGuildName.toUpperCase() }}</h1>
+		<div  v-if="!error404">
+		<h1 style="color:white;">Loading last battles</h1>
+		<div uk-spinner="ratio: 3"></div>
+		</div>
+		<RequestFailed v-if="error404">
+		</RequestFailed>
+	</div>
+	<div v-else class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
+		<div class="uk-child-width-1-3 uk-text-center uk-margin-medium uk-margin-medium-top" uk-grid>
+			<div class="form_global_search uk-text-left uk-width-auto@m">
+				<form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
+					<div class="select_div" uk-form-custom="target: > * > span:first-child">
+						<select v-model="searchType" @change="cleanName" class="uk-select">
+							<option value="guild">Guild</option>
+							<option value="alliance">Alliance</option>
+							<!-- <option value="player">Player</option> -->
+						</select>
+						<button class="" type="button" tabindex="-1">
+							<span></span>
+							<span uk-icon="icon: chevron-down" style="padding-left:5px"></span>
+						</button>
+					</div>
+					<input class="" v-model="searchGuildName"  :placeholder="searchType === 'guild' ? 'Search Guild Name' :'EXACT name (uppercase...)'">
+					<span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
+				</form>
+			</div>
+			<div class="uk-width-expand@m">
+			</div>
+			<div class="uk-width-auto@m">
+				<form class="uk-form-horizontal">
+					<select class="uk-select playerFilter" v-model="minBattlePlayers" @change="launchMinbattleSearch">
+						<option value="0">0 + players</option>
+					<option value="20">20 + players</option>
+					<option value="50">50 + players</option>
+					<option value="100">100 + players</option>
+					</select>
+				</form>
+			</div>
+		</div>
     <!-- PAGINATION -->
+		<Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" :searchGuildName="searchGuildName" @changeOffset="onChangeOffset"></Pagination>
 
-    <Pagination :currentOffset="currentOffset" :offsetLoading="offsetLoading" :searchGuildName="searchGuildName" @changeOffset="onChangeOffset"></Pagination>
+
 
     <RequestFailed v-if="error404">
     </RequestFailed>
@@ -100,20 +80,22 @@
           </table>
 
         </a>
-        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="height: 44px;top: 0px;right: 2px;position: absolute;">See killboard</button></router-link>
+        <router-link :to="killboardURL(battle.id)"><button class="uk-button uk-button-primary" style="height: 100%;top: 0px;right: 2px;position: absolute;">
+			<span class="icon right" uk-icon="icon: search; ratio: 1.5"></span>
+        </button></router-link>
         <div class="uk-accordion-content">
-          <table class="uk-table uk-table-divider detail">
-            <thead>
-              <tr>
-                  <th></th>
-                  <th>ALLIANCE</th>
-                  <th>GUILD</th>
-                  <th>PLAYERS</th>
-                  <th>KILLS/DEATHS</th>
-                  <th>KD RATIO</th>
-                  <th>KILLFAME</th>
-              </tr>
-            </thead>
+			<table class="uk-table uk-table-divider detail">
+				<thead>
+				<tr>
+					<th></th>
+					<th>ALLIANCE</th>
+					<th>GUILD</th>
+					<th>PLAYERS</th>
+					<th>KILLS/DEATHS</th>
+					<th>KD RATIO</th>
+					<th>KILLFAME</th>
+				</tr>
+				</thead>
             <tbody>
               <tr class="guilds" v-for="(guild, index) in battle.sortedGuilds" :key="index">
                 <td>
@@ -167,7 +149,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType
@@ -178,7 +160,7 @@ export default {
           this.error404 = true
         });
       } else {
-        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`,  //http://localhost:5000
+        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`,  //http://localhost:5000
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType // NOT USEFULL

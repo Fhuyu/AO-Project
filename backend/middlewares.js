@@ -78,9 +78,9 @@ module.exports = {
     battlesAttendanceZergPlayers: function (req, res, next) {
         if (req.data) {
             let players = {}
-            req.data = req.data.forEach( battle => {
+            req.data.forEach( battle => {
                 const playerPerGuild = Object.values(battle.battleData[0].players).filter( player => player.guildId === req.guildID)
-                // console.log(playerPerGuild) NEEDED WHEN WORKING
+                // console.log(playerPerGuild) //NEEDED WHEN WORKING
                 playerPerGuild.forEach( player => {
                     players[player.id] = {
                         name: player.name,
@@ -93,7 +93,7 @@ module.exports = {
                     }
                 })
             })
-            req.data = Object.values(players)
+            req.data = {battles : req.data, players : Object.values(players)}
         }
         next();
     },

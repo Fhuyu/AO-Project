@@ -1,36 +1,50 @@
 <template>
   <div id="app" :class="viewMode">
-    <div id="background">
-    </div>
-    <div id="header">
-      <router-link to='/' style="text-decoration: none;">
-        <h1><span style="color:#9e9e9e;">HANDHOLD</span><span style="color:#DFA408;">REPORT</span></h1> 
-      </router-link>
-      <p>Beta version - 0.4.0 | 
 
-      <button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
-      <div id="modal-close-default" uk-modal>
-          <div class="uk-modal-dialog uk-modal-body">
-              <button class="uk-modal-close-default" type="button" uk-close></button>
-              All details on HandHoldReport Discord : <a href="https://discord.gg/eQnTDFn" target="_blank"><img style="width:20px;" src="./assets/discord.png" alt="discord" /></a>
-              <h2 class="uk-modal-title">Incoming</h2>
-                  Battleboard : Save guild research to be able to click back from killboard<br />
-                  Battleboard : Highlight searched guild & player<br />
-                  Website : General design (Logo / Color)<br />
-              <h2 class="uk-modal-title">Done</h2>
-                  20-07-17 : Killboard : Handhold mode + Enable healing view<br />
-                  20-06-13 : Battleboard : Alliance + Player search (Exact name + Case sensitive)<br />
-                  20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />
-                  20-06-04 : Battleboard : Loading battles is faster<br />
-                  20-06-02 : New Database on duty ! Data Optimized<br />
-                  20-05-25 : Battleboard : Filter current battles by players : reworked (now show all battles and not only current offset)<br />
-                  20-05-24 : Battleboard : Guild quick search !<br />
-                  20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />
-                  20-05-20 : Killboards are loading faster + Half of them show directly Weapon, IP ... || Killboard global stat can now be order by IP<br />
-                  20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
-          </div>
+    <div id="header">
+      
+
+    <div class="uk-text-center" uk-grid>
+		<div class="uk-text-left uk-width-auto@m">
+			<router-link to='/' style="text-decoration: none;">
+				<h1><span>HANDHOLD</span><span style="color:#FF6933;">REPORT</span></h1> 
+			</router-link>
+			<p>Beta version - 0.4.0 | 
+
+			<button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
+			<div id="modal-close-default" uk-modal>
+				<div class="uk-modal-dialog uk-modal-body">
+					<button class="uk-modal-close-default" type="button" uk-close></button>
+					All details on HandHoldReport Discord : <a href="https://discord.gg/eQnTDFn" target="_blank"><img style="width:20px;" src="./assets/discord.png" alt="discord" /></a>
+					<h2 class="uk-modal-title">Incoming</h2>
+						Battleboard : Save guild research to be able to click back from killboard<br />
+						Battleboard : Highlight searched guild & player<br />
+						Website : General design (Logo / Color)<br />
+					<h2 class="uk-modal-title">Done</h2>
+						20-07-17 : Killboard : Handhold mode + Enable healing view<br />
+						20-06-13 : Battleboard : Alliance + Player search (Exact name + Case sensitive)<br />
+						20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />
+						20-06-04 : Battleboard : Loading battles is faster<br />
+						20-06-02 : New Database on duty ! Data Optimized<br />
+						20-05-25 : Battleboard : Filter current battles by players : reworked (now show all battles and not only current offset)<br />
+						20-05-24 : Battleboard : Guild quick search !<br />
+						20-05-22 : Killboards : Now show informations as soon as the data is fetched (Prevent several bugs) | Loading bar is still here as indicator<br />
+						20-05-20 : Killboards are loading faster + Half of them show directly Weapon, IP ... || Killboard global stat can now be order by IP<br />
+						20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
+				</div>
+			</div>
+		</div>
+		<div class="uk-width-1-5@m">
+			<router-link to='/' style="text-decoration: none;"><h4>BATTLEBOARD</h4></router-link>
+		</div>
+		<div class="uk-width-1-5@m">
+			<router-link to='/attendance' style="text-decoration: none;"><h4>ATTENDANCE</h4></router-link>
+		</div>
+		<div class="uk-width-expand@m">
+			<NightMode @clicked="onClickSwitchMode"></NightMode>
       </div>
-    <NightMode @clicked="onClickSwitchMode"></NightMode>
+  </div>
+
 
     </div>
       <!-- <div class="uk-card uk-card-secondary uk-card-body uk-width-1-2@m uk-margin-auto" style="text-align:center;">
@@ -88,28 +102,29 @@ export default {
 #footer {
   text-align: center;
   padding: 40px;
-
 }
 #header {
-  text-align: center;
-  padding: 40px;
+  padding: 20px;
 }
-#header h1 {
-  margin: 0;
+#header .active h4{
+	color:#0495a3;
+}
+#header h1, #header p {
+  margin:0;
 }
 .night #header h1, .night #header p, .night #header button{
   color:white;
 }
 .night#app {
     height: 100vh;
-    background-color: #1d1d1d;
+    background-color: #080B21;
 }
 
 .night h3 {
   color:white;
 }
 .night, .night .battleboard, .night #footer {
-    background: #1d1d1d;
+    background: #080B21;
 }
 .night li {
     background: #323232;
@@ -118,7 +133,7 @@ export default {
     color: #dddddd;
 }
 .night .uk-button-primary {
-    background: #0d7377;
+    background: #FF7A4D;
 }
 .night .uk-button-secondary {
   background: #3066BE;
