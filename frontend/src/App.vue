@@ -32,10 +32,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="uk-width-1-5@m">
-				<router-link to='/' style="text-decoration: none;"><h4>BATTLEBOARD</h4></router-link>
+			<div class="uk-width-1-5@m uk-margin-top" uk-grid>
+				<router-link to='/' class="uk-width-1-2" style="text-decoration: none;"><h4>BATTLEBOARD </h4></router-link>
+        <h4 class="uk-width-1-2" v-if="$route.params.id">>  <span>{{$route.params.id}}</span></h4>
 			</div>
-			<div class="uk-width-1-5@m">
+			<div class="uk-width-1-5@m uk-margin-top">
 				<router-link to='/attendance' style="text-decoration: none;"><h4>ATTENDANCE</h4></router-link>
 			</div>
 			<div class="uk-width-expand@m">
@@ -125,7 +126,7 @@ export default {
     background: #24212f;
 }
 .night td {
-    color: #dddddd;
+    color: white;
 }
 .night .uk-button-primary {
     background: #FF7A4D;

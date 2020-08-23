@@ -7,14 +7,16 @@
                     <thead>
                         <th style="width: 10px;"></th>
                         <th></th>
-                        <th>KILLFAME</th>
-                        <th>DEATHFAME</th>
+                        <th>WEEKLY KILLFAME</th>
+                        <th>TOTAL KILLFAME</th>
+                        <th>TOTAL DEATHFAME</th>
                     </thead>
-                    <tr  v-for="(player, index) in killFameGuild" :key="index">
+                    <tr  v-for="(guild, index) in killFameGuild" :key="index">
                         <td v-if="killFameGuildmax > index">#{{index + 1}}</td>
-                        <td v-if="killFameGuildmax > index"><b>{{player.Name}}</b><br/>{{player.AllianceName}}</td>
-                        <td v-if="killFameGuildmax > index">{{formatNumber(player.KillFame)}}</td>
-                        <td v-if="killFameGuildmax > index">{{formatNumber(player.DeathFame)}}</td>
+                        <td v-if="killFameGuildmax > index"><b>{{guild.Name}}</b><br/>{{guild.AllianceName}}</td>
+                        <td v-if="killFameGuildmax > index">{{formatNumber(guild.KillFame)}}</td>
+                        <td v-if="killFameGuildmax > index">{{formatNumber(guild.data.guild.killFame)}}</td>
+                        <td v-if="killFameGuildmax > index">{{formatNumber(guild.DeathFame)}}</td>
                     </tr>
                 </table>
                 <div class="loadmore">
@@ -30,15 +32,15 @@
                     <thead>
                         <th style="width: 10px;"></th>
                         <th></th>
-                        <th>KILLFAME</th>
-                        <th>DEATHFAME</th>
+                        <th>WEEKLY KILLFAME</th>
+                        <!-- <th>DEATHFAME</th> -->
                         <th>RATIO</th>
                     </thead>
                     <tr  v-for="(player, index) in killFamePlayer" :key="index">
                         <td v-if="killFamePlayermax > index">#{{index + 1}}</td>
                         <td v-if="killFamePlayermax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
                         <td v-if="killFamePlayermax > index">{{formatNumber(player.KillFame)}}</td>
-                        <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td>
+                        <!-- <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td> -->
                         <td v-if="killFamePlayermax > index">{{formatNumber(player.FameRatio)}}</td>
                     </tr>
                 </table>
@@ -59,22 +61,21 @@
                     <thead>
                         <th style="width: 10px;"></th>
                         <th></th>
-                        <th>KILLFAME</th>
-                        <th>DEATHFAME</th>
+                        <th> WEEKLY KILLFAME</th>
+                        <!-- <th>DEATHFAME</th> -->
                         <th>RATIO</th>
                     </thead>
                     <tr  v-for="(player, index) in killFameCrystal" :key="index">
-                        {{player}}
-                        <td v-if="killFamePlayermax > index">#{{index + 1}}</td>
-                        <td v-if="killFamePlayermax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
-                        <td v-if="killFamePlayermax > index">{{formatNumber(player.KillFame)}}</td>
-                        <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td><!--  -->
-                        <td v-if="killFamePlayermax > index">{{formatNumber(player.FameRatio)}}</td>
+                        <td v-if="killFameCrystalmax > index">#{{index + 1}}</td>
+                        <td v-if="killFameCrystalmax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
+                        <td v-if="killFameCrystalmax > index">{{formatNumber(player.KillFame)}}</td>
+                        <!-- <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td> -->
+                        <td v-if="killFameCrystalmax > index">{{formatNumber(player.FameRatio)}}</td>
                     </tr>
                 </table>
                 <div class="loadmore">
-                    <p v-if="killFamePlayermax < 4" @click="showMore('killFamePlayermax')">LOAD MORE <span uk-icon="chevron-down"></span></p>
-                    <p v-if="killFamePlayermax > 4" @click="showLess('killFamePlayermax')">SHOW LESS<span uk-icon="chevron-up"></span></p>
+                    <p v-if="killFameCrystalmax < 4" @click="showMore('killFameCrystalmax')">LOAD MORE <span uk-icon="chevron-down"></span></p>
+                    <p v-if="killFameCrystalmax > 4" @click="showLess('killFameCrystalmax')">SHOW LESS<span uk-icon="chevron-up"></span></p>
                 </div>
             </div>
         </div>
@@ -94,14 +95,15 @@ export default {
             killFameCrystal : null,
             killFamePlayermax: 3,
             killFameGuildmax: 3,
+            killFameCrystalmax: 3,
         }
     },
     async mounted () {
         await axios.get(`http://localhost:5000/topFame`)
         .then( async response => {  
-            this.killFamePlayer = response.data['https://gameinfo.albiononline.com/api/gameinfo/events/playerfame?range=week&limit=11&offset=0']
-            this.killFameGuild = response.data['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0']
-            this.killFameCrystal = response.data['https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topplayers?range=week&limit=11&offset=0']
+            this.killFamePlayer = response.data['playerFame']
+            this.killFameGuild = response.data['guildFame']
+            this.killFameCrystal = response.data['crystalFame']
         })
     },
     methods: {
@@ -119,10 +121,21 @@ export default {
 </script>
 
 <style scoped>
+.night .weeklyfamecomponent h4 {
+    color: #dddddd;
+}
+.night .weeklyfame tr:nth-child(2n) {
+    background: #2e2d33;
+}
+.weeklyfame tr:nth-child(2n) {
+    background: #fcfcfc;
+}
 .weeklyfamecomponent .uk-card {
     border-radius: 20px;
-    background: #25232F;
     padding: 10px;
+}
+.night .weeklyfamecomponent .uk-card {
+    background: #25232F;
 }
 table.weeklyfame th, table.weeklyfame td {
     font-size:12px;

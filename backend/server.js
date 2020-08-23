@@ -57,14 +57,54 @@ setInterval( async() => {
         // 'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topguilds?range=week&limit=11&offset=0'
 
     ]
-    topPvPURI.forEach( async(top) => {
+    topPvPURI.forEach( async(url) => {
         // console.log('fetch', top)
-        let response = await axios.get(top, { timeout: 120000 })
+        let response = await axios.get(url, { timeout: 120000 })
+        if(url === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
+            topPvP['guildFame'] = response.data
+        } else if (url === 'https://gameinfo.albiononline.com/api/gameinfo/events/playerfame?range=week&limit=11&offset=0') {
+            topPvP['playerFame'] = response.data
+        } else if (url === 'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topplayers?range=week&limit=11&offset=0') {
+            topPvP['crystalFame'] = response.data
+        }
+        redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
 
-        topPvP[top] = response.data
         // console.log(topPvP)
-        redis_client.setex(`top`, 7200, JSON.stringify(topPvP)); // 2h
+
+        if (url === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
+
+            const promises = topPvP['guildFame'].map( async guild => {
+                const response = await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/guilds/${guild.Id}/data`, { timeout: 120000 })
+                return ({ ...guild, data: response.data})
+            })
+        
+            await Promise.all(promises).then(guilds => {
+                topPvP['guildFame'] = guilds
+                redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
+            })
+            .catch(err => console.log('no', err))
+        }
+
+
+        // console.log(topPvP['guildFame'])
+
+        // if(top === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
+        //     topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'] = topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'].forEach( async (guild,index) => {
+        //         // console.log(guild.Id)
+        //         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/guilds/${guild.Id}/data`, { timeout: 120000 })
+        //         .then( response => {
+        //             // guild.data = response.data
+        //             console.log(topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'])
+        //             topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'][index] = ({ ...guild, data: response.data})
+        //             // console.log(topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'])
+        //             redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
+        //         })
+        //         .catch(err => console.log(err))
+        //     })
+        // }
+        
     })
+
     // battles = await axios.get(url, { timeout: 120000 })
 }, 10000 ); // 1h // 3600000
 
