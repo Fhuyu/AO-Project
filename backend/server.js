@@ -46,7 +46,7 @@ functions = require("./functions");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const dayInMilliseconds = 1000 * 60 * 60 * 24;
+// const dayInMilliseconds = 1000 * 60 * 60 * 24;
 setInterval( async() => { 
     let topPvP = {}
     const topPvPURI = [
@@ -58,7 +58,6 @@ setInterval( async() => {
 
     ]
     topPvPURI.forEach( async(url) => {
-        // console.log('fetch', top)
         let response = await axios.get(url, { timeout: 120000 })
         if(url === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
             topPvP['guildFame'] = response.data
@@ -69,20 +68,18 @@ setInterval( async() => {
         }
         redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
 
-        // console.log(topPvP)
-
         if (url === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
 
             const promises = topPvP['guildFame'].map( async guild => {
                 const response = await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/guilds/${guild.Id}/data`, { timeout: 120000 })
                 return ({ ...guild, data: response.data})
             })
-        
+
             await Promise.all(promises).then(guilds => {
                 topPvP['guildFame'] = guilds
                 redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
             })
-            .catch(err => console.log('no', err))
+            .catch(err => console.log(err))
         }
 
 

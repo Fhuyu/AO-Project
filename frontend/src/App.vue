@@ -31,10 +31,12 @@
 							20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
 					</div>
 				</div>
+        S10 starts 29.08.2020
 			</div>
+
 			<div class="uk-width-1-5@m uk-margin-top" uk-grid>
 				<router-link to='/' class="uk-width-1-2" style="text-decoration: none;"><h4>BATTLEBOARD </h4></router-link>
-        <h4 class="uk-width-1-2" v-if="$route.params.id">>  <span>{{$route.params.id}}</span></h4>
+        <!-- <h4 class="uk-width-1-2" v-if="$route.params.id">>  <span>{{$route.params.id}}</span></h4> -->
 			</div>
 			<div class="uk-width-1-5@m uk-margin-top">
 				<router-link to='/attendance' style="text-decoration: none;"><h4>ATTENDANCE</h4></router-link>
@@ -92,6 +94,9 @@ export default {
 </script>
 
 <style>
+.uk-select:not([multiple]):not([size]) option {
+  color:white;
+}
 #discord {
   width: 60px;
 }
@@ -113,14 +118,14 @@ export default {
 }
 .night#app {
     height: 100vh;
-    background-color: #080B21;
+    background-color: #05081c;
 }
 
 .night h3 {
   color:white;
 }
 .night, .night .battleboard, .night #footer {
-    background: #080B21;
+    background: #05081c;
 }
 .night li {
     background: #24212f;

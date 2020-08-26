@@ -1,5 +1,5 @@
 <template>
-    <div class="attendance" uk-grid>
+    <div class="battleboard" uk-grid>
         <div class="uk-width-4-5@m uk-margin-auto" style="z-index:1;">
             <div class="uk-child-width-1-2 uk-text-center uk-margin" uk-grid>
                 <div class="form_global_search">
@@ -19,57 +19,43 @@
                 </div>
                 <div>
                     <form class="uk-form-horizontal">
-                        <select class="uk-select playerFilter" v-model="minBattlePlayers" style="min-width: 250px;">
-                        <option value="20">20 + players from your guild</option>
-                        <option value="50">50 + players from your guild</option>
-                        <option value="100">100 + players from your guild</option>
+                        <select class="uk-select playerFilter" v-model="minBattlePlayers">
+                        <option value="20">20 + players</option>
+                        <option value="50">50 + players</option>
+                        <option value="100">100 + players</option>
                         </select>
                     </form>
                 </div>
             </div>
         </div>
         <div v-if="attendance" class="uk-width-3-5 uk-margin-auto">
-            <h3 style="text-align:center;">Total battles this week : {{attendance.battles.length}}</h3>
+            <h3>{{attendance.battles.length}} battle found</h3>
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
                 <thead>
-                    <th @click.prevent="onClickOrderBy('name', 'desc')">PLAYER NAME
-                        <span v-if="currentSort === 'name' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-                        <span v-if="currentSort === 'name' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-                    </th>
+                    <th>PLAYER NAME</th>
                     <th>KILLS</th>
                     <th>DEATHS</th>
-                    <th @click.prevent="onClickOrderBy('killFame', 'desc')">KILLFAME
-                        <span v-if="currentSort === 'killFame' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-                        <span v-if="currentSort === 'killFame' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-                    </th>
-                    <th @click.prevent="onClickOrderBy('attendance', 'desc')">ATTENDANCE
-                        <span v-if="currentSort === 'attendance' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
-                        <span v-if="currentSort === 'attendance' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
-                    </th>
+                    <th>KILLFAME</th>
+                    <th>ATTENDANCE</th>
                     <!-- <th>LOSING GUILD</th> -->
-                    <!-- <th></th> -->
+                    <th></th>
                 </thead>
                 <tr class="attendance_data" v-for="(item, index) in attendance.players" :key="index">
                     <td>{{ item.name }}</td>
                     <td>{{ item.kills }}</td>
                     <td>{{ item.deaths}}</td>
-                    <td>{{ formatNumber(item.killFame)}}</td>
+                    <td>{{ item.killFame}}</td>
                     <td>{{ item.attendance}}</td>
                 </tr>
             </table>
                 <!-- {{ item.battleEndDate + item.battleTotalPlayers + item.battleData[0].players}} -->
-                <h3 style="text-align:center;">Battles found</h3>
-
                 <table class="uk-table uk-width-3-5 uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;">
                 <thead>
                     <th>ID</th>
-                    <th>DATE</th>
-                    <th>TOTAL PLAYERS</th>
+                    <th></th>
                 </thead>
                 <tr class="attendance_data" v-for="(item, index) in attendance.battles" :key="index">
                     <td><a :href="`https://handholdreport.com/#/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
-                    <td>{{readableDate(item.battleData[0].startTime)}}</td>
-                    <td>{{item.battleTotalPlayers}}</td>
                 </tr>
             </table>
         </div>
@@ -91,26 +77,16 @@ export default {
             searchType :'guild',
             error404 : false,
             attendance : null,
-            currentSort: 'attendance',
-            currentSortDir: 'desc',
-
         }
     },
     components: {
     },
     methods: {
-        readableDate: function (date) {
-            return `${date.slice(0, 10)} ${date.slice(11, 19)}`
-        },
-        formatNumber (num) {
-            return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
-        },
         launchGuildBattleSearch: function () {
             this.fetchData()
             .then(res => {
                 console.log('received', res)
                 this.attendance = res.data
-                this.onClickOrderBy('attendance', 'desc')
             })
         },
         async fetchData () {
@@ -131,44 +107,12 @@ export default {
             }
             return response
         },
-        onClickOrderBy (currentSortName, currentSortDir) {
-
-            // if (currentSortName === this.currentSort) {
-            //     this.currentSortDir = this.currentSortDir === 'desc' ? 'asc' : 'desc'
-            // }
-
-            this.attendance.players = this.attendance.players.sort((a, b) => {
-                let modifier = 1
-                if (currentSortDir === 'desc') {
-                    modifier = -1
-                }
-                if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-                if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-                return 0
-            })
-            this.currentSort = currentSortName
-
-            // for (const alliance in this.battle.alliances) {
-            //     this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
-            //         let modifier = 1
-            //         if (currentSortDir === 'desc') {
-            //             modifier = -1
-            //         }
-            //         if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-            //         if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-            //         return 0
-            //     })
-            // } 
-        },
     },
     computed: {
     },
     mounted () {
     },
     watch: {
-        minBattlePlayers () {
-            this.launchGuildBattleSearch()
-        }
 
     }
 }
@@ -179,16 +123,5 @@ export default {
 @import './../assets/css/battleboard.css';
 .attendance_data td {
     padding: 5px 12px;
-}
-.attendance {
-    background-color: #05081c;
-}
-.attendance table {
-    background: #24212f;
-}
-.attendance_data:nth-of-type(odd) {
-    background: #3c3d44;
-    border-top: 1px solid #969696;
-    border-bottom: 1px solid #969696;
 }
 </style>

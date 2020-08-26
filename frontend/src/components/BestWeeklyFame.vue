@@ -11,8 +11,8 @@
                         <th>TOTAL KILLFAME</th>
                         <th>TOTAL DEATHFAME</th>
                     </thead>
-                    <tr  v-for="(guild, index) in killFameGuild" :key="index">
-                        <td v-if="killFameGuildmax > index">#{{index + 1}}</td>
+                    <tr  v-for="(guild, index) in killFameGuild" :key="index" >
+                        <td v-if="killFameGuildmax > index" style="height:40px;">#{{index + 1}}</td>
                         <td v-if="killFameGuildmax > index"><b>{{guild.Name}}</b><br/>{{guild.AllianceName}}</td>
                         <td v-if="killFameGuildmax > index">{{formatNumber(guild.KillFame)}}</td>
                         <td v-if="killFameGuildmax > index">{{formatNumber(guild.data.guild.killFame)}}</td>
@@ -37,7 +37,7 @@
                         <th>RATIO</th>
                     </thead>
                     <tr  v-for="(player, index) in killFamePlayer" :key="index">
-                        <td v-if="killFamePlayermax > index">#{{index + 1}}</td>
+                        <td v-if="killFamePlayermax > index" style="height:40px;">#{{index + 1}}</td>
                         <td v-if="killFamePlayermax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
                         <td v-if="killFamePlayermax > index">{{formatNumber(player.KillFame)}}</td>
                         <!-- <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td> -->
@@ -65,8 +65,8 @@
                         <!-- <th>DEATHFAME</th> -->
                         <th>RATIO</th>
                     </thead>
-                    <tr  v-for="(player, index) in killFameCrystal" :key="index">
-                        <td v-if="killFameCrystalmax > index">#{{index + 1}}</td>
+                    <tr  v-for="(player, index) in killFameCrystal" :key="index" >
+                        <td v-if="killFameCrystalmax > index" style="height:40px;">#{{index + 1}}</td>
                         <td v-if="killFameCrystalmax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
                         <td v-if="killFameCrystalmax > index">{{formatNumber(player.KillFame)}}</td>
                         <!-- <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td> -->

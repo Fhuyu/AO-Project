@@ -57,26 +57,30 @@
                 </tr>
 
                 <tr class="global" v-for="(alliance, index) in battle.sortedTopTableAlliances" :key="index" :class=" alliance.id === bestAlliance ? 'win' : alliance.id === loserAlliance ? 'lose' : ''">
-                    <td>{{ alliance.name }}</td>
-                    <td :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
-                    <td :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
-                    <td>{{ alliance.deaths }}</td>
-                    <td :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
-                    <td v-if="showStats && alliance.itempower">{{alliance.itempower.toFixed(0)}}</td>
+                    <td v-if="battleTableMax > index">{{ alliance.name }}</td>
+                    <td v-if="battleTableMax > index" :uk-tooltip="(alliance.players.length *100 / totalPlayer).toFixed(1) +' % players'">{{ alliance.players.length }}</td>
+                    <td v-if="battleTableMax > index" :uk-tooltip="(alliance.kills *100 / battle.totalKills).toFixed(1) +' % kills done'">{{ alliance.kills }}</td>
+                    <td v-if="battleTableMax > index">{{ alliance.deaths }}</td>
+                    <td v-if="battleTableMax > index" :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
+                    <td v-if="showStats && alliance.itempower && battleTableMax > index">{{alliance.itempower.toFixed(0)}}</td>
                     <td v-else></td>
                 </tr>
             </tbody>
         </table>
+        <div class="loadmore">
+            <p v-if="battleTableMax < 9" @click="battleTableMax = 30">LOAD MORE <span uk-icon="chevron-down"></span></p>
+            <p v-if="battleTableMax > 9" @click="battleTableMax = 8">SHOW LESS<span uk-icon="chevron-up"></span></p>
+        </div>
 
         <!-- PLAYER SEARCH -->
-        <div class="uk-margin">
+        <!-- <div class="uk-margin">
             <form class="uk-search uk-search-default" v-on:submit.prevent>
                 <span uk-search-icon></span>
                 <input class="uk-search-input" type="search" v-model="searchPlayerName" placeholder="Highlight player">
             </form>
             <a v-if="searchPlayerName" :href="searchPlayerAnchor" class="uk-button uk-button-primary"> GO</a>
             <button v-else class="uk-button uk-button-primary" disabled> GO</button>
-        </div>
+        </div> -->
 
         <RequestFailed v-if="error404" :killboardID="battle.id">
         </RequestFailed>
@@ -176,6 +180,7 @@ export default {
   name: 'Battle',
   data: function () {
     return {
+      battleTableMax: 8,
       battle: [],
       versus: [],
       totalPlayer: 0,

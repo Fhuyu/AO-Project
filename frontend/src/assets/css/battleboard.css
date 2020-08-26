@@ -10,7 +10,7 @@
     background:white;
 }
 .night .form_search svg{
-    background: #1C2D4A;
+    background: #332d4c;
 }
 .form_search button svg{
     height: 20px;
@@ -22,7 +22,7 @@
     font-size: 16px;
     border-color: transparent;
     background-color: transparent;
-    /* background: #1C2D4A; */
+    /* background: #332d4c; */
     color: #FF6933;
     margin-left: 5px;
     font-weight: 700;
@@ -37,7 +37,7 @@
     min-width: 115px;
 }
 .night .form_search .select_div {
-    background: #1C2D4A;
+    background: #332d4c;
 }
 .form_search input{
     max-height: 48px;
@@ -52,7 +52,7 @@
     vertical-align:middle;
 }
 .night .form_search input{
-    background: #1C2D4A;
+    background: #332d4c;
     color: white;
 }
 .form_search .icon.right {
@@ -63,7 +63,7 @@
     cursor:pointer;
 }
 .night .form_search .icon.right {
-    background: #1C2D4A;
+    background: #332d4c;
 }
 .playerFilter {
     height: 48px!important;
@@ -76,7 +76,7 @@
 .night .playerFilter {
     color: white;
     border: 0;
-    background: #1C2D4A;
+    background: #332d4c;
 }
 .result {
     margin:auto;
@@ -141,7 +141,7 @@
     background: #f8f8f8;
 }
 .night .detail tr:nth-child(2n) {
-    background: #474747;
+    background: #3c3d44;
 }
 .battleboard li:nth-child(2n) {
     background: #fcfcfc;
