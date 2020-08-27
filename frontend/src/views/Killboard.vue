@@ -90,7 +90,7 @@
     </div>
   </div>
   <div v-else class="uk-margin-auto" style="text-align:center;"> <!--  -->
-      <h1 style="color:white;">Loading initial statistics</h1>
+      <h1 style="color:white;">Loading killboard</h1>
       <span uk-spinner="ratio: 3"></span>
   </div>
   

@@ -7,7 +7,7 @@
 				<router-link to='/' style="text-decoration: none;">
 					<h1><span>HANDHOLD</span><span style="color:#FF6933;">REPORT</span></h1> 
 				</router-link>
-				<p>Beta version - 0.4.0 | 
+				<p>Beta version - 0.5.0 | 
 
 				<button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
 				<div id="modal-close-default" uk-modal>
@@ -17,8 +17,8 @@
 						<h2 class="uk-modal-title">Incoming</h2>
 							Battleboard : Save guild research to be able to click back from killboard<br />
 							Battleboard : Highlight searched guild & player<br />
-							Website : General design (Logo / Color)<br />
 						<h2 class="uk-modal-title">Done</h2>
+							20-08-27 : Attendance : Version 1 + Rework design + Top stats<br />
 							20-07-17 : Killboard : Handhold mode + Enable healing view<br />
 							20-06-13 : Battleboard : Alliance + Player search (Exact name + Case sensitive)<br />
 							20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />

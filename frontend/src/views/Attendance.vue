@@ -86,9 +86,12 @@
             </table>
         </div>
         <div v-else class="uk-width-3-5 uk-margin-auto informations">
+            <div v-if="loading">
+                <span uk-spinner="ratio: 3"></span>
+            </div>
             <p>
                 <h3>Informations - V.1.0 - Zerg attendance</h3>
-                 It allows you to :<br/>
+                It allows you to :<br/>
                 <ul class="uk-list uk-list-hyphen">
                     <li>
                         Search your battles with your guild minimum player.<br/>
@@ -128,6 +131,7 @@ export default {
             attendance : null,
             currentSort: 'attendance',
             currentSortDir: 'desc',
+            loading : false,
         }
     },
     components: {
@@ -140,10 +144,12 @@ export default {
             return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "." });
         },
         launchGuildBattleSearch: function () {
+            this.loading = true
             this.fetchData()
             .then(res => {
                 this.attendance = res.data
                 this.onClickOrderBy('attendance', 'desc')
+                this.loading = false
             })
         },
         async fetchData () {
