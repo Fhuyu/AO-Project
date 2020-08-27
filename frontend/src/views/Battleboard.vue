@@ -157,7 +157,7 @@ export default {
     async fetchData () {
       let response = null
       if (this.searchGuildName) {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}/${this.searchGuildName}`, //https://handholdreport.com/api/
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType
@@ -168,7 +168,7 @@ export default {
           this.error404 = true
         });
       } else {
-        response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}`,  //http://localhost:5000
+        response = await axios.get(`https://handholdreport.com/api/battles/${this.currentOffset}`,  //http://localhost:5000
           { params: {
               minBattlePlayers : this.minBattlePlayers,
               searchType : this.searchType // NOT USEFULL

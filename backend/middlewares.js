@@ -12,7 +12,7 @@ module.exports = {
             try {
                 guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
                 req.guildID = guilds[0].guildID
-                console.log(req.guildID)
+                // console.log(req.guildID)
             } catch (er) {
                 console.log('error', er)
             }
@@ -34,7 +34,7 @@ module.exports = {
     }, */
     battlesMDW: async function (req, res, next) {
         req.query.minBattlePlayers = req.query.minBattlePlayers === undefined ? 0 : req.query.minBattlePlayers
-        console.log('nbplayer', req.query.minBattlePlayers)
+        // console.log('nbplayer', req.query.minBattlePlayers)
 
         const offsetNumber = parseInt(req.params.offset) + 50
         let query = {}
@@ -43,11 +43,11 @@ module.exports = {
             let guildTosearch = "battleData.guilds." + req.guildID
             query[guildTosearch] = {$exists: true }
         } else if (req.query.searchType === 'alliance') {
-            console.log('alliance is', req.allianceName)
+            // console.log('alliance is', req.allianceName)
             query = '{"$where": "function() { for (var field in this.battleData[0].alliances) { if (this.battleData[0].alliances[field].name == (\'' + req.allianceName + '\')) return true}return false}"}'
             query = JSON.parse(query)
         } else if (req.query.searchType === 'player') {
-            console.log('player is', req.playerName)
+            // console.log('player is', req.playerName)
             query = '{"$where": "function() { for (var field in this.battleData[0].players) { if (this.battleData[0].players[field].name == (\'' + req.playerName + '\')) return true}return false}"}'
             query = JSON.parse(query)
         } // semaine milliseconde : < 604800000
@@ -61,7 +61,7 @@ module.exports = {
         } else {
             req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
         }
-        console.log('next', req.dataParse.length)
+        // console.log('next', req.dataParse.length)
         next()
     },
 

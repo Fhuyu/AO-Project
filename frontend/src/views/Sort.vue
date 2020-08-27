@@ -82,14 +82,11 @@ export default {
       return response
     },
     sort: function (column) {
-      console.log(this.currentSort)
-      console.log('clicked', column)
       if (column === this.currentSort) {
         this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc'
       }
       this.currentSort = column
       this.reload += 1
-      console.log(this.currentSort)
     }
 
   },

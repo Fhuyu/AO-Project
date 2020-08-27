@@ -149,7 +149,7 @@ export default {
         async fetchData () {
             let response = null
             if (this.searchGuildName) {
-                response = await axios.get(`http://localhost:5000/attendance/${this.searchGuildName}`, //https://handholdreport.com/api/
+                response = await axios.get(`https://handholdreport.com/api/attendance/${this.searchGuildName}`, //https://handholdreport.com/api/
                 // response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`
                 { params: {
                     minBattlePlayers : this.minBattlePlayers,

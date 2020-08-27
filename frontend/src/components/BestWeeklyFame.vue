@@ -99,7 +99,7 @@ export default {
         }
     },
     async mounted () {
-        await axios.get(`http://localhost:5000/topFame`)
+        await axios.get(`https://handholdreport.com/api/topFame`)
         .then( async response => {  
             this.killFamePlayer = response.data['playerFame']
             this.killFameGuild = response.data['guildFame']
