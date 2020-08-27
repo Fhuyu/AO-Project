@@ -98,8 +98,9 @@
 					<th>GUILD</th>
 					<th>PLAYERS</th>
 					<th>KILLS/DEATHS</th>
-					<th>KD RATIO</th>
 					<th>KILLFAME</th>
+          <th></th>
+          <th></th>
 				</tr>
 				</thead>
             <tbody>
@@ -112,7 +113,6 @@
                 <td>{{ guild.name }}</td>
                 <td>{{guild.numbers}}</td>
                 <td>{{guild.kills}} / {{guild.deaths}}</td>
-                <td>{{(guild.deaths ? (guild.kills/guild.deaths).toFixed(1) : guild.kills)}}</td>
                 <td>{{formatNumber(guild.killFame) }} ({{ ((guild.killFame*100)/ battle.totalFame).toFixed(1) }} %)</td>
               </tr>
             </tbody>

@@ -1,5 +1,5 @@
 <template>
-  <div id="app" :class="viewMode">
+    <div id="app" :class="viewMode">
 
     <div id="header">
 		<div class="uk-text-center" uk-grid>
@@ -31,41 +31,59 @@
 							20-05-19 : New version available (HTTPS / Faster battleboard loading)<br />
 					</div>
 				</div>
-        S10 starts 29.08.2020
 			</div>
 
-			<div class="uk-width-1-5@m uk-margin-top" uk-grid>
-				<router-link to='/' class="uk-width-1-2" style="text-decoration: none;"><h4>BATTLEBOARD </h4></router-link>
-        <!-- <h4 class="uk-width-1-2" v-if="$route.params.id">>  <span>{{$route.params.id}}</span></h4> -->
+        <nav class="uk-navbar-container uk-navbar-transparent menu" uk-navbar>
+          <div class="uk-navbar-left">
+              <ul class="uk-navbar-nav">
+                  <li>				
+                    <router-link to='/' style="text-decoration: none;">BATTLEBOARD</router-link>
+                  </li>
+                  <li>
+                    <router-link to='/attendance' style="text-decoration: none;">ATTENDANCE</router-link>
+                  </li>
+                  <li>
+                    <a uk-toggle="target: #support">SUPPORT THE PROJECT</a>
+                  </li>
+              </ul>
+          </div>
+        </nav>
+        <div id="support" uk-modal>
+            <div class="uk-modal-dialog uk-modal-body">
+                <button class="uk-modal-close-default" type="button" uk-close></button>
+                <h2 class="uk-modal-title">Support</h2>
+                This website is still under development.<br/>
+                If you want to help & support the server (or even buy me a coffee), this button brings you to Paypal.<br />
+                <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ZRAWUYBSCPB8Q&item_name=Server%20%26%20Coffee%21&currency_code=EUR&source=url">
+                <button class="uk-button uk-button-primary" style="background:#FF7A4D">DONATE</button></a><br/>
+                <p>If you need a special development / feature for your guild, you can join HandHoldReport discord or contact me on discord : Fuyu#2494
+                </p>
+
+                <h2 class="uk-modal-title">Contribute</h2>
+                    - If you have any ideas<br />
+                    - If you want to report a bug<br />
+                    - If you want to help on something<br />
+                    - If you want to know the next update<br />
+                    <a target="_blank" href="https://discord.gg/eQnTDFn"> 
+                      <button class="uk-button uk-button-primary" style="background:#FF7A4D">JOIN HANDHOLDREPORT DISCORD <img style="width:40px;" src="./assets/discord.png" alt="discord" />
+                      </button>
+                    </a>
+
+                    <a href="https://discord.gg/eQnTDFn" target="_blank"></a>
+                <h4 style="text-align:center">THANK YOU!</h4>
+            </div>
+        </div>
 			</div>
-			<div class="uk-width-1-5@m uk-margin-top">
-				<router-link to='/attendance' style="text-decoration: none;"><h4>ATTENDANCE</h4></router-link>
-			</div>
+				
 			<div class="uk-width-expand@m">
 				<NightMode @clicked="onClickSwitchMode"></NightMode>
 		</div>
 	</div>
 
-
-
-    </div>
     <router-view/>
     <div id="footer">
-      <div>Website under development. Wanna share your feedback ? <br />
-      <a href="https://discord.gg/eQnTDFn" target="_blank"><img id="discord" src="./assets/discord.png" alt="discord" /></a>
-      <form  action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="width: 130px;
-    height: 100px;
-    overflow: hidden;margin: 20px auto;">
-        <input type="hidden" name="cmd" value="_donations" />
-        <input type="hidden" name="business" value="ZRAWUYBSCPB8Q" />
-        <input type="hidden" name="item_name" value="Coffee & Server !" />
-        <input type="hidden" name="currency_code" value="EUR" />
-        <input type="image" style="width: 200px;margin: -40% -50%;" src="https://media.giphy.com/media/EqNfolceUiLPW/giphy.gif" border="0" name="submit" title="Send me one coffee with Paypal !" alt="Donate with PayPal button" />
-        <img alt="" border="0" src="https://www.paypal.com/en_FR/i/scr/pixel.gif" width="1" height="1" />
-      </form>
-      </div>
-      
 
+    </div>
 
     </div>
 
@@ -94,8 +112,12 @@ export default {
 </script>
 
 <style>
+.night .menu li {
+  background: none;
+}
 .uk-select:not([multiple]):not([size]) option {
   color:white;
+  background: #444;
 }
 #discord {
   width: 60px;
@@ -107,8 +129,11 @@ export default {
 #header {
   padding: 20px;
 }
+#header h4 {
+	color:#f2c4b5;
+}
 #header .active h4{
-	color:#0495a3;
+	color:#FF7A4D;
 }
 #header h1, #header p {
   margin:0;

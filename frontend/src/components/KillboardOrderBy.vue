@@ -3,8 +3,8 @@
   <div style="position: absolute;
     right: 0;
     margin-right: 5%;">
-    <img @click="changeColumn()" :style="!columnClass ? 'background-color:#14b2b8' : 'background-color:#FF7A4D'" style="padding:5px;" src="../assets/tree-column.png" />
-    <img @click="changeColumn()" :style="columnClass ? 'background-color:#14b2b8' : 'background-color:#FF7A4D'" style="padding:5px;"  src="../assets/two-column.png" />
+    <img @click="changeColumn()" :style="!columnClass ? 'background-color:#FF7A4D' : 'background-color:#fc9876'" style="padding:5px;" src="../assets/tree-column.png" />
+    <img @click="changeColumn()" :style="columnClass ? 'background-color:#FF7A4D' : 'background-color:#fc9876'" style="padding:5px;"  src="../assets/two-column.png" />
   </div>
     <div class="uk-button-group">
         <button @click="sort('guildName')" class="uk-button uk-button-secondary">GUILDNAME
@@ -80,4 +80,8 @@ export default {
 </script>
 
 <style scoped>
+.orderby .uk-button-secondary {
+    font-weight: 800;
+    background: #FF7A4D;
+}
 </style>

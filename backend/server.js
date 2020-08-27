@@ -81,33 +81,13 @@ setInterval( async() => {
             })
             .catch(err => console.log(err))
         }
-
-
-        // console.log(topPvP['guildFame'])
-
-        // if(top === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
-        //     topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'] = topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'].forEach( async (guild,index) => {
-        //         // console.log(guild.Id)
-        //         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/guilds/${guild.Id}/data`, { timeout: 120000 })
-        //         .then( response => {
-        //             // guild.data = response.data
-        //             console.log(topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'])
-        //             topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'][index] = ({ ...guild, data: response.data})
-        //             // console.log(topPvP['https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0'])
-        //             redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
-        //         })
-        //         .catch(err => console.log(err))
-        //     })
-        // }
         
     })
-
-    // battles = await axios.get(url, { timeout: 120000 })
-}, 10000 ); // 1h // 3600000
+}, 1800000 ); // 30m / 1h : 3600000
 
 let battles = null
 let fetching = false
-let lastFecthTime = null
+// let lastFecthTime = null
 const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
@@ -220,19 +200,7 @@ setInterval( async() => {
         }
     })
 }
-}, 40000);
-
-// app.post('/updateBattle', function(req, res) {
-//     console.log(req.body)
-//     const battleData = req.body.battleData
-// })
-/* app.use('/battles/:offset/:guildName', (req,res,next) => {
-    if (req.query.searchType === 'guild') {
-        middlewares.guildIdMDW(req,res,next)
-    }
-        
-    next()
-}) */
+}, 90000);
 
 app.get('/topFame', cors(), (req, res) => { 
     redis_client.get('top', (err, response) => {
@@ -344,7 +312,5 @@ app.get('/player/:id', cors(), (req, res) => { // RECUP L'ID DE LA BATTLE POUR F
             res.status(404).send({ success: false, message: error.message });
         });
 })
-
-
 
 app.listen(port);

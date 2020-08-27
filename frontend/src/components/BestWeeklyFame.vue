@@ -1,6 +1,6 @@
 <template>
-	<div class="uk-grid-medium uk-child-width-expand@s uk-text-center weeklyfamecomponent" uk-grid>
-        <div v-if="killFameGuild">
+	<div class="uk-grid-medium uk-child-width-expand@s uk-text-center weeklyfamecomponent uk-margin-large" uk-grid>
+        <div v-if="killFameGuild" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body">
                 <h4>TOP KILL FAME GUILD</h4>
                 <table class="uk-table weeklyfame">
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="killFamePlayer">
+        <div v-if="killFamePlayer" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body">
                 <h4>TOP KILL FAME PLAYER</h4>
                 <table class="uk-table weeklyfame">
@@ -54,7 +54,7 @@
                     </router-link> -->
                 </div>
             </div>
-        <div v-if="killFameCrystal">
+        <div v-if="killFameCrystal" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body">
                 <h4>TOP CRYSTAL LEAGUE PLAYER</h4>
                 <table class="uk-table weeklyfame">
@@ -121,6 +121,9 @@ export default {
 </script>
 
 <style scoped>
+.weeklyfamecomponent .uk-card {
+    background: #f2f2f2;
+}
 .night .weeklyfamecomponent h4 {
     color: #dddddd;
 }

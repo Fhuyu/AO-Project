@@ -21,7 +21,7 @@
       <span style="color:#f1f1f1">{{battle.KillArea.replace(/_/g, " ")}} | {{readableDate(battle.startTime)}}</span>
     </div>
       
-        <table v-if="headerView === 'allianceTable'" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 4px 0px rgba(235,235,235,1);">
+        <table v-if="headerView === 'allianceTable'" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 2px 0px rgba(235,235,235,1);">
 
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
@@ -63,14 +63,13 @@
                     <td v-if="battleTableMax > index">{{ alliance.deaths }}</td>
                     <td v-if="battleTableMax > index" :uk-tooltip="(alliance.killFame *100 / battle.totalFame).toFixed(1) +' % killfame'">{{ formatNumber(alliance.killFame) }}</td>
                     <td v-if="showStats && alliance.itempower && battleTableMax > index">{{alliance.itempower.toFixed(0)}}</td>
-                    <td v-else></td>
+                    <td v-if="showStats && !alliance.itempower && battleTableMax > index"></td>
                 </tr>
             </tbody>
         </table>
-        <div class="loadmore">
-            <p v-if="battleTableMax < 9" @click="battleTableMax = 30">LOAD MORE <span uk-icon="chevron-down"></span></p>
-            <p v-if="battleTableMax > 9" @click="battleTableMax = 8">SHOW LESS<span uk-icon="chevron-up"></span></p>
-        </div>
+        <div v-if="battleTableMax < 9 && battle.sortedTopTableAlliances.length > 9" @click="battleTableMax = 30" style="text-align:center;">LOAD MORE <span uk-icon="chevron-down"></span></div>
+        <div v-if="battleTableMax > 9" @click="battleTableMax = 8" style="text-align:center;">SHOW LESS<span uk-icon="chevron-up"></span></div>
+        
 
         <!-- PLAYER SEARCH -->
         <!-- <div class="uk-margin">
@@ -85,7 +84,7 @@
         <RequestFailed v-if="error404" :killboardID="battle.id">
         </RequestFailed>
 
-        <KillboardOrderBy style="text-align: center;" :showStats="showStats" :columnClass="columnClass" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
+        <KillboardOrderBy style="text-align: center; margin-top: 60px!important;" :showStats="showStats" :columnClass="columnClass" @clicked="onClickOrderBy" @changecolumn="onChangeColumn">
         </KillboardOrderBy>
 
     </div>
