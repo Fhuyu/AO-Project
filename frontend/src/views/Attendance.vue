@@ -79,7 +79,8 @@
                     </td>
                     <td>{{ item.name }}</td>
                     <td>
-                        <img style="height:35px" :src="imageWeaponUri(item.weapon)">
+                        <img style="height:35px" :src="imageWeaponUri(item.weapon[0])">
+                        <img style="height:35px" :src="imageWeaponUri(item.weapon[1])">
                     </td>
                     <td>{{ item.kills }}</td>
                     <td>{{ item.deaths}}</td>
@@ -211,7 +212,11 @@ export default {
                         // console.log(weapon.split(/_(.+)/)[1].split('@')[0].split('?')[0])
                         mainWeapon[currentWeapon] = mainWeapon[currentWeapon] ? mainWeapon[currentWeapon] + 1 : 1
                     })
-                    player.weapon = Object.keys(mainWeapon).reduce((a, b) => mainWeapon[a] > mainWeapon[b] ? a : b);
+                    player.weapon = Object.keys(mainWeapon).sort( (a, b) => {
+                        return mainWeapon[b] - mainWeapon[a];
+                    });
+                    // console.log(mainWeapon)
+                    // player.weapon = Object.keys(mainWeapon).length ? Object.keys(mainWeapon).reduce((a, b) => mainWeapon[a] > mainWeapon[b] ? a : b) : ''
                 })
             })
         },
@@ -254,7 +259,7 @@ export default {
             
         },
         imageWeaponUri (weapon) {
-            return `https://render.albiononline.com/v1/item/T8_${weapon}` // https://gameinfo.albiononline.com/api/gameinfo/items/
+            return weapon ? `https://render.albiononline.com/v1/item/T8_${weapon}` : '' // https://gameinfo.albiononline.com/api/gameinfo/items/
         },
     },
     computed: {
