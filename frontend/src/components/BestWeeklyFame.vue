@@ -8,15 +8,15 @@
                         <th style="width: 10px;"></th>
                         <th></th>
                         <th>WEEKLY KILLFAME</th>
-                        <th>TOTAL KILLFAME</th>
-                        <th>TOTAL DEATHFAME</th>
+                        <th v-if="killFameGuild[0].data">TOTAL KILLFAME</th>
+                        <th v-if="killFameGuild[0].data">TOTAL DEATHFAME</th>
                     </thead>
                     <tr  v-for="(guild, index) in killFameGuild" :key="index" >
                         <td v-if="killFameGuildmax > index" style="height:40px;">#{{index + 1}}</td>
                         <td v-if="killFameGuildmax > index"><b>{{guild.Name}}</b><br/>{{guild.AllianceName}}</td>
                         <td v-if="killFameGuildmax > index">{{formatNumber(guild.KillFame)}}</td>
-                        <td v-if="killFameGuildmax > index">{{formatNumber(guild.data.guild.killFame)}}</td>
-                        <td v-if="killFameGuildmax > index">{{formatNumber(guild.DeathFame)}}</td>
+                        <td v-if="killFameGuildmax > index && guild.data">{{formatNumber(guild.data.guild.killFame)}}</td>
+                        <td v-if="killFameGuildmax > index && guild.data">{{formatNumber(guild.DeathFame)}}</td>
                     </tr>
                 </table>
                 <div class="loadmore">
