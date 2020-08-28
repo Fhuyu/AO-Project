@@ -91,8 +91,8 @@ module.exports = {
                         deaths : players[player.id] ? players[player.id].deaths + player.deaths : player.deaths,
                         assistance : players[player.id] ? players[player.id].assistance + player.assistance : player.assistance,
                         // deathFame : players[player.id] ? players[player.id].deathFame.push(player.deathFame)  : player.deathFame,
-                        itempower : players[player.id] ? player.itempower ? players[player.id].itempower.push(player.itempower) : players[player.id].itempower : player.itempower ? [player.itempower] : [],
-                        weapon : players[player.id] ? player.weapon ? players[player.id].weapon.push(player.weapon) : players[player.id].weapon : player.weapon ? [player.weapon] : [],
+                        itempower : players[player.id] ? player.itempower ? [...players[player.id].itempower, parseInt(player.itempower)] : players[player.id].itempower : player.itempower ? [parseInt(player.itempower)] : [],
+                        // weapon : players[player.id] ? player.weapon ? players[player.id].weapon.push(player.weapon) : players[player.id].weapon : player.weapon ? [player.weapon] : [],
                         attendance : players[player.id] ? players[player.id].attendance + 1 : 1,
                     }
                 })
