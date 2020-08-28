@@ -43,7 +43,7 @@
                         <span v-if="currentSort === 'name' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
                         <span v-if="currentSort === 'name' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
                     </th>
-                    <th>MAIN WEAPON</th>
+                    <th uk-tooltip="Mouse over the weapon to see how many times it was played.">MAIN WEAPON *</th>
                     <th @click.prevent="onClickOrderBy('kills', 'desc')">KILLS
                         <span v-if="currentSort === 'kills' && currentSortDir === 'desc'" uk-icon="arrow-up"></span>
                         <span v-if="currentSort === 'kills' && currentSortDir === 'asc'" uk-icon="arrow-down"></span>
@@ -79,8 +79,8 @@
                     </td>
                     <td>{{ item.name }}</td>
                     <td>
-                        <img style="height:35px" :src="imageWeaponUri(item.weapon[0])">
-                        <img style="height:35px" :src="imageWeaponUri(item.weapon[1])">
+                        <img v-if="item.playerWeaponOrder" style="height:35px" :uk-tooltip="`Played ${item.weapon[item.playerWeaponOrder[0]]} times`" :src="imageWeaponUri(item.playerWeaponOrder[0])">
+                        <img v-if="item.playerWeaponOrder" style="height:35px" :uk-tooltip="`Played ${item.weapon[item.playerWeaponOrder[1]]} times`" :src="imageWeaponUri(item.playerWeaponOrder[1])">
                     </td>
                     <td>{{ item.kills }}</td>
                     <td>{{ item.deaths}}</td>
@@ -212,7 +212,8 @@ export default {
                         // console.log(weapon.split(/_(.+)/)[1].split('@')[0].split('?')[0])
                         mainWeapon[currentWeapon] = mainWeapon[currentWeapon] ? mainWeapon[currentWeapon] + 1 : 1
                     })
-                    player.weapon = Object.keys(mainWeapon).sort( (a, b) => {
+                    player.weapon = mainWeapon
+                    player.playerWeaponOrder = Object.keys(mainWeapon).sort( (a, b) => {
                         return mainWeapon[b] - mainWeapon[a];
                     });
                     // console.log(mainWeapon)

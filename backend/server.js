@@ -66,7 +66,7 @@ setInterval( async() => {
         } else if (url === 'https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague/topplayers?range=week&limit=11&offset=0') {
             topPvP['crystalFame'] = response.data
         }
-        redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
+        // redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
 
         if (url === 'https://gameinfo.albiononline.com/api/gameinfo/events/guildfame?range=week&limit=11&offset=0') {
 
@@ -79,11 +79,11 @@ setInterval( async() => {
                 topPvP['guildFame'] = guilds
                 redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
             })
-            .catch(err => console.log(err))
+            .catch(err => console.log('fetch error'))
         }
         
     })
-}, 1800000 ); // 30m / 1h : 3600000
+}, 1200000 ); // 20m / 1h : 3600000
 
 let battles = null
 let fetching = false
