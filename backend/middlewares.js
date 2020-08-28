@@ -8,20 +8,22 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     guildIdMDW: async function (req, res, next) {
+        let err = false
         if (req.query.searchType === 'guild') {
             try {
                 guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
                 req.guildID = guilds[0].guildID
                 // console.log(req.guildID)
             } catch (er) {
-                console.log('error', er)
+                // console.log('error', er)
+                err = true
             }
         } else if (req.query.searchType === 'alliance') {
             req.allianceName = req.params.guildName   
         } else if (req.query.searchType === 'player') {
             req.playerName = req.params.guildName    
         }         
-        next();
+        err ? res.send('Error') : next();
     },
 /*     allianceMDW: function (req, res, next) {
         console.log(req.params)
@@ -92,7 +94,7 @@ module.exports = {
                         assistance : players[player.id] ? players[player.id].assistance + player.assistance : player.assistance,
                         // deathFame : players[player.id] ? players[player.id].deathFame.push(player.deathFame)  : player.deathFame,
                         itempower : players[player.id] ? player.itempower ? [...players[player.id].itempower, parseInt(player.itempower)] : players[player.id].itempower : player.itempower ? [parseInt(player.itempower)] : [],
-                        // weapon : players[player.id] ? player.weapon ? players[player.id].weapon.push(player.weapon) : players[player.id].weapon : player.weapon ? [player.weapon] : [],
+                        weapon : players[player.id] ? player.weapon ? [...players[player.id].weapon, player.weapon] : players[player.id].weapon : player.weapon ? [player.weapon] : [],
                         attendance : players[player.id] ? players[player.id].attendance + 1 : 1,
                     }
                 })
