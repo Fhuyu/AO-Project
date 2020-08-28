@@ -79,13 +79,13 @@
                     </td>
                     <td>{{ item.name }}</td>
                     <td>
-                        <img :uk-tooltip="weaponTooltip(item.weapon)" style="height:35px" :src="imageWeaponUri(item.weapon)">
+                        <img style="height:35px" :src="imageWeaponUri(item.weapon)">
                     </td>
                     <td>{{ item.kills }}</td>
                     <td>{{ item.deaths}}</td>
                     <td>{{ item.assistance}}</td>
                     <!-- <td>{{item.itempower}}</td> -->
-                    <td v-if="item.itempower.length">{{ (item.itempower.reduce((accumulator, currentValue) => accumulator + currentValue) / item.itempower.length).toFixed(0)}}</td>
+                    <td v-if="item.itempower && item.itempower.length">{{ (item.itempower.reduce((accumulator, currentValue) => accumulator + currentValue) / item.itempower.length).toFixed(0)}}</td>
                     <td v-else></td>
                     <td>{{ formatNumber(item.killFame)}}</td>
                     <td>{{ item.attendance}}</td>
@@ -238,35 +238,20 @@ export default {
             // if (currentSortName === this.currentSort) {
             //     this.currentSortDir = this.currentSortDir === 'desc' ? 'asc' : 'desc'
             // }
+            if (this.attendance.players) {
+                this.attendance.players = this.attendance.players.sort((a, b) => {
+                    let modifier = 1
+                    if (currentSortDir === 'desc') {
+                        modifier = -1
+                    }
+                    if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+                    if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+                    return 0
+                })
+                this.currentSort = currentSortName
+            }
 
-            this.attendance.players = this.attendance.players.sort((a, b) => {
-                let modifier = 1
-                if (currentSortDir === 'desc') {
-                    modifier = -1
-                }
-                if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-                if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-                return 0
-            })
-            this.currentSort = currentSortName
-
-            // for (const alliance in this.battle.alliances) {
-            //     this.battle.alliances[alliance].sortedPlayers = this.battle.alliances[alliance].players.sort((a, b) => {
-            //         let modifier = 1
-            //         if (currentSortDir === 'desc') {
-            //             modifier = -1
-            //         }
-            //         if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-            //         if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-            //         return 0
-            //     })
-            // } 
-        },
-        weaponTooltip (weapon) {
-            // FROM "T4_2H_TWINSCYTHE_HELL@2?quality=3" TO T4.2 2H WINSCYTHE HELL OUTSTANDING
-            const regex = '^[^?]+'
-            const quality = '[^=]*$'
-            return `${store.quality[weapon.match(quality)[0]]} ${weapon.match(regex)[0]}`
+            
         },
         imageWeaponUri (weapon) {
             return `https://render.albiononline.com/v1/item/T8_${weapon}` // https://gameinfo.albiononline.com/api/gameinfo/items/
