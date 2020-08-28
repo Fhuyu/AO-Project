@@ -89,12 +89,15 @@ module.exports = {
                         killFame : players[player.id] ? players[player.id].killFame + player.killFame : player.killFame,
                         kills : players[player.id] ? players[player.id].kills + player.kills : player.kills,
                         deaths : players[player.id] ? players[player.id].deaths + player.deaths : player.deaths,
+                        assistance : players[player.id] ? players[player.id].assistance + player.assistance : player.assistance,
                         // deathFame : players[player.id] ? players[player.id].deathFame.push(player.deathFame)  : player.deathFame,
-                        // itempower : players[player.id] ? players[player.id].itempower.push(player.itempower) : player.itempower ? [player.itempower] : [],
+                        itempower : players[player.id] ? player.itempower ? players[player.id].itempower.push(player.itempower) : players[player.id].itempower : player.itempower ? [player.itempower] : [],
+                        weapon : players[player.id] ? player.weapon ? players[player.id].weapon.push(player.weapon) : players[player.id].weapon : player.weapon ? [player.weapon] : [],
                         attendance : players[player.id] ? players[player.id].attendance + 1 : 1,
                     }
                 })
             })
+            console.log('attendance', req.params.guildName)
             req.data = {battles : req.data, players : Object.values(players)}
         }
         next();

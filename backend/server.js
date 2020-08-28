@@ -123,7 +123,7 @@ async function deathPlayer (battle, player) {
 
 }
 setInterval( async() => { 
-    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 11 }}).sort({battleID:-1}).limit(100)
+    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
     // console.log('checkbattle length', checkBattle.length)
     checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
     // console.log('checkbattle length after fiilter', checkBattle.length)
@@ -169,13 +169,19 @@ setInterval( async() => {
                     // battle.fullEventDeath = false
                     battle = functions.battleTreatment(battle)
 
-                    await new Battle({
-                        battleID: battle.id,
-                        battleTotalPlayers: Object.keys(battle.players).length,
-                        battleEndDate : battle.timeout,
-                        battleData : battle
-                    })
-                    .save()
+                    try {
+                        await new Battle({
+                            battleID: battle.id,
+                            battleTotalPlayers: Object.keys(battle.players).length,
+                            battleEndDate : battle.timeout,
+                            battleData : battle
+                        })
+                        .save()
+
+                    } catch {
+                        console.log('error battle registered')
+                    }
+                    
                     // .then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     functions.registerNewGuild(battle.guilds, guildsIDInDB)
@@ -195,12 +201,10 @@ setInterval( async() => {
                 }
         } catch (err){
             fetching = false
-            // redis_client.set('guilds', JSON.stringify(guilds));
-            // redis_client.set(`battles`, JSON.stringify(battlesTemp));
         }
     })
 }
-}, 90000);
+}, 40000);
 
 app.get('/topFame', cors(), (req, res) => { 
     redis_client.get('top', (err, response) => {
