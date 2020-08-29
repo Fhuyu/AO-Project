@@ -212,6 +212,17 @@ app.get('/topFame', cors(), (req, res) => {
         res.send(response)
     })
 })
+app.get('/guilds', cors(), (req, res) => { 
+    Guild.find( {}, (err, guilds) => {
+        if (!err) {
+            res.json(guilds)
+        }
+    })
+    // redis_client.get('', (err, response) => {
+    //     if (err)res.status(404).send({ success: false, message: err.message });
+    //     res.send(response)
+    // })
+})
 
 app.use('/battles/:offset/:guildName', middlewares.guildIdMDW)
 // app.use('/battles/:offset/:guildName', middlewares.allianceMDW)

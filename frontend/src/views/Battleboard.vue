@@ -18,7 +18,7 @@
 
 		<div class="uk-child-width-1-3 uk-text-center uk-margin-medium uk-margin-medium-top" uk-grid>
 			<div class="form_global_search uk-text-left uk-width-auto@m">
-				<form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)">
+				<form class="form_search" @submit.prevent="launchGuildSearch(searchGuildName)"> <!-- @submit.prevent="launchGuildSearch(searchGuildName)" -->
 					<div class="select_div" uk-form-custom="target: > * > span:first-child">
 						<select v-model="searchType" @change="cleanName" class="uk-select">
 							<option value="guild">Guild</option>
@@ -30,9 +30,10 @@
 							<span uk-icon="icon: chevron-down" style="padding-left:5px"></span>
 						</button>
 					</div>
-					<input class="" v-model="searchGuildName"  :placeholder="searchType === 'guild' ? 'Search Guild Name' :'EXACT name (uppercase...)'">
+					<input v-model="searchGuildName"  :placeholder="searchType === 'guild' ? 'Search Guild Name' :'EXACT name (uppercase...)'">
 					<span class="icon right" @click="launchGuildSearch(searchGuildName)" uk-icon="icon: search; ratio: 1.5"></span>
 				</form>
+        <v-select taggable ref="mySelect" :options="currentGuildSearch" label="guildName" :clearable="false" v-model="searchGuildName"></v-select>
 			</div>
 			<div class="uk-width-expand@m">
 			</div>
@@ -141,6 +142,8 @@ export default {
   },
   data: function () {
     return {
+      currentGuildSearch: [],
+      guilds: [],
       battles: [],
       searchGuildName: this.$route.params.guildName,
       searchType : this.$route.query.search ? this.$route.query.search : 'guild',
@@ -223,7 +226,8 @@ export default {
     cleanName: function () {
       this.searchGuildName = ''
     },
-    launchGuildSearch: function (guildName) {
+    launchGuildSearch: function () {
+      this.searchGuildName = this.currentGuildSearch[0]
       this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
       this.currentOffset = 0
       this.minBattlePlayers = 0
@@ -287,18 +291,34 @@ export default {
           this.initialLoader = false
         })
       })
-    }
-
+    },
   },
-  mounted () {
+  async mounted () {
     this.currentOffset = 0
     if (this.currentOffset === 0) this.initialLoader = true // Condition needed ?
+    await axios.get(`http://localhost:5000/guilds`) //https://handholdreport.com/api/
+    .then( res => {
+      this.guilds = res.data
+    })
+
     
   },
   watch: {
     currentOffset: function () {
       this.launchNewSearch()
     },
+    searchGuildName: function (guildSearch) {
+      if (guildSearch.toUpperCase() === this.currentGuildSearch[0]) {
+        this.$refs["mySelect"].open = false;
+      } else if (guildSearch.length > 2) {
+        this.currentGuildSearch = this.guilds.filter( guild => guild.guildName.includes(guildSearch.toUpperCase()))
+        .map( guild => guild.guildName)
+        .sort ( (a, b) => a.length - b.length)
+        this.$refs["mySelect"].open = true;
+      } else {
+        this.$refs["mySelect"].open = false;
+      }
+    }
   }
 }
 
@@ -306,4 +326,12 @@ export default {
 
 <style scoped>
 @import './../assets/css/battleboard.css';
+.vs__actions {
+  display: none;
+}
+.vs__dropdown-toggle {
+  display: none!important;
+  background:white;
+}
+/* @import "vue-select/src/scss/vue-select.scss"; */
 </style>

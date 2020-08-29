@@ -43,7 +43,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  // mode: 'history',
+  mode: 'history',
   routes,
   // linkActiveClass: "active", // active class for non-exact links.
   linkExactActiveClass: "active" // active class for *exact* links.

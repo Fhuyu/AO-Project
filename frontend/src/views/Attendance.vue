@@ -16,6 +16,7 @@
                         <input class="" v-model="searchGuildName"  placeholder="Guild Name">
                         <span class="icon right" @click="launchGuildBattleSearch()" uk-icon="icon: search; ratio: 1.5"></span> <!-- @click="launchGuildSearch(searchGuildName)" -->
                     </form>
+                    <v-select taggable ref="mySelect" :options="currentGuildSearch" label="guildName" :clearable="false" v-model="searchGuildName"></v-select>
                 </div>
                 <div>
                     <form class="uk-form-horizontal">
@@ -36,6 +37,19 @@
                 <span uk-spinner="ratio: 3"></span>
             </div>
             <h3 style="text-align:center;">Total battles this week : {{attendance.battles.length}}</h3>
+            <div class="uk-child-width-expand@s uk-text-center" uk-grid style="color: #a0a0a0;">
+                <div>
+                    <p> GUILD AVG IP : {{guildAvgIP}}</p>
+                </div>
+                <div>
+                    <p> TOTAL PLAYERS: {{attendance.players.length}}</p>
+                </div>
+                <div>
+                    <p>GUILD ZvZ KILLFAME : {{formatNumber(weeklyKillFame)}}</p>
+                </div>
+            </div>
+
+
             <table class="uk-table" style="margin-bottom:0px;bottom: 12px;position: relative;">
                 <thead>
                     <th></th>
@@ -85,8 +99,7 @@
                     <td>{{ item.kills }}</td>
                     <td>{{ item.deaths}}</td>
                     <td>{{ item.assistance}}</td>
-                    <!-- <td>{{item.itempower}}</td> -->
-                    <td v-if="item.itempower && item.itempower.length">{{ (item.itempower.reduce((accumulator, currentValue) => accumulator + currentValue) / item.itempower.length).toFixed(0)}}</td>
+                    <td v-if="item.itempower.length">{{item.itempower}}</td>
                     <td v-else></td>
                     <td>{{ formatNumber(item.killFame)}}</td>
                     <td>{{ item.attendance}}</td>
@@ -119,27 +132,26 @@
             <div v-if="loading" style="text-align:center;">
                 <span uk-spinner="ratio: 3"></span>
             </div>
-            <p>
-                <h3>Informations - V.1.0 - Zerg attendance</h3>
-                It allows you to :<br/>
-                <ul class="uk-list uk-list-hyphen">
-                    <li>
-                        Search your battles with your guild minimum player.<br/>
-                        Why ? If one goes to rat a zerg, it will not count as an attendance, because your zerg is not at least 20 members.
-                    </li>
-                    <li>
-                        Check attendance on 1 week. <br/>
-                        If you ask the attendance September 7, it shows you from September 1 to September 7. <br/>
-                        You'd like it to be from Monday to match with the server stat reset ? Join HandHoldReport discord and we'll discuss!
-                    </li>
-                    <li>
-                        If a member is cluster queued, and he never joined the battle, his attendance won't count.
-                    </li>
-                    <li>
-                        It doesn't show a member if he never joined a battle.
-                    </li>
-                </ul>
-            </p>
+            <div class="uk-card uk-card-secondary uk-card-body">
+                <h3 class="uk-card-title" style="text-align:center;">Informations - V.2 - Zerg attendance</h3>
+
+                <h4 style="text-align:center;">1. Search your guild name. <br/>
+                2. Choose your zerg size. <br/>
+                3. Enjoy!</h4>
+                <h4>Goal :</h4>
+                As a guild manager, you can check who is attending to your call, with stats. <br/>
+                As a recruiter, you can follow you recruit activity. <br/>
+                As a player, you can compare your stat with your guildmate, and see your performance this week. <br/>
+                <h4>Your zerg, your player count:</h4>
+                Search your battles with your guild minimum player.<br/>
+                If one goes to rat a zerg, it will not count as an attendance, because your zerg is not at least 20 members.
+                <h4>Weekly Attendance :</h4>
+                If you ask the attendance September 7, it shows you from September 1 to September 7. <br/>
+                You'd like it to be from Monday to match with the server stat reset ? Join HandHoldReport discord and we'll discuss!
+                
+                <h4>To know :</h4>
+                If a member is cluster queued, and he never joined the battle, his attendance won't count.
+            </div>
         </div>
 
     </div>
@@ -159,7 +171,7 @@ export default {
             searchType :'guild',
             error404 : false,
             attendance : null,
-            currentSort: 'attendance',
+            currentSort: '',
             currentSortDir: 'desc',
             loading : false,
 
@@ -167,6 +179,12 @@ export default {
             bestPlayerKill: { name: '', kill: 0 },
             bestPlayerAssistance: { name: '', assistance: 0 },
             bestPlayerIP: { name: '', itempower: 0 },
+
+            currentGuildSearch: [],
+            guilds : [],
+
+            guildAvgIP : 0,
+            weeklyKillFame : 0,
         }
     },
     components: {
@@ -185,14 +203,26 @@ export default {
             // if (player.name === this.bestPlayerIP.name) return "bestIp"
         },
         launchGuildBattleSearch: function () {
+            this.searchGuildName = this.currentGuildSearch[0]
+
             this.loading = true
             this.fetchData()
             .then(res => {
                 this.attendance = res.data
                 this.onClickOrderBy('attendance', 'desc')
                 this.loading = false
-                
+
+                // RESET
+                this.bestPlayerKillfame = { name: '', killfame: 0 }
+                this.bestPlayerKill = { name: '', kill: 0 }
+                this.bestPlayerAssistance = { name: '', assistance: 0 }
+                this.bestPlayerIP = { name: '', itempower: 0 }
+                let playerCounterForIP = 0
+                this.weeklyKillFame = 0
+                this.guildAvgIP = 0
+
                 this.attendance.players.forEach( player => {
+                    // BEST STATS
                     if (player.killFame > this.bestPlayerKillfame.killfame) {
                         this.bestPlayerKillfame.killfame = player.killFame
                         this.bestPlayerKillfame.name = player.name
@@ -205,7 +235,15 @@ export default {
                         this.bestPlayerAssistance.assistance = player.assistance
                         this.bestPlayerAssistance.name = player.name
                     }
-
+                    // WEEKLY KILL FAME
+                    this.weeklyKillFame += player.killFame
+                    // AVG IP CALCUL
+                    if (player.itempower && player.itempower.length) {
+                        player.itempower = (player.itempower.reduce((accumulator, currentValue) => accumulator + currentValue) / player.itempower.length).toFixed(0)
+                        this.guildAvgIP += parseInt(player.itempower)
+                        playerCounterForIP += 1
+                    }
+                    // MAIN WEAPONS
                     let mainWeapon = {}
                     player.weapon.forEach( weapon => {
                         let currentWeapon = weapon.split(/_(.+)/)[1].split('@')[0].split('?')[0]
@@ -219,6 +257,7 @@ export default {
                     // console.log(mainWeapon)
                     // player.weapon = Object.keys(mainWeapon).length ? Object.keys(mainWeapon).reduce((a, b) => mainWeapon[a] > mainWeapon[b] ? a : b) : ''
                 })
+                this.guildAvgIP = (this.guildAvgIP / playerCounterForIP).toFixed(0)
             })
         },
         async fetchData () {
@@ -241,19 +280,23 @@ export default {
         },
         onClickOrderBy (currentSortName, currentSortDir) {
 
-            // if (currentSortName === this.currentSort) {
-            //     this.currentSortDir = this.currentSortDir === 'desc' ? 'asc' : 'desc'
-            // }
+            if (currentSortName === this.currentSort) {
+                // this.currentSortDir = this.currentSortDir === 'desc' ? 'asc' : 'desc'
+            }
             if (this.attendance.players) {
-                this.attendance.players = this.attendance.players.sort((a, b) => {
-                    let modifier = 1
-                    if (currentSortDir === 'desc') {
-                        modifier = -1
-                    }
-                    if (a[currentSortName] < b[currentSortName]) return -1 * modifier
-                    if (a[currentSortName] > b[currentSortName]) return 1 * modifier
-                    return 0
-                })
+                    this.attendance.players = this.attendance.players.sort((a, b) => {
+                        let modifier = 1
+                        if (currentSortDir === 'desc') {
+                            modifier = -1
+                        }
+                        if (a[currentSortName] < b[currentSortName]) return -1 * modifier
+                        if (a[currentSortName] > b[currentSortName]) return 1 * modifier
+                        return 0
+                    })
+                // if (this.currentSortDir === 'asc') {
+                //     this.attendance.players = this.attendance.players.reverse()
+                // }
+                
                 this.currentSort = currentSortName
             }
 
@@ -265,13 +308,28 @@ export default {
     },
     computed: {
     },
-    mounted () {
+    async mounted () {
+        await axios.get(`https://handholdreport.com/api/guilds`) //https://handholdreport.com/api/
+        .then( res => {
+            this.guilds = res.data
+        })
     },
     watch: {
         minBattlePlayers () {
             this.launchGuildBattleSearch()
-        }
-
+        },
+        searchGuildName: function (guildSearch) {
+            if (guildSearch.toUpperCase() === this.currentGuildSearch[0]) {
+                this.$refs["mySelect"].open = false;
+            } else if (guildSearch.length > 2) {
+                this.currentGuildSearch = this.guilds.filter( guild => guild.guildName.includes(guildSearch.toUpperCase()))
+                .map( guild => guild.guildName)
+                .sort ( (a, b) => a.length - b.length)
+                this.$refs["mySelect"].open = true;
+            } else {
+                this.$refs["mySelect"].open = false;
+            }
+        },
     }
 }
 // DANS LE TABLEAU DES GUILDES, POUR CHAQUE GUILDES (TABLEAU) AVOIR TOUS SES JOUEURS (OBJ)

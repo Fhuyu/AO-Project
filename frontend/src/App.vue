@@ -165,4 +165,24 @@ export default {
 .night .uk-button-secondary {
   background: #3066BE;
 }
+.attendance .v-select {
+  width:350px;
+  margin: auto;
+}
+.vs__dropdown-toggle {
+  display: none!important;
+  background:white;
+}
+.vs__dropdown-menu {
+  background: #2e2a42!important;
+  max-width: 350px;
+
+}
+.vs__dropdown-menu li {
+  color: white;
+  background: #444;
+}
+.night .attendance li:nth-child(2n) {
+    background: #131218;
+}
 </style>
