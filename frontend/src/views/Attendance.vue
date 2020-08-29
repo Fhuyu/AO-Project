@@ -33,11 +33,17 @@
             </div>
         </div>
         <div v-if="attendance" class="uk-width-3-5 uk-margin-auto">
+            
             <div v-if="loading" style="text-align:center;">
                 <span uk-spinner="ratio: 3"></span>
             </div>
+            <div v-if="!attendance.battles.length" class="uk-card uk-card-secondary uk-card-body">
+                We found 0 battles with your zerg size over {{minBattlePlayers}} players.
+                Try to select a lower size on the right dropdown.
+            </div>
+
             <h3 style="text-align:center;">Total battles this week : {{attendance.battles.length}}</h3>
-            <div class="uk-child-width-expand@s uk-text-center" uk-grid style="color: #a0a0a0;">
+            <div v-if="attendance.battles.length" class="uk-child-width-expand@s uk-text-center" uk-grid style="color: #a0a0a0;">
                 <div>
                     <p> GUILD AVG IP : {{guildAvgIP}}</p>
                 </div>
@@ -115,11 +121,11 @@
                     <th></th>
                 </thead>
                 <tr class="attendance_data" v-for="(item, index) in attendance.battles" :key="index">
-                    <td><a :href="`https://handholdreport.com/#/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
+                    <td><a :href="`https://handholdreport.com/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
                     <td>{{readableDate(item.battleData[0].startTime)}}</td>
                     <td>{{item.battleTotalPlayers}}</td>
                     <td style="padding: 0; text-align: right;">
-                        <a :href="`https://handholdreport.com/#/killboard/${item.battleData[0].id}`" target="_blank">
+                        <a :href="`https://handholdreport.com/killboard/${item.battleData[0].id}`" target="_blank">
                             <button class="uk-button uk-button-primary" style=" background:#FF7A4D;">
                                 <span class="icon right" uk-icon="icon: search; ratio: 1.5"></span>
                             </button>

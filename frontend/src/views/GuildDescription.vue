@@ -55,7 +55,7 @@
                     <th></th>
                 </thead>
                 <tr class="attendance_data" v-for="(item, index) in attendance.battles" :key="index">
-                    <td><a :href="`https://handholdreport.com/#/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
+                    <td><a :href="`https://handholdreport.com/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
                 </tr>
             </table>
         </div>
