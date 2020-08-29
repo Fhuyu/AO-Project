@@ -296,7 +296,7 @@ export default {
   async mounted () {
     this.currentOffset = 0
     if (this.currentOffset === 0) this.initialLoader = true // Condition needed ?
-    await axios.get(`http://localhost:5000/guilds`) //https://handholdreport.com/api/
+    await axios.get(`https://handholdreport.com/api/guilds`) //https://handholdreport.com/api/
     .then( res => {
       this.guilds = res.data
     })
