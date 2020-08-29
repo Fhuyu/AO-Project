@@ -227,7 +227,7 @@ export default {
       this.searchGuildName = ''
     },
     launchGuildSearch: function () {
-      this.searchGuildName = this.currentGuildSearch[0]
+      if (this.searchType === 'guild') this.searchGuildName = this.currentGuildSearch[0]
       this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
       this.currentOffset = 0
       this.minBattlePlayers = 0
@@ -307,8 +307,12 @@ export default {
     currentOffset: function () {
       this.launchNewSearch()
     },
+    searchType: function () {
+        this.$refs["mySelect"].open = false;
+    },
     searchGuildName: function (guildSearch) {
-      if (guildSearch.toUpperCase() === this.currentGuildSearch[0]) {
+      if (this.searchType === 'guild') {
+        if (guildSearch.toUpperCase() === this.currentGuildSearch[0]) {
         this.$refs["mySelect"].open = false;
       } else if (guildSearch.length > 2) {
         this.currentGuildSearch = this.guilds.filter( guild => guild.guildName.includes(guildSearch.toUpperCase()))
@@ -318,6 +322,9 @@ export default {
       } else {
         this.$refs["mySelect"].open = false;
       }
+
+      }
+      
     }
   }
 }
