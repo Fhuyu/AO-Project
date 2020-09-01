@@ -7,7 +7,7 @@
       <div class="uk-margin" style="text-align: right;">
       <button class="uk-button uk-button-primary" v-if="headerView !== 'handholdReview' && headerView !== 'handholdTable'" @click="headerView = 'handholdReview'" >HANDHOLD MODE</button>
       <button class="uk-button uk-button-primary" v-if="headerView === 'handholdTable'" @click="headerView = 'handholdReview'" >EDIT HANDHOLD MODE</button>
-      <button class="uk-button uk-button-primary" style="margin-left: 20px; " v-if="headerView !== 'allianceTable'" @click="headerView = 'allianceTable'">GLOBAL STATS</button>
+      <button class="uk-button uk-button-primary" style="margin-left: 20px; " v-if="headerView !== 'allianceTable' && headerView !== 'guildTable'" @click="headerView = 'allianceTable'">GLOBAL STATS</button>
     </div>
       <Handhold v-show="headerView === 'handholdReview'" :alliances="battle.sortedTopTableAlliances" v-on:changeHeaderView="changeHeaderViewToHandHoldTable" :bestAlliance="bestAlliance">
       </Handhold>
@@ -15,13 +15,23 @@
       <HandholdTable v-if="headerView === 'handholdTable'" :handhold="handhold" :winnerHandhold="handhold.winner" :loserHandhold="handhold.loser" :othersHandhold="handhold.others">
       </HandholdTable>
       
-    <div style="text-align:center" v-if="headerView === 'allianceTable'">
+    <div style="text-align:center" v-if="headerView === 'allianceTable' || headerView === 'guildTable'">
       <h1 style="color:white;"><span style="color:rgb(25, 96, 12)">{{versus[0]}}</span> <span style="color:#666">vs</span> <span style="color:rgb(109, 40, 13)">{{versus[1]}} </span> 
       <span v-if="versus.length > 2"> <span style="color:#666"> vs</span> {{versus[2]}}</span></h1>
       <span style="color:#f1f1f1">{{battle.KillArea.replace(/_/g, " ")}} | {{readableDate(battle.startTime)}}</span>
     </div>
+
+    <div class="uk-container-small uk-margin-auto">
+      <button class="uk-button switchTable" :class="headerView === 'guildTable' ? 'activeTable' : ''" @click="headerView = 'guildTable'">Per Guild</button>
+      <button class="uk-button switchTable" :class="headerView === 'allianceTable' ? 'activeTable' : ''" @click="headerView = 'allianceTable'">Per Alliance</button>
+    </div>
     
-    <GuildTopTable :battle="battle"></GuildTopTable>
+    <GuildTopTable :battle="battle" 
+      :bestAlliance="bestAlliance"
+      :loserAlliance="loserAlliance"
+      v-if="headerView === 'guildTable'"
+      style="margin-top:8px;">
+    </GuildTopTable>
       
         <table v-if="headerView === 'allianceTable'" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 2px 0px rgba(235,235,235,1);">
             <thead>
@@ -381,4 +391,14 @@ export default {
 
 <style scoped>
 @import './../assets/css/killboard.css';
+
+.switchTable {
+  font-size: 10px;
+  padding: 0 8px;
+  background: #2e2a42;
+  color: white;
+}
+.activeTable {
+  background: #413d72!important;
+}
 </style>
