@@ -20,9 +20,10 @@
       <span v-if="versus.length > 2"> <span style="color:#666"> vs</span> {{versus[2]}}</span></h1>
       <span style="color:#f1f1f1">{{battle.KillArea.replace(/_/g, " ")}} | {{readableDate(battle.startTime)}}</span>
     </div>
+    
+    <GuildTopTable :battle="battle"></GuildTopTable>
       
         <table v-if="headerView === 'allianceTable'" class="uk-table stat_battle uk-container-small uk-margin-auto" style="margin-bottom:0px;bottom: 12px;position: relative;box-shadow: 0px 0px 2px 0px rgba(235,235,235,1);">
-
             <thead>
                 <th style="font-weight: bold;">ALLIANCE</th>
                 <th @click="allianceOrderBy(battle.sortedTopTableAlliances, 'players', 'desc', 'sortedTopTableAlliances')" style="cursor:pointer;font-weight: bold;">PLAYERS
@@ -69,7 +70,6 @@
         </table>
         <div v-if="battleTableMax < 9 && battle.sortedTopTableAlliances.length > 9" @click="battleTableMax = 30" style="text-align:center;">LOAD MORE <span uk-icon="chevron-down"></span></div>
         <div v-if="battleTableMax > 9" @click="battleTableMax = 8" style="text-align:center;">SHOW LESS<span uk-icon="chevron-up"></span></div>
-        
 
         <!-- PLAYER SEARCH -->
         <!-- <div class="uk-margin">
@@ -170,6 +170,7 @@
 <script>
 import axios from 'axios'
 import RequestFailed from "@/components/RequestFailed"
+import GuildTopTable from "@/components/Killboard/GuildTopTable"
 import KillboardOrderBy from "@/components/KillboardOrderBy"
 import KillboardPlayersList from "@/components/KillboardPlayersList"
 import Handhold from "@/components/Handhold"
@@ -212,6 +213,7 @@ export default {
     KillboardPlayersList,
     Handhold,
     HandholdTable,
+    GuildTopTable,
   },
   computed: {
     searchPlayerAnchor : function () {
@@ -224,6 +226,7 @@ export default {
     },
   },
   methods: {
+  
     changeHeaderViewToHandHoldTable (winnerHandhold, loserHandhold, othersHandhold, side1, side2, side3) {
       this.headerView = 'handholdTable'
       this.handhold.winner = this.battle.sortedTopTableAlliances.filter( alliance => winnerHandhold.includes(alliance.id))
@@ -368,8 +371,8 @@ export default {
         if (this.battle.sortedTopTableAlliances.length > 2) this.versus.push(this.battle.sortedTopTableAlliances[2].name)
         this.treatmentPlayerEventDeath()
         this.battle.sortedTopTableAlliances.forEach( alliance => {
-        alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
-      })
+          alliance.itempower = alliance.listItemPower && alliance.listItemPower.length ? alliance.listItemPower.reduce((a, b) => (a + b)) / alliance.listItemPower.length : ''
+        })
       })
       
   },
