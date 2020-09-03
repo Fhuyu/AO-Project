@@ -1,23 +1,12 @@
 <template>
-    <div class="crystal-league uk-width-4-5@m uk-margin-auto" >
-        <table class="uk-table header_result" style="margin-bottom:0px;bottom: 12px;position: relative;">
-            <thead>
-            <th style="width:12%">DATE</th>
-            <th style="width:6%">LEVEL</th>
-            <th style="width:5%">KILLS</th>
-            <th style="width:15%">WINNING GUILD</th>
-            <th style="width:15%">LOSING GUILD</th>
-            <th></th>
-            </thead>
-        </table>
+    <div class="crystal-league" >
 
-        <div class="uk-child-width-1-2@m" uk-grid>
+        <div class="uk-child-width-1-2@m uk-width-4-5@m uk-margin-auto" uk-grid>
             <div class="uk-card uk-card-default uk-margin-small crystal-detail m-2" v-for="(battle, index) in data" :key="index">
                 <table class="uk-table result" style="margin-bottom:0px;bottom: 12px;position: relative;">
                     <tbody>
                     <tr>
                         <td width="" style="max-width:180px!important;">{{readableDate(battle.startTime)}}</td>
-                        <td width="">Level {{ battle.crystalLeagueLevel}}</td>
                         <td class="players">
                             <li v-for="(player, i) in Object.values(battle.team1Results)" :key='i'>
                                 {{player.Name}}
@@ -30,6 +19,8 @@
                                 {{player.Name}}
                             </li>
                         </td>
+                        <td width="">Level {{ battle.crystalLeagueLevel}}</td>
+
                     </tr>
                     </tbody>
                 </table>
@@ -71,10 +62,14 @@ export default {
 </script>
 
 <style scoped>
+.night .crystal-league {
+    background-color: #05081c;
+}
 .crystal-detail {
     width: 45%;
     margin: 2%;
     margin-bottom:0px!important;
+    padding-left: 0;
 }
 .night .crystal-detail {
     background:#24212f;
