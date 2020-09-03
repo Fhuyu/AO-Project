@@ -10,6 +10,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/Attendance.vue')
   },
   {
+    path: '/crystal-league',
+    name: 'CrystalLeague',
+    component: () => import(/* webpackChunkName: "battleboard" */ '../views/CrystalLeague.vue')
+  },
+  {
     path: '/guild/:name',
     name: 'Guild Description',
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/GuildDescription.vue')

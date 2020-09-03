@@ -212,6 +212,13 @@ app.get('/topFame', cors(), (req, res) => {
         res.send(response)
     })
 })
+app.get('/crystalLeague', cors(), (req, res) => { 
+    axios.get('https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=0')
+        .then( response => {
+            res.send(response.data)
+        })
+        .catch(err => console.log('oops', err))
+})
 app.get('/guilds', cors(), (req, res) => { 
     Guild.find( {}, (err, guilds) => {
         if (!err) {
