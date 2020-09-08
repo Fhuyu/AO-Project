@@ -1,0 +1,63 @@
+module.exports = {
+    cleanEvents : function (event) {
+        return {
+            TimeStamp : event.TimeStamp,
+            Killer : {
+                Name : event.Killer.Name,
+                Id : event.Killer.Id,
+                GuildName : event.Killer.GuildName,
+                GuildId : event.Killer.GuildId,
+                AllianceName : event.Killer.AllianceName,
+                AllianceId : event.Killer.AllianceId,
+                AllianceTag : event.Killer.AllianceTag,
+                KillFame : event.Killer.KillFame,
+                Itempower : event.Killer.AverageItemPower,
+                MainHand : `${event.Killer.Equipment.MainHand.Type}?quality=${event.Killer.Equipment.MainHand.Quality}`,
+                OffHand : `${event.Killer.Equipment.OffHand.Type}?quality=${event.Killer.Equipment.OffHand.Quality}`,
+                Head : `${event.Killer.Equipment.Head.Type}?quality=${event.Killer.Equipment.Head.Quality}`,
+                Armor : `${event.Killer.Equipment.Armor.Type}?quality=${event.Killer.Equipment.Armor.Quality}`,
+                Shoes : `${event.Killer.Equipment.Shoes.Type}?quality=${event.Killer.Equipment.Shoes.Quality}`,
+                Cape : `${event.Killer.Equipment.Cape.Type}?quality=${event.Killer.Equipment.Cape.Cape}`,
+                Potion : event.Killer.Equipment.Potion.Type,
+            },
+            Victim : {
+                Name : event.Victim.Name,
+                Id : event.Victim.Id,
+                GuildName : event.Victim.GuildName,
+                GuildId : event.Victim.GuildId,
+                AllianceName : event.Victim.AllianceName,
+                AllianceId : event.Victim.AllianceId,
+                AllianceTag : event.Victim.AllianceTag,
+                DeathFame : event.Victim.DeathFame,
+                Itempower : event.Victim.AverageItemPower,
+                MainHand : `${event.Victim.Equipment.MainHand.Type}?quality=${event.Victim.Equipment.MainHand.Quality}`,
+                OffHand : `${event.Victim.Equipment.OffHand.Type}?quality=${event.Victim.Equipment.OffHand.Quality}`,
+                Head : `${event.Victim.Equipment.Head.Type}?quality=${event.Victim.Equipment.Head.Quality}`,
+                Armor : `${event.Victim.Equipment.Armor.Type}?quality=${event.Victim.Equipment.Armor.Quality}`,
+                Shoes : `${event.Victim.Equipment.Shoes.Type}?quality=${event.Victim.Equipment.Shoes.Quality}`,
+                Cape : `${event.Victim.Equipment.Cape.Type}?quality=${event.Victim.Equipment.Cape.Cape}`,
+                Potion : event.Victim.Equipment.Potion.Type,
+            },
+            Participants : event.Participants.map( Participant => {
+                return {
+                    Name : event.Participant.Name,
+                    Id : event.Participant.Id,
+                    GuildName : event.Participant.GuildName,
+                    GuildId : event.Participant.GuildId,
+                    AllianceName : event.Participant.AllianceName,
+                    AllianceId : event.Participant.AllianceId,
+                    AllianceTag : event.Participant.AllianceTag,
+                    DeathFame : event.Participant.DeathFame,
+                    Itempower : event.Participant.AverageItemPower,
+                    MainHand : `${event.Participant.Equipment.MainHand.Type}?quality=${event.Participant.Equipment.MainHand.Quality}`,
+                    OffHand : `${event.Participant.Equipment.OffHand.Type}?quality=${event.Participant.Equipment.OffHand.Quality}`,
+                    Head : `${event.Participant.Equipment.Head.Type}?quality=${event.Participant.Equipment.Head.Quality}`,
+                    Armor : `${event.Participant.Equipment.Armor.Type}?quality=${event.Participant.Equipment.Armor.Quality}`,
+                    Shoes : `${event.Participant.Equipment.Shoes.Type}?quality=${event.Participant.Equipment.Shoes.Quality}`,
+                    Cape : `${event.Participant.Equipment.Cape.Type}?quality=${event.Participant.Equipment.Cape.Cape}`,
+                    Potion : event.Participant.Equipment.Potion.Type,
+                }
+            }), 
+        }
+    }
+}

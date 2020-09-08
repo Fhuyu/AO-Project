@@ -83,6 +83,11 @@ module.exports = {
                 }).save()
             }
         }
+    },
+    crystalPlayersArray(playerObj1, playerObj2) {
+        let playersID = Object.keys(playerObj1).concat(Object.keys(playerObj2))
+        let players = Object.values(playerObj1).concat(Object.values(playerObj2))
+        return players.map((player, i) => ({...player, id: playersID[i]}))
     }
 
 }

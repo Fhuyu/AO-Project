@@ -16,6 +16,7 @@ const cors = require('cors') // https://github.com/expressjs/cors
 const mongoose = require('mongoose')
 const Battle = require('./models/Battle')
 const Guild = require('./models/Guild')
+const Crystal = require('./models/Crystal')
 const url = 'mongodb://127.0.0.1:27017/hhr'
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }) // useFind... is to make findOneAndUpdate work without warning
@@ -41,6 +42,7 @@ const app = express();
 
 middlewares = require("./middlewares");
 functions = require("./functions");
+cleanEvents = require("./functions/cleanEvent");
 
 //Body Parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -96,7 +98,49 @@ async function deathPlayer (battle, player) {
         .then( async response => {
             const eventdeath = response.data 
             eventdeath.forEach(async (eventDeath) => {
-                if (eventDeath.BattleId === battle.id) {
+
+                if (eventDeath.KillArea === "CRYSTAL_LEAGUE") {
+                    console.log('crystal found')
+                    try {
+                        const crystalInDB = await Crystal.find({ battleID: battle.id }).limit(1)
+                        if(!crystalInDB.length) {
+
+                            let playersBattleId = Object.keys(battle.players)
+
+                            const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(100)
+
+                            let crystalFound = crystalEmptyInDB.find(crystal => {
+                                let playerCount = 0
+                                let playersCrystalId = crystal.players.map(player => player.id)
+                                playersBattleId.forEach( player => {
+                                    if(playersCrystalId.includes(player)) playerCount = playerCount +1
+                                })
+                                return playerCount > 7 ? true : false
+                            })
+                            if (crystalFound) {
+                                // crystalFound.battleID = battle.BattleId
+                                // crystalFound.battleFame = battle.totalFame
+    
+                                axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${battle.id}?offset=0&limit=51`)
+                                .then( async response => {
+                                    let events = response.data
+                                    let eventCleaned = events.map( ev => cleanEvents.cleanEvent(ev))
+
+                                    await Crystal.updateOne({ matchID: crystalFound.matchID }, {
+                                        battleID: battle.id,
+                                        battleFame : battle.totalFame,
+                                        events : eventCleaned
+                                    })
+                                    console.log('update crystal', battle.id)
+                                })
+                            }
+                        }
+
+                    } catch(err) {
+                        console.log('error battle registered', err)
+                    }
+
+                } else if (eventDeath.BattleId === battle.id) {
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
                     battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
                     await Battle.updateOne({ battleID: battle.id }, {
@@ -104,7 +148,6 @@ async function deathPlayer (battle, player) {
                     })
                 }
             })
-            
             // > in case we re launch playerDead from 2nd setInterval
             if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
                 battle.fullEventDeath = true
@@ -159,13 +202,15 @@ setInterval( async() => {
         const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
         try {
             battles = await axios.get(url, { timeout: 120000 })
-            // console.log('done data fetch', value)
+            console.log('done data fetch', value)
 
             let battlesData = battles.data;
 
             battlesData.forEach( async (battle) => {
+
                 const battleInDB = await Battle.find({ battleID : battle.id}).limit(1)
                 if (!battleInDB.length) {
+                    // console.log('battle saved')
                     // battle.fullEventDeath = false
                     battle = functions.battleTreatment(battle)
 
@@ -193,8 +238,8 @@ setInterval( async() => {
                         }
                     }
                 }
-                        
             })
+
             fetchDone += 1
             if (fetchDone === offset.length) {
                     fetching = false
@@ -215,6 +260,27 @@ app.get('/topFame', cors(), (req, res) => {
 app.get('/crystalLeague', cors(), (req, res) => { 
     axios.get('https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=0')
         .then( response => {
+            response.data.forEach( async (battle) => {
+                try {
+                    let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
+                    crystalKills += Object.values(battle.team2Results).reduce((t, {Kills}) => t + Kills, 0)
+
+                    let crystalStats = new Crystal({
+                        matchID: battle.MatchId,
+                        totalKills: crystalKills,
+                        level: battle.crystalLeagueLevel,
+                        startTime : battle.startTime,
+                        team1Tickets : battle.team1Tickets,
+                        team2Tickets : battle.team2Tickets,
+                        players: functions.crystalPlayersArray(battle.team1Results, battle.team2Results),
+                        team2Timeline: battle.team2Timeline,
+                        team1Timeline: battle.team1Timeline,
+                    })
+                    await crystalStats.save()
+                } catch (err){
+                    // console.log('eeror crystal save', err)
+                }
+            })
             res.send(response.data)
         })
         .catch(err => console.log('oops', err))
