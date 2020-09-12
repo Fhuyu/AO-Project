@@ -90,7 +90,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 // let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 700, 800] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
         // console.log('launch playerdead', battle.id, player.id)
@@ -153,34 +153,37 @@ async function deathPlayer (battle, player) {
 }
 setInterval( async () => { 
 
-    axios.get('https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=0')
-    .then( response => {
-        console.log(response.data)
-        response.data.forEach( async (battle) => {
-            try {
-                let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
-                crystalKills += Object.values(battle.team2Results).reduce((t, {Kills}) => t + Kills, 0)
+    const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600,650,700,750,800,850,900,950,1000,1050,1100,1150,1200,1250,1300,1350]
 
-                let crystalStats = new Crystal({
-                    matchID: battle.MatchId,
-                    totalKills: crystalKills,
-                    level: battle.crystalLeagueLevel,
-                    startTime : battle.startTime,
-                    team1Leader : battle.team1LeaderId,
-                    team2Leader : battle.team2LeaderId,
-                    team1Tickets : battle.team1Tickets,
-                    team2Tickets : battle.team2Tickets,
-                    players: functions.crystalPlayersArray(battle.team1Results, battle.team2Results),
-                    team2Timeline: battle.team2Timeline,
-                    team1Timeline: battle.team1Timeline,
-                })
-                await crystalStats.save()
-            } catch (err){
-                // console.log('eeror crystal save', err)
-            }
-        })
+    offset.forEach( (value) => {
+        axios.get(`https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=${value}`)
+        .then( response => {
+            console.log(response.data)
+            response.data.forEach( async (battle) => {
+                try {
+                    let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
+                    crystalKills += Object.values(battle.team2Results).reduce((t, {Kills}) => t + Kills, 0)
+
+                    let crystalStats = new Crystal({
+                        matchID: battle.MatchId,
+                        totalKills: crystalKills,
+                        level: battle.crystalLeagueLevel,
+                        startTime : battle.startTime,
+                        team1Leader : battle.team1LeaderId,
+                        team2Leader : battle.team2LeaderId,
+                        team1Tickets : battle.team1Tickets,
+                        team2Tickets : battle.team2Tickets,
+                        players: functions.crystalPlayersArray(battle.team1Results, battle.team2Results),
+                        team2Timeline: battle.team2Timeline,
+                        team1Timeline: battle.team1Timeline,
+                    })
+                    await crystalStats.save()
+                } catch (err) {
+                    // console.log('eeror crystal save', err)
+                }
+            })
+        }).catch(err => console.log('crystal fetch error'))
     })
-    .catch(err => console.log('oops'))
     
     let crystalDB = await Crystal.find({ battleID: { $not: { $eq: 0 } } }).limit(200) // battleID: 0 
     if (crystalDB.length > 0) {
@@ -195,11 +198,11 @@ setInterval( async () => {
                 await Crystal.updateOne({ matchID: crystal.matchID }, {
                     events : eventCleaned
                 })
-                console.log('updated', crystal.battleID)
+                // console.log('updated', crystal.battleID)
             })
         })
     }
-}, 6000); // 10m 600000
+}, 600000); // 10m 600000
 setInterval( async() => { 
     
     let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
