@@ -90,10 +90,68 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 // let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550,1200, 1250, 1300, 1350] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
-async function deathPlayer (battle) {
-    // console.log('launch playerdead', battle.id, player.id)
+async function deathPlayer (battle, player) {
+        // console.log('launch playerdead', battle.id, player.id)
+            await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
+            .then( async response => {
+                const eventdeath = response.data 
+                eventdeath.forEach(async (eventDeath) => {
+                    if(eventDeath.KillArea === "CRYSTAL_LEAGUE") {
+                        console.log('crystal found!!')
+                        // const crystalInDB = await Crystal.find({ battleID: eventDeath.BattleId }).limit(1)
+                        // if(!crystalInDB.length) {
+
+                            const crystalEmptyInDB = await Crystal.find({}).limit(200) // battleID: 0 
+
+                            let crystalFound = crystalEmptyInDB.find(crystal => {
+                                let players = crystal.players.map( player => player.id)
+                                if (players.includes(eventDeath.Victim.Id) && players.includes(eventDeath.Killer.Id)) {
+                                    return true
+                                } else {
+                                    return false
+                                }
+                            })
+                            console.log(crystalFound && crystalFound.matchID, eventDeath.TimeStamp)
+                            if (crystalFound) {
+                                console.log('crystal saved -------------------------', eventDeath.BattleId)
+                                await Crystal.updateOne({ matchID: crystalFound.matchID }, {
+                                    battleID: eventDeath.BattleId,
+                                    // battleFame : battle.totalFame,
+                                    // events : eventdeath
+                                })
+                                .catch(err => console.log('error fail'))
+                            }
+                            
+                        // }
+                    }
+                    if (eventDeath.BattleId === battle.id) {
+                        battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
+                        battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
+                        await Battle.updateOne({ battleID: battle.id }, {
+                            battleData: battle
+                        })
+                    }
+                })
+                
+                // > in case we re launch playerDead from 2nd setInterval
+                if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
+                    battle.fullEventDeath = true
+                    delete battle.succeedFetch
+                    delete battle.failedFetch
+                    await Battle.updateOne({ battleID: battle.id }, {
+                        battleData: battle
+                    })
+                }
+                
+            })
+            .catch(function (error) {
+                battle.failedFetch += parseInt(player.deaths)
+            })
+            
+    
+    /* // console.log('launch playerdead', battle.id, player.id)
         await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${battle.id}?offset=0&limit=51`)
         .then( async response => {
             const eventdeath = response.data 
@@ -169,26 +227,43 @@ async function deathPlayer (battle) {
         })
         .catch(function (error) {
             console.log('error fetch')
-        })
-        
+        }) */
 
 }
-// setInterval( async() => { 
-//     let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
-//     // console.log('checkbattle length', checkBattle.length)
-//     checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
-//     // console.log('checkbattle length after fiilter', checkBattle.length)
-//     checkBattle.forEach( battleDB => {
-//         // console.log(battleDB.battleID)
-//         const battle = battleDB.battleData[0]
-//         for (const player in battle.players) {
-//             // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
-//             if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
-//                 deathPlayer (battle, battle.players[player]) 
-//             }
-//         }
-//     })
-// }, 30000);
+setInterval( async() => { 
+    
+    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
+    // console.log('checkbattle length', checkBattle.length)
+    checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
+    // console.log('checkbattle length after fiilter', checkBattle.length)
+    checkBattle.forEach( battleDB => {
+        // console.log(battleDB.battleID)
+        const battle = battleDB.battleData[0]
+        for (const player in battle.players) {
+            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
+            if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
+                deathPlayer (battle, battle.players[player]) 
+            }
+        }
+    })
+}, 180000);
+setInterval( async() => { 
+    
+    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
+    // console.log('checkbattle length', checkBattle.length)
+    checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
+    // console.log('checkbattle length after fiilter', checkBattle.length)
+    checkBattle.forEach( battleDB => {
+        // console.log(battleDB.battleID)
+        const battle = battleDB.battleData[0]
+        for (const player in battle.players) {
+            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
+            if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
+                deathPlayer (battle, battle.players[player]) 
+            }
+        }
+    })
+}, 30000);
 setInterval( async() => { 
     // lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
@@ -238,7 +313,12 @@ setInterval( async() => {
                     // .then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     functions.registerNewGuild(battle.guilds, guildsIDInDB)
-                    deathPlayer(battle)
+                    // EVENTDEATH BATTLE-ID
+                    for (const player in battle.players) {
+                        if (battle.players[player].deaths > 0) {
+                            deathPlayer (battle, battle.players[player]) 
+                        }
+                    }
                 }
             })
 
