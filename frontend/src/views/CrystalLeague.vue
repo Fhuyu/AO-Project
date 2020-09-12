@@ -50,7 +50,7 @@ export default {
         
     },
     async mounted () {
-        await axios.get(`http://localhost:5000/crystalLeague`) //https://handholdreport.com/api/
+        await axios.get(`https://handholdreport.com/api/crystalLeague`) //https://handholdreport.com/api/ http://localhost:5000
         .then( res => {
             this.data = res.data
             // this.data.forEach(battle => {

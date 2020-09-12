@@ -80,14 +80,6 @@ export default {
         
     },
     async mounted () {
-        await axios.get(`http://localhost:5000/crystalLeague`) //https://handholdreport.com/api/
-        .then( res => {
-            this.data = res.data
-            this.data.forEach(battle => {
-                battle.team1Results = this.playersArray(battle.team1Results)
-                battle.team2Results = this.playersArray(battle.team2Results)
-            })
-        })
     },
     watch: {
 

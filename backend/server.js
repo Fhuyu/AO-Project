@@ -90,7 +90,7 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 // let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550,1200, 1250, 1300, 1350] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 700, 800] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer (battle, player) {
         // console.log('launch playerdead', battle.id, player.id)
@@ -149,85 +149,6 @@ async function deathPlayer (battle, player) {
             .catch(function (error) {
                 battle.failedFetch += parseInt(player.deaths)
             })
-            
-    
-    /* // console.log('launch playerdead', battle.id, player.id)
-        await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${battle.id}?offset=0&limit=51`)
-        .then( async response => {
-            const eventdeath = response.data 
-            // console.log(eventdeath)
-            // console.log('fetched', eventdeath[0]["KillArea"]) 
-
-                if (eventdeath[0]["KillArea"] == "CRYSTAL_LEAGUE") {
-                    console.log('crystal found')
-                    const crystalInDB = await Crystal.find({ battleID: battle.id }).limit(1)
-                    if(!crystalInDB.length) {
-
-                        const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(100)
-
-                        let playersBattleId = Object.keys(battle.players)
-                        console.log(playersBattleId.length)
-
-                        let crystalFound = crystalEmptyInDB.find(crystal => {
-                        //     let playerCount = 0
-                        //     console.log(playersCrystalId)
-                        //     playersBattleId.forEach( player => {
-                        //         if(playersCrystalId.includes(player)) playerCount = playerCount +1
-                        //     })
-                        //     return playerCount > 7 ? true : false
-                            let playersCrystalId = crystal.players.map(player => player.id)
-
-                            let playerCompare = {};
-
-                            playersBattleId.forEach(i => playerCompare[i] = false);
-                            // console.log(playerCompare)
-                            playersCrystalId.forEach(i => playerCompare[i] === false && (playerCompare[i] = true));
-                            let match = Object.keys(playerCompare).filter(k => playerCompare[k] );
-                            console.log(match.length)
-                            return match.length
-
-                        })
-
-                        // console.log(crystalFound)
-                        if (crystalFound) {
-                            // crystalFound.battleID = battle.BattleId
-                            // crystalFound.battleFame = battle.totalFame
-                            console.log('crystal fetch', battle.id)
-                            // let eventCleaned = eventdeath.map( ev => cleanEvent.cleanEvents(ev))
-
-                            await Crystal.updateOne({ matchID: crystalFound.matchID }, {
-                                battleID: battle.id,
-                                battleFame : battle.totalFame,
-                                events : eventdeath
-                            })
-                            .catch(err => console.log('error fail'))
-                            console.log('update crystal', battle.id)
-                        }
-                    }
-                }
-
-            //     } else if (e.BattleId === battle.id) {
-            //         battle = functions.battleEventDeathTreatment(battle, player, e)
-            //         battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
-            //         await Battle.updateOne({ battleID: battle.id }, {
-            //             battleData: battle
-            //         })
-            //     }
-            // })
-            // // > in case we re launch playerDead from 2nd setInterval
-            // if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
-            //     battle.fullEventDeath = true
-            //     delete battle.succeedFetch
-            //     delete battle.failedFetch
-            //     await Battle.updateOne({ battleID: battle.id }, {
-            //         battleData: battle
-            //     })
-            // }
-            
-        })
-        .catch(function (error) {
-            console.log('error fetch')
-        }) */
 
 }
 setInterval( async () => { 
@@ -259,12 +180,11 @@ setInterval( async () => {
             }
         })
     })
-    .catch(err => console.log('oops', err))
+    .catch(err => console.log('oops'))
     
     let crystalDB = await Crystal.find({ battleID: { $not: { $eq: 0 } } }).limit(200) // battleID: 0 
     if (crystalDB.length > 0) {
         crystalDB = crystalDB.filter( c => !c.events.length)
-        console.log('hello', crystalDB.length)
         crystalDB.forEach( crystal => {
             axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
             .then( async response => {
@@ -273,14 +193,13 @@ setInterval( async () => {
                 eventCleaned = eventCleaned.map( ev => cleanEvent.cleanEvents(ev))
 
                 await Crystal.updateOne({ matchID: crystal.matchID }, {
-                    // battleFame : battle.totalFame,
                     events : eventCleaned
                 })
                 console.log('updated', crystal.battleID)
             })
         })
     }
-}, 60000); // 10m 600000
+}, 6000); // 10m 600000
 setInterval( async() => { 
     
     let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
