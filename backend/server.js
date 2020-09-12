@@ -158,7 +158,7 @@ setInterval( async () => {
     offset.forEach( (value) => {
         axios.get(`https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=${value}`)
         .then( response => {
-            console.log(response.data)
+            // console.log(response.data)
             response.data.forEach( async (battle) => {
                 try {
                     let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
@@ -191,7 +191,7 @@ setInterval( async () => {
         crystalDB.forEach( crystal => {
             axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
             .then( async response => {
-                console.log(crystal.battleID)
+                // console.log(crystal.battleID)
                 let eventCleaned = response.data
                 eventCleaned = eventCleaned.map( ev => cleanEvent.cleanEvents(ev))
 
