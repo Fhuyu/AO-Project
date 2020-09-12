@@ -7,7 +7,9 @@ const crystalSchema = new Schema({
   battleID: { type: Number, "default" : false},
   battleFame: { type: Number },
   totalKills: { type: Number },
-  level: { type: Number }, //, unique: true
+  level: { type: Number },
+  team1Leader : { type: String },
+  team2Leader : { type: String },
   startTime : { type: Date},
   team1Tickets : { type: Number },
   team2Tickets : { type: Number },

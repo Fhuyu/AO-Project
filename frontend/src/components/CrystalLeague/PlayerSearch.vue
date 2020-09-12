@@ -10,7 +10,7 @@
                         <span uk-icon="icon: chevron-down" style="padding-left:5px"></span>
                     </button>
                 </div>
-                <input v-model="searchName">
+                <input v-model="searchName" placeholder="NOT WORKING">
                 <span class="icon right" @click="launchGuildSearch(searchName)" uk-icon="icon: search; ratio: 1.5"></span>
             </form>
     </div>

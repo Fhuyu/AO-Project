@@ -4,13 +4,14 @@
         <tr>
             <td width="110" style="text-align:center;">
                 {{readableDate(battle.startTime)}}<br/>
-                Level {{ battle.crystalLeagueLevel}}
+                Level {{ battle.level}}
             </td>
             <td class="players">
-                <li v-for="(player, i) in battle.team1Results" :key='i' :id="player.PlayerId">
-                    <img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1"/> 
+                <li v-for="(player, i) in team1Results(battle)" :key='i' :id="player.PlayerId">
+                    <!-- <img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1"/>  -->
+                    <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
                     {{player.Name}}
-                    <img style="width:11px;" v-if="battle.team1LeaderId === player.id" src="../../assets/crown.png" /> 
+                    <img style="width:11px;" v-if="battle.team1Leader === player.id" src="../../assets/crown.png" /> 
                 </li>
             </td>
             <td style="position:relative;width:40px;">
@@ -18,23 +19,23 @@
                 <span style="position:absolute; top:0; width:100px">9 KILLS</span>
                 <span style="position:absolute;bottom: 10px;left: -10px;color:#3a85ad;font-weight:bold;">
                     <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC"> 
-                    {{teamSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.crystalLeagueLevel)}}
+                    {{teamSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level)}}
                 </span>
             </td>
             <td style="position:relative;width:40px;">
                 <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
                 <span style="position:absolute; top:0">9</span>
                 <span style="position:absolute;bottom: 10px;left: 10px;color:#3a85ad;font-weight:bold;">
-                {{teamSeasonPoints(battle.team2Tickets, battle.team1Tickets, battle.crystalLeagueLevel)}}
+                {{teamSeasonPoints(battle.team2Tickets, battle.team1Tickets, battle.level)}}
                 <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC"></span>
             </td>
             <td class="players" style="text-align:right;">
-                <li v-for="(player, i) in battle.team2Results" :key='i'>
-                    <img style="width:11px;" v-if="battle.team2LeaderId === player.id" src="../../assets/crown.png" /> 
-                    {{player.Name}} <img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1"/>
+                <li v-for="(player, i) in team2Results(battle)" :key='i'>
+                    <img style="width:11px;" v-if="battle.team2Leader === player.id" src="../../assets/crown.png" /> 
+                    {{player.Name}}
+                    <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
                 </li>
             </td>
-
         </tr>
         </tbody>
     </table>
@@ -52,6 +53,7 @@ export default {
         }
     },
     components: {
+        
     },
     methods: {
         readableDate: function (date) {
@@ -70,11 +72,30 @@ export default {
                 if (40 > ennemyPoint) return this.seasonPoints.points[crystalLevel] * 0.4 * 5
             }
         },
+        team1Results: function (battle) {
+            return battle.players.filter( p => p.Team === "ATTACKER")
+        },
+        team2Results: function (battle) {
+            return battle.players.filter( p => p.Team === "DEFENDER")
+        },
+        imageWeaponUri (weaponType) {
+            return `https://render.albiononline.com/v1/item/${weaponType}` // https://gameinfo.albiononline.com/api/gameinfo/items/
+        },
     },
     computed: {
         
     },
     mounted () {
+        this.battle.events.forEach( e => {
+            this.battle.players = this.battle.players.map( player => {
+                if (player.id === e.Killer.Id) return {...player, MainHand : e.Killer.MainHand}
+                if (player.id === e.Victim.Id) return {...player, MainHand : e.Victim.MainHand}
+                e.Participants.forEach( p => {
+                    if (player.id === p.Id && !player.MainHand) return {...player, MainHand : p.MainHand}
+                })
+                return {...player}
+            }) 
+        })
     },
     watch: {
 

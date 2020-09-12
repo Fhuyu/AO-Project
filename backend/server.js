@@ -103,7 +103,7 @@ async function deathPlayer (battle, player) {
                         // const crystalInDB = await Crystal.find({ battleID: eventDeath.BattleId }).limit(1)
                         // if(!crystalInDB.length) {
 
-                            const crystalEmptyInDB = await Crystal.find({}).limit(200) // battleID: 0 
+                            const crystalEmptyInDB = await Crystal.find({battleID: 0}).limit(200) // battleID: 0 
 
                             let crystalFound = crystalEmptyInDB.find(crystal => {
                                 let players = crystal.players.map( player => player.id)
@@ -230,23 +230,57 @@ async function deathPlayer (battle, player) {
         }) */
 
 }
-setInterval( async() => { 
-    
-    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
-    // console.log('checkbattle length', checkBattle.length)
-    checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
-    // console.log('checkbattle length after fiilter', checkBattle.length)
-    checkBattle.forEach( battleDB => {
-        // console.log(battleDB.battleID)
-        const battle = battleDB.battleData[0]
-        for (const player in battle.players) {
-            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
-            if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
-                deathPlayer (battle, battle.players[player]) 
+setInterval( async () => { 
+
+    axios.get('https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=0')
+    .then( response => {
+        console.log(response.data)
+        response.data.forEach( async (battle) => {
+            try {
+                let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
+                crystalKills += Object.values(battle.team2Results).reduce((t, {Kills}) => t + Kills, 0)
+
+                let crystalStats = new Crystal({
+                    matchID: battle.MatchId,
+                    totalKills: crystalKills,
+                    level: battle.crystalLeagueLevel,
+                    startTime : battle.startTime,
+                    team1Leader : battle.team1LeaderId,
+                    team2Leader : battle.team2LeaderId,
+                    team1Tickets : battle.team1Tickets,
+                    team2Tickets : battle.team2Tickets,
+                    players: functions.crystalPlayersArray(battle.team1Results, battle.team2Results),
+                    team2Timeline: battle.team2Timeline,
+                    team1Timeline: battle.team1Timeline,
+                })
+                await crystalStats.save()
+            } catch (err){
+                // console.log('eeror crystal save', err)
             }
-        }
+        })
     })
-}, 180000);
+    .catch(err => console.log('oops', err))
+    
+    let crystalDB = await Crystal.find({ battleID: { $not: { $eq: 0 } } }).limit(200) // battleID: 0 
+    if (crystalDB.length > 0) {
+        crystalDB = crystalDB.filter( c => !c.events.length)
+        console.log('hello', crystalDB.length)
+        crystalDB.forEach( crystal => {
+            axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
+            .then( async response => {
+                console.log(crystal.battleID)
+                let eventCleaned = response.data
+                eventCleaned = eventCleaned.map( ev => cleanEvent.cleanEvents(ev))
+
+                await Crystal.updateOne({ matchID: crystal.matchID }, {
+                    // battleFame : battle.totalFame,
+                    events : eventCleaned
+                })
+                console.log('updated', crystal.battleID)
+            })
+        })
+    }
+}, 60000); // 10m 600000
 setInterval( async() => { 
     
     let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
@@ -339,33 +373,11 @@ app.get('/topFame', cors(), (req, res) => {
         res.send(response)
     })
 })
-app.get('/crystalLeague', cors(), (req, res) => { 
-    axios.get('https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=0')
-        .then( response => {
-            response.data.forEach( async (battle) => {
-                try {
-                    let crystalKills = Object.values(battle.team1Results).reduce((t, {Kills}) => t + Kills, 0)
-                    crystalKills += Object.values(battle.team2Results).reduce((t, {Kills}) => t + Kills, 0)
+app.get('/crystalLeague', cors(), async (req, res) => { 
+    let crystals = await Crystal.find({}).limit(50).sort({startTime: -1})
+    console.log('hello')
+    res.json(crystals)
 
-                    let crystalStats = new Crystal({
-                        matchID: battle.MatchId,
-                        totalKills: crystalKills,
-                        level: battle.crystalLeagueLevel,
-                        startTime : battle.startTime,
-                        team1Tickets : battle.team1Tickets,
-                        team2Tickets : battle.team2Tickets,
-                        players: functions.crystalPlayersArray(battle.team1Results, battle.team2Results),
-                        team2Timeline: battle.team2Timeline,
-                        team1Timeline: battle.team1Timeline,
-                    })
-                    await crystalStats.save()
-                } catch (err){
-                    // console.log('eeror crystal save', err)
-                }
-            })
-            res.send(response.data)
-        })
-        .catch(err => console.log('oops', err))
 })
 app.get('/guilds', cors(), (req, res) => { 
     Guild.find( {}, (err, guilds) => {

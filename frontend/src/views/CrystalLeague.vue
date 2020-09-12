@@ -1,6 +1,10 @@
 <template>
     <div class="crystal-league">
         <div class="uk-width-4-5@m uk-margin-auto">
+            <div class="uk-card uk-card-secondary uk-card-body">
+                <h1 style="color:white">THIS PAGE IS STILL UNDER DEVELOPMENT</h1>
+                PLEASE BE AWARE IT MIGHT BUG. THIS IS ONLY FOR THE FIRST FEEDBACK.
+            </div>
             <BestWeeklyFame></BestWeeklyFame>
             <PlayerSearch></PlayerSearch>
 
@@ -49,10 +53,10 @@ export default {
         await axios.get(`http://localhost:5000/crystalLeague`) //https://handholdreport.com/api/
         .then( res => {
             this.data = res.data
-            this.data.forEach(battle => {
-                battle.team1Results = this.playersArray(battle.team1Results)
-                battle.team2Results = this.playersArray(battle.team2Results)
-            })
+            // this.data.forEach(battle => {
+            //     battle.team1Results = this.playersArray(battle.team1Results)
+            //     battle.team2Results = this.playersArray(battle.team2Results)
+            // })
         })
     },
     watch: {
