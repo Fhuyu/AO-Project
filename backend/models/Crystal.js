@@ -13,7 +13,8 @@ const crystalSchema = new Schema({
   team2Tickets : { type: Number },
   players: { type : Array , "default" : [] },
   team2Timeline: { type : Array , "default" : [] },
-  team1Timeline: { type : Array , "default" : [] }
+  team1Timeline: { type : Array , "default" : [] },
+  events: { type : Array},
 })
 crystalSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('Crystal', crystalSchema)

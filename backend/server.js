@@ -90,23 +90,22 @@ setInterval( async() => {
 let battles = null
 let fetching = false
 // let lastFecthTime = null
-const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550,1000,1050,1100,1150,1200,1250,1300] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
-async function deathPlayer (battle, player) {
+async function deathPlayer (battle) {
     // console.log('launch playerdead', battle.id, player.id)
-        await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/players/${player.id}/deaths`)
+        await axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${battle.id}?offset=0&limit=51`)
         .then( async response => {
             const eventdeath = response.data 
-            eventdeath.forEach(async (e) => {
+            // console.log(eventdeath)
+            // console.log('fetched', eventdeath[0]["KillArea"]) 
 
-                if (e.KillArea === 'CRYSTAL_LEAGUE') {
+                if (eventdeath[0]["KillArea"] == "CRYSTAL_LEAGUE") {
                     console.log('crystal found')
                     const crystalInDB = await Crystal.find({ battleID: battle.id }).limit(1)
                     if(!crystalInDB.length) {
 
                         const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(100)
-                        // console.log(crystalEmptyInDB)
-                        console.log(battle)
 
                         let playersBattleId = Object.keys(battle.players)
                         console.log(playersBattleId.length)
@@ -126,76 +125,70 @@ async function deathPlayer (battle, player) {
                             // console.log(playerCompare)
                             playersCrystalId.forEach(i => playerCompare[i] === false && (playerCompare[i] = true));
                             let match = Object.keys(playerCompare).filter(k => playerCompare[k] );
-                            // console.log(match)
-                            return match.length > 7
+                            console.log(match.length)
+                            return match.length
 
                         })
 
-                        console.log(crystalFound)
+                        // console.log(crystalFound)
                         if (crystalFound) {
                             // crystalFound.battleID = battle.BattleId
                             // crystalFound.battleFame = battle.totalFame
-                            console.log('crystal fetch')
+                            console.log('crystal fetch', battle.id)
+                            // let eventCleaned = eventdeath.map( ev => cleanEvent.cleanEvents(ev))
 
-
-                            axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${battle.id}?offset=0&limit=51`)
-                            .then( async response => {
-                                console.log('stat fetch')
-                                let events = response.data
-                                let eventCleaned = events.map( ev => cleanEvent.cleanEvents(ev))
-
-                                await Crystal.updateOne({ matchID: crystalFound.matchID }, {
-                                    battleID: battle.id,
-                                    battleFame : battle.totalFame,
-                                    events : eventCleaned
-                                })
-                                console.log('update crystal', battle.id)
+                            await Crystal.updateOne({ matchID: crystalFound.matchID }, {
+                                battleID: battle.id,
+                                battleFame : battle.totalFame,
+                                events : eventdeath
                             })
                             .catch(err => console.log('error fail'))
+                            console.log('update crystal', battle.id)
                         }
                     }
-
-                } else if (e.BattleId === battle.id) {
-                    battle = functions.battleEventDeathTreatment(battle, player, e)
-                    battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
-                    await Battle.updateOne({ battleID: battle.id }, {
-                        battleData: battle
-                    })
                 }
-            })
-            // > in case we re launch playerDead from 2nd setInterval
-            if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
-                battle.fullEventDeath = true
-                delete battle.succeedFetch
-                delete battle.failedFetch
-                await Battle.updateOne({ battleID: battle.id }, {
-                    battleData: battle
-                })
-            }
+
+            //     } else if (e.BattleId === battle.id) {
+            //         battle = functions.battleEventDeathTreatment(battle, player, e)
+            //         battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
+            //         await Battle.updateOne({ battleID: battle.id }, {
+            //             battleData: battle
+            //         })
+            //     }
+            // })
+            // // > in case we re launch playerDead from 2nd setInterval
+            // if (battle.succeedFetch === battle.totalKills || battle.succeedFetch > battle.totalKills) {
+            //     battle.fullEventDeath = true
+            //     delete battle.succeedFetch
+            //     delete battle.failedFetch
+            //     await Battle.updateOne({ battleID: battle.id }, {
+            //         battleData: battle
+            //     })
+            // }
             
         })
         .catch(function (error) {
-            battle.failedFetch += parseInt(player.deaths)
+            console.log('error fetch')
         })
         
 
 }
-setInterval( async() => { 
-    let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
-    // console.log('checkbattle length', checkBattle.length)
-    checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
-    // console.log('checkbattle length after fiilter', checkBattle.length)
-    checkBattle.forEach( battleDB => {
-        // console.log(battleDB.battleID)
-        const battle = battleDB.battleData[0]
-        for (const player in battle.players) {
-            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
-            if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
-                deathPlayer (battle, battle.players[player]) 
-            }
-        }
-    })
-}, 30000);
+// setInterval( async() => { 
+//     let checkBattle = await Battle.find({'battleTotalPlayers' : { $gt: 19 }}).sort({battleID:-1}).limit(100)
+//     // console.log('checkbattle length', checkBattle.length)
+//     checkBattle = checkBattle.filter( battle => !battle.battleData[0].fullEventDeath)
+//     // console.log('checkbattle length after fiilter', checkBattle.length)
+//     checkBattle.forEach( battleDB => {
+//         // console.log(battleDB.battleID)
+//         const battle = battleDB.battleData[0]
+//         for (const player in battle.players) {
+//             // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
+//             if (battle.players[player].deathFame.length < battle.players[player].deaths) { 
+//                 deathPlayer (battle, battle.players[player]) 
+//             }
+//         }
+//     })
+// }, 30000);
 setInterval( async() => { 
     // lastFecthTime = battles ? Math.abs(new Date() - new Date(battles.headers.date)) : null
     // let minutes = lastFecthTime ? Math.floor((lastFecthTime/1000)/60) : null
@@ -245,13 +238,7 @@ setInterval( async() => {
                     // .then( battle => console.log('battle registered', battle.battleData[0].id))
 
                     functions.registerNewGuild(battle.guilds, guildsIDInDB)
-
-                    // EVENTDEATH BATTLE-ID
-                    for (const player in battle.players) {
-                        if (battle.players[player].deaths > 0) {
-                            deathPlayer (battle, battle.players[player]) 
-                        }
-                    }
+                    deathPlayer(battle)
                 }
             })
 
