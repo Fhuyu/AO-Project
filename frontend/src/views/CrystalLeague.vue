@@ -73,7 +73,8 @@ export default {
     async fetchCrystals() {
       this.offsetLoading = true;
       await axios
-        .get(`http://localhost:5000/crystalLeague/${this.currentOffset}`, {
+        // .get(`http://localhost:5000/crystalLeague/${this.currentOffset}`, {
+        .get(`https://handholdreport.com/api  /crystalLeague/${this.currentOffset}`, {
           params: {
             hideLevel1: this.hideLevel1
           }
