@@ -8,8 +8,6 @@
                         <td width="180" style="max-width:180px!important;">WIN <br/>
                             <span class="result" :class="battle.team1Tickets > battle.team2Tickets ? 'win' : 'lose'">{{battle.team1Tickets}} </span> 
                             <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'"> {{battle.team2Tickets}}</span><br/>
-
-
                         
                         </td>
                         <td><img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1" width="50"/> </td>

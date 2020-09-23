@@ -16,7 +16,6 @@
             </td>
             <td style="position:relative;width:40px;">
                 <span class="result" :class="battle.team1Tickets > battle.team2Tickets ? 'win' : 'lose'">{{battle.team1Tickets}}</span><br/>
-                <span style="position:absolute; top:0; width:100px">9 KILLS</span>
                 <span style="position:absolute;bottom: 10px;left: -10px;color:#3a85ad;font-weight:bold;">
                     <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC"> 
                     {{teamSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level)}}
@@ -24,7 +23,6 @@
             </td>
             <td style="position:relative;width:40px;">
                 <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
-                <span style="position:absolute; top:0">9</span>
                 <span style="position:absolute;bottom: 10px;left: 10px;color:#3a85ad;font-weight:bold;">
                 {{teamSeasonPoints(battle.team2Tickets, battle.team1Tickets, battle.level)}}
                 <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC"></span>

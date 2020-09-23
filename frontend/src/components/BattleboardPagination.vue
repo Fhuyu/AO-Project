@@ -28,8 +28,9 @@ export default {
   },
   methods: {
     changeOffset (step) {
-      this.currentOffset += step === 'next' ? 50 : -50
-      this.$emit('changeOffset', this.currentOffset)
+      let offset = this.currentOffset
+      offset += step === 'next' ? 50 : -50
+      this.$emit('changeOffset', offset)
     },
   },
 }
