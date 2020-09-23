@@ -8,20 +8,22 @@ const Guild = require('./models/Guild')
 
 module.exports = {
     guildIdMDW: async function (req, res, next) {
+        let err = false
         if (req.query.searchType === 'guild') {
             try {
                 guilds = await Guild.find({"guildName": req.params.guildName.toUpperCase()})
                 req.guildID = guilds[0].guildID
-                console.log(req.guildID)
+                // console.log(req.guildID)
             } catch (er) {
-                console.log('error', er)
+                // console.log('error', er)
+                err = true
             }
         } else if (req.query.searchType === 'alliance') {
             req.allianceName = req.params.guildName   
         } else if (req.query.searchType === 'player') {
             req.playerName = req.params.guildName    
         }         
-        next();
+        err ? res.send('Error') : next();
     },
 /*     allianceMDW: function (req, res, next) {
         console.log(req.params)
@@ -34,7 +36,7 @@ module.exports = {
     }, */
     battlesMDW: async function (req, res, next) {
         req.query.minBattlePlayers = req.query.minBattlePlayers === undefined ? 0 : req.query.minBattlePlayers
-        console.log('nbplayer', req.query.minBattlePlayers)
+        // console.log('nbplayer', req.query.minBattlePlayers)
 
         const offsetNumber = parseInt(req.params.offset) + 50
         let query = {}
@@ -43,11 +45,11 @@ module.exports = {
             let guildTosearch = "battleData.guilds." + req.guildID
             query[guildTosearch] = {$exists: true }
         } else if (req.query.searchType === 'alliance') {
-            console.log('alliance is', req.allianceName)
+            // console.log('alliance is', req.allianceName)
             query = '{"$where": "function() { for (var field in this.battleData[0].alliances) { if (this.battleData[0].alliances[field].name == (\'' + req.allianceName + '\')) return true}return false}"}'
             query = JSON.parse(query)
         } else if (req.query.searchType === 'player') {
-            console.log('player is', req.playerName)
+            // console.log('player is', req.playerName)
             query = '{"$where": "function() { for (var field in this.battleData[0].players) { if (this.battleData[0].players[field].name == (\'' + req.playerName + '\')) return true}return false}"}'
             query = JSON.parse(query)
         } // semaine milliseconde : < 604800000
@@ -61,7 +63,7 @@ module.exports = {
         } else {
             req.dataParse = await Battle.find(query).sort({battleID:-1}).limit(offsetNumber)
         }
-        console.log('next', req.dataParse.length)
+        // console.log('next', req.dataParse.length)
         next()
     },
 
@@ -89,12 +91,15 @@ module.exports = {
                         killFame : players[player.id] ? players[player.id].killFame + player.killFame : player.killFame,
                         kills : players[player.id] ? players[player.id].kills + player.kills : player.kills,
                         deaths : players[player.id] ? players[player.id].deaths + player.deaths : player.deaths,
+                        assistance : players[player.id] ? players[player.id].assistance + player.assistance : player.assistance,
                         // deathFame : players[player.id] ? players[player.id].deathFame.push(player.deathFame)  : player.deathFame,
-                        // itempower : players[player.id] ? players[player.id].itempower.push(player.itempower) : player.itempower ? [player.itempower] : [],
+                        itempower : players[player.id] ? player.itempower ? [...players[player.id].itempower, parseInt(player.itempower)] : players[player.id].itempower : player.itempower ? [parseInt(player.itempower)] : [],
+                        weapon : players[player.id] ? player.weapon ? [...players[player.id].weapon, player.weapon] : players[player.id].weapon : player.weapon ? [player.weapon] : [],
                         attendance : players[player.id] ? players[player.id].attendance + 1 : 1,
                     }
                 })
             })
+            console.log('attendance', req.params.guildName)
             req.data = {battles : req.data, players : Object.values(players)}
         }
         next();

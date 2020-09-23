@@ -7,7 +7,7 @@
 				<router-link to='/' style="text-decoration: none;">
 					<h1><span>HANDHOLD</span><span style="color:#FF6933;">REPORT</span></h1> 
 				</router-link>
-				<p>Beta version - 0.4.0 | 
+				<p>Version 0.5.3 | 
 
 				<button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
 				<div id="modal-close-default" uk-modal>
@@ -17,8 +17,10 @@
 						<h2 class="uk-modal-title">Incoming</h2>
 							Battleboard : Save guild research to be able to click back from killboard<br />
 							Battleboard : Highlight searched guild & player<br />
-							Website : General design (Logo / Color)<br />
 						<h2 class="uk-modal-title">Done</h2>
+							20-09-01 : Killboard : Switch to guild stats<br />
+							20-08-28 : Attendance : Show IP + Main Weapon + Assistance<br />
+							20-08-27 : Attendance : Version 1 + Rework design + Top stats<br />
 							20-07-17 : Killboard : Handhold mode + Enable healing view<br />
 							20-06-13 : Battleboard : Alliance + Player search (Exact name + Case sensitive)<br />
 							20-06-06 : Killboard : Loading battles is faster & more (on discord)<br />
@@ -54,8 +56,13 @@
                 <h2 class="uk-modal-title">Support</h2>
                 This website is still under development.<br/>
                 If you want to help & support the server (or even buy me a coffee), this button brings you to Paypal.<br />
-                <a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ZRAWUYBSCPB8Q&item_name=Server%20%26%20Coffee%21&currency_code=EUR&source=url">
-                <button class="uk-button uk-button-primary" style="background:#FF7A4D">DONATE</button></a><br/>
+                <a class="m-4" target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ZRAWUYBSCPB8Q&item_name=Server%20%26%20Coffee%21&currency_code=EUR&source=url">
+                <button class="uk-button uk-button-primary" style="background:#FF7A4D">DONATE PAYPAL</button></a><br/>
+                <br/>
+
+                <a href="https://en.tipeee.com/handholdreport" style="margin: 10px 0!important;">
+                <button class="uk-button uk-button-primary" style="background:#FF7A4D">Support HandHoldReport on Tipeee</button>
+                </a>
                 <p>If you need a special development / feature for your guild, you can join HandHoldReport discord or contact me on discord : Fuyu#2494
                 </p>
 
@@ -89,7 +96,7 @@
 
   </div>
 </template>
-
+<script async src="https://plugin.tipeee.com/widget.js" charset="utf-8"></script>
 <script>
 import NightMode from "@/components/NightMode"
 export default {
@@ -109,6 +116,7 @@ export default {
   }
   
 }
+
 </script>
 
 <style>
@@ -163,5 +171,25 @@ export default {
 }
 .night .uk-button-secondary {
   background: #3066BE;
+}
+.attendance .v-select {
+  width:350px;
+  margin: auto;
+}
+.vs__dropdown-toggle {
+  display: none!important;
+  background:white;
+}
+.vs__dropdown-menu {
+  background: #2e2a42!important;
+  max-width: 350px;
+
+}
+.vs__dropdown-menu li {
+  color: white;
+  background: #444;
+}
+.night .attendance li:nth-child(2n) {
+    background: #131218;
 }
 </style>

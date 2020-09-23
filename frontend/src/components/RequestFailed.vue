@@ -1,8 +1,8 @@
 <template>
   <div class="errormessage">
-    <div class="uk-card uk-card-primary uk-card-body">
-    <h3 class="uk-card-title">OOPS ! An error occured. </h3> 
-    <h3>Please check your guild name </h3>
+    <div class="uk-card uk-card-primary uk-card-body" style="background: #FF7A4D;width: 50%;margin: auto;">
+    <h3 class="uk-card-title">I can't find your guild! </h3> 
+    <h3>Please check your guild name</h3>
     <!-- <router-link :to="killboardURL()"><button class="uk-button uk-button-primary">REFRESH THIS PAGE</button></router-link> -->
   </div>
   </div>

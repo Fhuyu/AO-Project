@@ -55,7 +55,7 @@
                     <th></th>
                 </thead>
                 <tr class="attendance_data" v-for="(item, index) in attendance.battles" :key="index">
-                    <td><a :href="`https://handholdreport.com/#/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
+                    <td><a :href="`https://handholdreport.com/killboard/${item.battleData[0].id}`">{{ item.battleData[0].id }}</a></td>
                 </tr>
             </table>
         </div>
@@ -92,7 +92,7 @@ export default {
         async fetchData () {
             let response = null
             if (this.searchGuildName) {
-                response = await axios.get(`http://localhost:5000/attendance/${this.searchGuildName}`, //https://handholdreport.com/api/
+                response = await axios.get(`https://handholdreport.com/api/attendance/${this.searchGuildName}`, //https://handholdreport.com/api/
                 // response = await axios.get(`http://localhost:5000/battles/${this.currentOffset}/${this.searchGuildName}`
                 { params: {
                     minBattlePlayers : this.minBattlePlayers,

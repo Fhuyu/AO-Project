@@ -10,6 +10,16 @@ const routes = [
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/Attendance.vue')
   },
   {
+    path: '/crystal-league',
+    name: 'CrystalLeague',
+    component: () => import(/* webpackChunkName: "battleboard" */ '../views/CrystalLeague.vue')
+  },
+  {
+    path: '/crystal-league/:name',
+    name: 'CrystalLeaguePlayer',
+    component: () => import(/* webpackChunkName: "battleboard" */ '../views/CrystalLeaguePlayer.vue')
+  },
+  {
     path: '/guild/:name',
     name: 'Guild Description',
     component: () => import(/* webpackChunkName: "battleboard" */ '../views/GuildDescription.vue')
@@ -43,7 +53,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  // mode: 'history',
+  mode: 'history',
   routes,
   // linkActiveClass: "active", // active class for non-exact links.
   linkExactActiveClass: "active" // active class for *exact* links.
