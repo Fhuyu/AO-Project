@@ -78,11 +78,12 @@ setInterval(async() => {
                 return ({...guild, data: response.data })
             })
 
-            await Promise.all(promises).then(guilds => {
+            await Promise.all(promises)
+            .then(guilds => {
                     topPvP['guildFame'] = guilds
                     redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
                 })
-                .catch(err => console.log('fetch error'))
+            .catch(err => console.log('fetch error'))
         }
 
     })
@@ -183,26 +184,37 @@ setInterval(async() => {
                         // console.log('eeror crystal save', err)
                     }
                 })
-            }).catch(err => console.log('crystal fetch error'))
+            })
+            .catch(err => console.log('crystal fetch error'))
     })
 
-    let crystalDB = await Crystal.find({ battleID: { $not: { $eq: 0 } } }).limit(200) // battleID: 0 
-    if (crystalDB.length > 0) {
-        crystalDB = crystalDB.filter(c => !c.events.length)
-        crystalDB.forEach(crystal => {
-            axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
-                .then(async response => {
-                    // console.log(crystal.battleID)
-                    let eventCleaned = response.data
-                    eventCleaned = eventCleaned.map(ev => cleanEvent.cleanEvents(ev))
+    try {
+        let crystalDB = await Crystal.find({ $and: [{ 'battleID': { "$ne": null }}, { 'battleID': { "$ne": 0 }}] }).sort({ startTime: -1 }).limit(200) // battleID: 0 
+        if (crystalDB.length > 0) {
+            crystalDB = crystalDB.filter(c => !c.events.length)
 
-                    await Crystal.updateOne({ matchID: crystal.matchID }, {
-                            events: eventCleaned
+            if (crystalDB.length > 0) {
+
+                crystalDB.forEach(crystal => {
+                    axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
+                        .then(async response => {
+                            // console.log(crystal.battleID)
+                            let eventCleaned = response.data
+                            eventCleaned = eventCleaned.map(ev => cleanEvent.cleanEvents(ev))
+
+                            await Crystal.updateOne({ matchID: crystal.matchID }, {
+                                events: eventCleaned
+                            })
                         })
-                        // console.log('updated', crystal.battleID)
+                        .catch(console.log('error fetch crystal 2'))
+
                 })
-        })
+            }
+        }
+    } catch {
+        console.log('eeror --')
     }
+
 }, 60000); // 10m 600000
 setInterval(async() => {
 
@@ -220,29 +232,29 @@ setInterval(async() => {
             }
         }
     })
-    let isBattleACrystal = await Battle.find({ 'battleTotalPlayers': { $lt: 11 } }).sort({ battleID: -1 }).limit(300)
+    let isBattleACrystal = await Battle.find({ 'battleTotalPlayers': { $lt: 11 } }).sort({ battleID: -1 }).limit(400)
     isBattleACrystal = isBattleACrystal.filter(battle => battle.battleData[0].KillArea === "CRYSTAL_LEAGUE")
-    console.log('isBattleACrystal', isBattleACrystal.length)
-    console.log('b4 crystalEmptyInDB')
+    // console.log('isBattleACrystal', isBattleACrystal.length)
+    // console.log('b4 crystalEmptyInDB')
 
+    if (isBattleACrystal.length > 0) {
+        // console.log('in')
+        const crystalEmptyInDB = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).limit(100) // battleID: 0 
+        // console.log('after crystalEmptyInDB')
 
-
-    if (isBattleACrystal.length) {
-        const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(100) // battleID: 0 
-        console.log('after crystalEmptyInDB')
         isBattleACrystal.forEach(async b => {
-            // let crystals = await Crystal.find({ battleID : b.battleID}).limit(100).sort({startTime: -1})
-            console.log('b4 crystals')
+
+            // console.log('b4 crystals')
             let crystals = await Crystal.find({ battleID: b.battleData[0].id }).limit(1)
-            console.log('after crystals')
+            // console.log('after crystals')
 
             if (!crystals.length) {
 
                 let battlePlayers = Object.keys(b.battleData[0].players)
                 let crystalFound = crystalEmptyInDB.find(crystal => {
                     let playersCrystalId = crystal.players.map(player => player.id)
-                        // console.log(playersCrystalId)
-                        // console.log(battlePlayers)
+                    // console.log(playersCrystalId)
+                    // console.log(battlePlayers)
                     let playerCompare = {};
 
                     battlePlayers.forEach(p => playerCompare[p] = false);
@@ -255,10 +267,10 @@ setInterval(async() => {
                 })
 
                 // console.log('a', crystalFound && crystalFound.matchID, b.battleEndDate)
-                console.log('crystal found in after fetch')
-                console.log(b.battleData[0].id)
+                // console.log('crystal found in after fetch')
+                // console.log(b.battleData[0].id)
                 if (crystalFound) {
-                    console.log('crystal saved after -------------------------', b.battleData[0].id)
+                    // console.log('crystal saved after -------------------------', b.battleData[0].id)
                     await Crystal.updateOne({ matchID: crystalFound.matchID }, {
                             battleID: b.battleData[0].id,
                         })
@@ -296,7 +308,7 @@ setInterval(async() => {
             const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
             try {
                 battles = await axios.get(url, { timeout: 120000 })
-                console.log('done data fetch', value)
+                // console.log('done data fetch', value)
 
                 let battlesData = battles.data;
 

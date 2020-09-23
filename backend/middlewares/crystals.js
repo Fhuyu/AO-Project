@@ -8,14 +8,11 @@ const Guild = require('../models/Guild')
 
 module.exports = {
     fetchCrystals: async function(req, res, next) {
-        // Hide or show lv 1
         req.params.offset = parseInt(req.params.offset)
 
         if (req.query.hideLevel1 === 'true') {
-            console.log('in')
             req.data = await Crystal.find({ level: { $gt: 1 } }).limit(req.params.offset + 50).sort({ startTime: -1 })
         } else {
-            console.log('out')
             req.data = await Crystal.find({}).limit(req.params.offset + 50).sort({ startTime: -1 })
         }
         next();
