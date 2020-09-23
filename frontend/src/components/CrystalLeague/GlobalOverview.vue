@@ -96,7 +96,18 @@ export default {
         })
     },
     watch: {
-
+        battle : function () {
+            this.battle.events.forEach( e => {
+            this.battle.players = this.battle.players.map( player => {
+                if (player.id === e.Killer.Id) return {...player, MainHand : e.Killer.MainHand}
+                if (player.id === e.Victim.Id) return {...player, MainHand : e.Victim.MainHand}
+                e.Participants.forEach( p => {
+                    if (player.id === p.Id && !player.MainHand) return {...player, MainHand : p.MainHand}
+                })
+                return {...player}
+            }) 
+            })
+        }
     }
 }
 </script>
