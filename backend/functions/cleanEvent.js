@@ -17,7 +17,7 @@ module.exports = {
                 Head : event.Killer.Equipment.Head && `${event.Killer.Equipment.Head.Type}?quality=${event.Killer.Equipment.Head.Quality}`,
                 Armor : event.Killer.Equipment.Armor && `${event.Killer.Equipment.Armor.Type}?quality=${event.Killer.Equipment.Armor.Quality}`,
                 Shoes : event.Killer.Equipment.Shoes && `${event.Killer.Equipment.Shoes.Type}?quality=${event.Killer.Equipment.Shoes.Quality}`,
-                Cape : event.Killer.Equipment.MainHand && `${event.Killer.Equipment.Cape.Type}?quality=${event.Killer.Equipment.Cape.Cape}`,
+                Cape : event.Killer.Equipment.Cape && `${event.Killer.Equipment.Cape.Type}?quality=${event.Killer.Equipment.Cape.Cape}`,
                 Potion : event.Killer.Equipment.Potion ? event.Killer.Equipment.Potion.Type: null,
             },
             Victim : {
