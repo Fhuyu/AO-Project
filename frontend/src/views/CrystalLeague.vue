@@ -5,7 +5,7 @@
         <h1 style="color:white">THIS PAGE IS STILL UNDER DEVELOPMENT</h1>PLEASE BE AWARE IT MIGHT BUG. THIS IS ONLY FOR THE FIRST FEEDBACK.
       </div>
       <BestWeeklyFame></BestWeeklyFame>
-      <PlayerSearch></PlayerSearch>
+      <PlayerSearch @playerSearch="fetchCrystals"></PlayerSearch>
 
       <Pagination
         :currentOffset="currentOffset"
@@ -70,11 +70,12 @@ export default {
       console.log(offset);
       this.currentOffset = offset;
     },
-    async fetchCrystals() {
+    async fetchCrystals(player) {
       this.offsetLoading = true;
+      // const url = player ? `http://localhost:5000/crystalLeague/${this.currentOffset}/${player}` : `http://localhost:5000/crystalLeague/${this.currentOffset}`
+      const url = player ? `https://handholdreport.com/api/crystalLeague/${this.currentOffset}/${player}` : `https://handholdreport.com/api/crystalLeague/${this.currentOffset}`
       await axios
-        // .get(`http://localhost:5000/crystalLeague/${this.currentOffset}`, {
-        .get(`https://handholdreport.com/api/crystalLeague/${this.currentOffset}`, {
+        .get(url, {
           params: {
             hideLevel1: this.hideLevel1
           }

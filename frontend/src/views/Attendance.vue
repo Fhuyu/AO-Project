@@ -21,12 +21,19 @@
                 <div>
                     <form class="uk-form-horizontal">
                         <select class="uk-select playerFilter" v-model="minBattlePlayers" style="min-width: 250px;">
+                        <option value="1">1 + players from your guild</option>
                         <option value="10">10 + players from your guild</option>
                         <option value="20">20 + players from your guild</option>
                         <option value="30">30 + players from your guild</option>
                         <option value="50">50 + players from your guild</option>
                         <option value="80">80 + players from your guild</option>
                         <option value="100">100 + players from your guild</option>
+                        </select>
+                    </form>
+                    <form class="uk-form-horizontal uk-margin">
+                        <select class="uk-select playerFilter" v-model="timeRange" style="min-width: 250px;">
+                            <option value="604800000">1 week ago → Today</option>
+                            <option value="2628000000">1 month ago → Today</option>
                         </select>
                     </form>
                 </div>
@@ -173,6 +180,7 @@ export default {
     data: function () {
         return {
             minBattlePlayers: 20,
+            timeRange : '604800000',
             searchGuildName: null,
             searchType :'guild',
             error404 : false,
@@ -214,6 +222,7 @@ export default {
             this.loading = true
             this.fetchData()
             .then(res => {
+                console.log('res', res)
                 this.attendance = res.data
                 this.onClickOrderBy('attendance', 'desc')
                 this.loading = false
@@ -272,9 +281,10 @@ export default {
                 response = await axios.get(`https://handholdreport.com/api/attendance/${this.searchGuildName}`, //https://handholdreport.com/api/
                 // response = await axios.get(`http://localhost:5000/attendance/${this.searchGuildName}`,
                     { params: {
-                        minBattlePlayers : this.minBattlePlayers,
-                        searchType : this.searchType,
-                        page : 'attendance',
+                            minBattlePlayers : this.minBattlePlayers,
+                            timeRange : this.timeRange,
+                            searchType : this.searchType,
+                            page : 'attendance',
                         }
                     }
                 ) 
@@ -322,7 +332,10 @@ export default {
     },
     watch: {
         minBattlePlayers () {
-            this.launchGuildBattleSearch()
+            if (this.searchGuildName) this.launchGuildBattleSearch()
+        },
+        timeRange () {
+            if (this.searchGuildName) this.launchGuildBattleSearch()
         },
         searchGuildName: function (guildSearch) {
             if (guildSearch.toUpperCase() === this.currentGuildSearch[0]) {

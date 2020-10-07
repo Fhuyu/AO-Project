@@ -1,6 +1,6 @@
 <template>
     <div class="form_global_search uk-text-center uk-width-auto@m m-4">
-            <form class="form_search" @submit.prevent="launchGuildSearch(searchName)">
+            <form class="form_search" @submit.prevent="playerSearch(searchName)">
                 <div class="select_div" uk-form-custom="target: > * > span:first-child">
                     <select v-model="searchType"  class="uk-select">
                         <option value="player">Player</option>
@@ -10,8 +10,8 @@
                         <span uk-icon="icon: chevron-down" style="padding-left:5px"></span>
                     </button>
                 </div>
-                <input v-model="searchName" placeholder="NOT WORKING">
-                <span class="icon right" @click="launchGuildSearch(searchName)" uk-icon="icon: search; ratio: 1.5"></span>
+                <input v-model="searchName" placeholder="Name with capital letter">
+                <span class="icon right" @click="playerSearch(searchName)" uk-icon="icon: search; ratio: 1.5"></span>
             </form>
     </div>
 </template>
@@ -31,10 +31,12 @@ export default {
         
     },
     methods: {
-        launchGuildSearch: function () {
+        playerSearch: function () {
+            console.log('emit')
+            this.$emit('playerSearch', this.searchName)
             // if (this.searchType === 'guild') this.searchGuildName = this.currentGuildSearch[0]
             // this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
-            // this.currentOffset = 0
+            this.currentOffset = 0
             // this.minBattlePlayers = 0
             // this.launchNewSearch() // fetch new data
         },
