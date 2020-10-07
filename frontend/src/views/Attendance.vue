@@ -33,6 +33,7 @@
                     <form class="uk-form-horizontal uk-margin">
                         <select class="uk-select playerFilter" v-model="timeRange" style="min-width: 250px;">
                             <option value="604800000">1 week ago → Today</option>
+                            <option value="1209600000">2 weeks ago → Today</option>
                             <option value="2628000000">1 month ago → Today</option>
                         </select>
                     </form>
