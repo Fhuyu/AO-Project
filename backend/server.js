@@ -79,11 +79,11 @@ setInterval(async() => {
             })
 
             await Promise.all(promises)
-            .then(guilds => {
+                .then(guilds => {
                     topPvP['guildFame'] = guilds
                     redis_client.setex(`top`, 7200, JSON.stringify(topPvP))
                 })
-            .catch(err => console.log('fetch error'))
+                .catch(err => console.log('fetch error'))
         }
 
     })
@@ -158,7 +158,8 @@ setInterval(async() => {
     const offset = [0, 50, 100, 150, 200, 250]
 
     offset.forEach((value) => {
-        axios.get(`https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?limit=51&offset=${value}`)
+        let date = Date.now();
+        axios.get(`https://gameinfo.albiononline.com/api/gameinfo/matches/crystalleague?t=${date}&limit=51&offset=${value}`)
             .then(response => {
                 // console.log(response.data)
                 response.data.forEach(async(battle) => {
@@ -189,7 +190,7 @@ setInterval(async() => {
     })
 
     try {
-        let crystalDB = await Crystal.find({ $and: [{ 'battleID': { "$ne": null }}, { 'battleID': { "$ne": 0 }}] }).sort({ startTime: -1 }).limit(200) // battleID: 0 
+        let crystalDB = await Crystal.find({ $and: [{ 'battleID': { "$ne": null } }, { 'battleID': { "$ne": 0 } }] }).sort({ startTime: -1 }).limit(200) // battleID: 0 
         if (crystalDB.length > 0) {
             crystalDB = crystalDB.filter(c => !c.events.length)
 
@@ -234,27 +235,27 @@ setInterval(async() => {
     })
     let isBattleACrystal = await Battle.find({ 'battleTotalPlayers': { $lt: 11 } }).sort({ battleID: -1 }).limit(400)
     isBattleACrystal = isBattleACrystal.filter(battle => battle.battleData[0].KillArea === "CRYSTAL_LEAGUE")
-    // console.log('isBattleACrystal', isBattleACrystal.length)
-    // console.log('b4 crystalEmptyInDB')
+        // console.log('isBattleACrystal', isBattleACrystal.length)
+        // console.log('b4 crystalEmptyInDB')
 
     if (isBattleACrystal.length > 0) {
         // console.log('in')
         const crystalEmptyInDB = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).limit(100) // battleID: 0 
-        // console.log('after crystalEmptyInDB')
+            // console.log('after crystalEmptyInDB')
 
         isBattleACrystal.forEach(async b => {
 
             // console.log('b4 crystals')
             let crystals = await Crystal.find({ battleID: b.battleData[0].id }).limit(1)
-            // console.log('after crystals')
+                // console.log('after crystals')
 
             if (!crystals.length) {
 
                 let battlePlayers = Object.keys(b.battleData[0].players)
                 let crystalFound = crystalEmptyInDB.find(crystal => {
                     let playersCrystalId = crystal.players.map(player => player.id)
-                    // console.log(playersCrystalId)
-                    // console.log(battlePlayers)
+                        // console.log(playersCrystalId)
+                        // console.log(battlePlayers)
                     let playerCompare = {};
 
                     battlePlayers.forEach(p => playerCompare[p] = false);
@@ -305,10 +306,11 @@ setInterval(async() => {
 
 
         offset.forEach(async(value) => {
-            const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${value}`
+            let date = Date.now()
+            const url = `https://gameinfo.albiononline.com/api/gameinfo/battles?t=${date}&limit=50&sort=recent&offset=${value}`
             try {
                 battles = await axios.get(url, { timeout: 120000 })
-                // console.log('done data fetch', value)
+                    // console.log('done data fetch', value)
 
                 let battlesData = battles.data;
 
@@ -398,6 +400,7 @@ app.get('/battles/:offset', cors(), (req, res) => {
     if (req.data) {
         res.send(req.data)
     } else {
+
         let url = `https://gameinfo.albiononline.com/api/gameinfo/battles?limit=50&sort=recent&offset=${req.params.offset}`; //&guildId=LKYQ8b0mTvaPk0LxVny5UQ
         fetch(url, { timeout: 60000 })
             .then((res) => res.json())
