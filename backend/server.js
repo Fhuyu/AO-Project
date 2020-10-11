@@ -100,34 +100,34 @@ async function deathPlayer(battle, player) {
         .then(async response => {
             const eventdeath = response.data
             eventdeath.forEach(async(eventDeath) => {
-                if (eventDeath.KillArea === "CRYSTAL_LEAGUE") {
-                    // console.log('crystal found!!')
-                    // const crystalInDB = await Crystal.find({ battleID: eventDeath.BattleId }).limit(1)
-                    // if(!crystalInDB.length) {
+                // if (eventDeath.KillArea === "CRYSTAL_LEAGUE") {
+                //     // console.log('crystal found!!')
+                //     // const crystalInDB = await Crystal.find({ battleID: eventDeath.BattleId }).limit(1)
+                //     // if(!crystalInDB.length) {
 
-                    const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(300) // battleID: 0 
+                //     const crystalEmptyInDB = await Crystal.find({ battleID: 0 }).limit(300) // battleID: 0 
 
-                    let crystalFound = crystalEmptyInDB.find(crystal => {
-                            let players = crystal.players.map(player => player.id)
-                            if (players.includes(eventDeath.Victim.Id) && players.includes(eventDeath.Killer.Id)) {
-                                return true
-                            } else {
-                                return false
-                            }
-                        })
-                        // console.log(crystalFound && crystalFound.matchID, eventDeath.TimeStamp)
-                    if (crystalFound) {
-                        console.log('crystal saved -------------------------', eventDeath.BattleId)
-                        await Crystal.updateOne({ matchID: crystalFound.matchID }, {
-                                battleID: eventDeath.BattleId,
-                                // battleFame : battle.totalFame,
-                                // events : eventdeath
-                            })
-                            .catch(err => console.log('error fail'))
-                    }
+                //     let crystalFound = crystalEmptyInDB.find(crystal => {
+                //             let players = crystal.players.map(player => player.id)
+                //             if (players.includes(eventDeath.Victim.Id) && players.includes(eventDeath.Killer.Id)) {
+                //                 return true
+                //             } else {
+                //                 return false
+                //             }
+                //         })
+                //         // console.log(crystalFound && crystalFound.matchID, eventDeath.TimeStamp)
+                //     if (crystalFound) {
+                //         console.log('crystal saved -------------------------', eventDeath.BattleId)
+                //         await Crystal.updateOne({ matchID: crystalFound.matchID }, {
+                //                 battleID: eventDeath.BattleId,
+                //                 // battleFame : battle.totalFame,
+                //                 // events : eventdeath
+                //             })
+                //             .catch(err => console.log('error fail'))
+                //     }
 
-                    // }
-                }
+                //     // }
+                // }
                 if (eventDeath.BattleId === battle.id) {
                     battle = functions.battleEventDeathTreatment(battle, player, eventDeath)
                     battle.succeedFetch += parseInt(player.deaths) // can maybe double on setinterval no2
@@ -189,32 +189,32 @@ setInterval(async() => {
             .catch(err => console.log('crystal fetch error'))
     })
 
-    try {
-        let crystalDB = await Crystal.find({ $and: [{ 'battleID': { "$ne": null } }, { 'battleID': { "$ne": 0 } }] }).sort({ startTime: -1 }).limit(200) // battleID: 0 
-        if (crystalDB.length > 0) {
-            crystalDB = crystalDB.filter(c => !c.events.length)
+    // try {
+    //     let crystalDB = await Crystal.find({ $and: [{ 'battleID': { "$ne": null } }, { 'battleID': { "$ne": 0 } }] }).sort({ startTime: -1 }).limit(200) // battleID: 0 
+    //     if (crystalDB.length > 0) {
+    //         crystalDB = crystalDB.filter(c => !c.events.length)
 
-            if (crystalDB.length > 0) {
+    //         if (crystalDB.length > 0) {
 
-                crystalDB.forEach(crystal => {
-                    axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
-                        .then(async response => {
-                            // console.log(crystal.battleID)
-                            let eventCleaned = response.data
-                            eventCleaned = eventCleaned.map(ev => cleanEvent.cleanEvents(ev))
+    //             crystalDB.forEach(crystal => {
+    //                 axios.get(`https://gameinfo.albiononline.com/api/gameinfo/events/battle/${crystal.battleID}?offset=0&limit=51`)
+    //                     .then(async response => {
+    //                         // console.log(crystal.battleID)
+    //                         let eventCleaned = response.data
+    //                         eventCleaned = eventCleaned.map(ev => cleanEvent.cleanEvents(ev))
 
-                            await Crystal.updateOne({ matchID: crystal.matchID }, {
-                                events: eventCleaned
-                            })
-                        })
-                        .catch(console.log('error fetch crystal 2'))
+    //                         await Crystal.updateOne({ matchID: crystal.matchID }, {
+    //                             events: eventCleaned
+    //                         })
+    //                     })
+    //                     .catch(console.log('error fetch crystal 2'))
 
-                })
-            }
-        }
-    } catch {
-        console.log('eeror --')
-    }
+    //             })
+    //         }
+    //     }
+    // } catch {
+    //     console.log('eeror --')
+    // }
 
 }, 60000); // 10m 600000
 setInterval(async() => {
@@ -224,67 +224,67 @@ setInterval(async() => {
     checkBattle = checkBattle.filter(battle => !battle.battleData[0].fullEventDeath)
         // console.log('checkbattle length after fiilter', checkBattle.length)
     checkBattle.forEach(battleDB => {
-        // console.log(battleDB.battleID)
-        const battle = battleDB.battleData[0]
-        for (const player in battle.players) {
-            // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
-            if (battle.players[player].deathFame.length < battle.players[player].deaths) {
-                deathPlayer(battle, battle.players[player])
-            }
-        }
-    })
-    let isBattleACrystal = await Battle.find({ 'battleTotalPlayers': { $lt: 11 } }).sort({ battleID: -1 }).limit(400)
-    isBattleACrystal = isBattleACrystal.filter(battle => battle.battleData[0].KillArea === "CRYSTAL_LEAGUE")
-        // console.log('isBattleACrystal', isBattleACrystal.length)
-        // console.log('b4 crystalEmptyInDB')
-
-    if (isBattleACrystal.length > 0) {
-        // console.log('in')
-        const crystalEmptyInDB = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).limit(100) // battleID: 0 
-            // console.log('after crystalEmptyInDB')
-
-        isBattleACrystal.forEach(async b => {
-
-            // console.log('b4 crystals')
-            let crystals = await Crystal.find({ battleID: b.battleData[0].id }).limit(1)
-                // console.log('after crystals')
-
-            if (!crystals.length) {
-
-                let battlePlayers = Object.keys(b.battleData[0].players)
-                let crystalFound = crystalEmptyInDB.find(crystal => {
-                    let playersCrystalId = crystal.players.map(player => player.id)
-                        // console.log(playersCrystalId)
-                        // console.log(battlePlayers)
-                    let playerCompare = {};
-
-                    battlePlayers.forEach(p => playerCompare[p] = false);
-                    playersCrystalId.forEach(p => playerCompare[p] === false && (playerCompare[p] = true));
-                    // console.log('player compare', playerCompare)
-                    let match = Object.keys(playerCompare).filter(p => playerCompare[p]);
-                    // console.log('match compare', match)
-                    // console.log(match.length)
-                    return match.length
-                })
-
-                // console.log('a', crystalFound && crystalFound.matchID, b.battleEndDate)
-                // console.log('crystal found in after fetch')
-                // console.log(b.battleData[0].id)
-                if (crystalFound) {
-                    // console.log('crystal saved after -------------------------', b.battleData[0].id)
-                    await Crystal.updateOne({ matchID: crystalFound.matchID }, {
-                            battleID: b.battleData[0].id,
-                        })
-                        .catch(err => console.log('error fail'))
+            // console.log(battleDB.battleID)
+            const battle = battleDB.battleData[0]
+            for (const player in battle.players) {
+                // console.log(battle.players[player].deathFame.length, battle.players[player].deaths)
+                if (battle.players[player].deathFame.length < battle.players[player].deaths) {
+                    deathPlayer(battle, battle.players[player])
                 }
-
             }
-
-            // SEARCH FOR BATTLEID IN CCRYSTAL DB
-            // IF NO CRYSTAL, TRY TO FIND THE CRYSTAL
-            // SAVE THE NEW BATTLE ID
         })
-    }
+        // let isBattleACrystal = await Battle.find({ 'battleTotalPlayers': { $lt: 11 } }).sort({ battleID: -1 }).limit(400)
+        // isBattleACrystal = isBattleACrystal.filter(battle => battle.battleData[0].KillArea === "CRYSTAL_LEAGUE")
+        //     // console.log('isBattleACrystal', isBattleACrystal.length)
+        //     // console.log('b4 crystalEmptyInDB')
+
+    // if (isBattleACrystal.length > 0) {
+    //     // console.log('in')
+    //     const crystalEmptyInDB = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).limit(100) // battleID: 0 
+    //         // console.log('after crystalEmptyInDB')
+
+    //     isBattleACrystal.forEach(async b => {
+
+    //         // console.log('b4 crystals')
+    //         let crystals = await Crystal.find({ battleID: b.battleData[0].id }).limit(1)
+    //             // console.log('after crystals')
+
+    //         if (!crystals.length) {
+
+    //             let battlePlayers = Object.keys(b.battleData[0].players)
+    //             let crystalFound = crystalEmptyInDB.find(crystal => {
+    //                 let playersCrystalId = crystal.players.map(player => player.id)
+    //                     // console.log(playersCrystalId)
+    //                     // console.log(battlePlayers)
+    //                 let playerCompare = {};
+
+    //                 battlePlayers.forEach(p => playerCompare[p] = false);
+    //                 playersCrystalId.forEach(p => playerCompare[p] === false && (playerCompare[p] = true));
+    //                 // console.log('player compare', playerCompare)
+    //                 let match = Object.keys(playerCompare).filter(p => playerCompare[p]);
+    //                 // console.log('match compare', match)
+    //                 // console.log(match.length)
+    //                 return match.length
+    //             })
+
+    //             // console.log('a', crystalFound && crystalFound.matchID, b.battleEndDate)
+    //             // console.log('crystal found in after fetch')
+    //             // console.log(b.battleData[0].id)
+    //             if (crystalFound) {
+    //                 // console.log('crystal saved after -------------------------', b.battleData[0].id)
+    //                 await Crystal.updateOne({ matchID: crystalFound.matchID }, {
+    //                         battleID: b.battleData[0].id,
+    //                     })
+    //                     .catch(err => console.log('error fail'))
+    //             }
+
+    //         }
+
+    //         // SEARCH FOR BATTLEID IN CCRYSTAL DB
+    //         // IF NO CRYSTAL, TRY TO FIND THE CRYSTAL
+    //         // SAVE THE NEW BATTLE ID
+    //     })
+    // }
 
 
 }, 50000);
