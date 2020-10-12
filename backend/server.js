@@ -366,12 +366,7 @@ app.get('/topFame', cors(), (req, res) => {
 })
 
 // ------ CRYSTAL LEAGUE
-app.use('/crystalLeague/:offset/:player', crystalsMiddlewares.findPlayer)
-app.use('/crystalLeague/:offset/:player', crystalsMiddlewares.crystalsOffsetMDW)
-app.get('/crystalLeague/:offset/:player', cors(), async(req, res) => {
-    res.json(req.data)
-})
-
+app.use('/crystalLeague/:offset', crystalsMiddlewares.setQuery)
 app.use('/crystalLeague/:offset', crystalsMiddlewares.fetchCrystals)
 app.use('/crystalLeague/:offset', crystalsMiddlewares.crystalsOffsetMDW)
 app.get('/crystalLeague/:offset', cors(), async(req, res) => {

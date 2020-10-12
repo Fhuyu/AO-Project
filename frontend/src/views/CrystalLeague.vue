@@ -5,7 +5,15 @@
         <h1 style="color:white">THIS PAGE IS STILL UNDER DEVELOPMENT</h1>PLEASE BE AWARE IT MIGHT BUG. THIS IS ONLY FOR THE FIRST FEEDBACK.
       </div>
       <BestWeeklyFame></BestWeeklyFame>
-      <PlayerSearch @playerSearch="fetchCrystals"></PlayerSearch>
+
+      <div uk-grid>
+        <div class="uk-width-1-2">
+          <PlayerSearch @playerSearch="setPlayer"></PlayerSearch>
+        </div>
+        <div class="uk-width-1-2">
+          <CalendarSearch @dateSearch="setDate"></CalendarSearch>
+        </div>
+    </div>
 
       <Pagination
         :currentOffset="currentOffset"
@@ -31,6 +39,7 @@
 </template>
 
 <script>
+import CalendarSearch from "@/components/CrystalLeague/Calendar";
 import PlayerSearch from "@/components/CrystalLeague/PlayerSearch";
 import GlobalOverview from "@/components/CrystalLeague/GlobalOverview";
 import BestWeeklyFame from "@/components/CrystalLeague/BestWeeklyFame";
@@ -51,14 +60,19 @@ export default {
       currentOffset: 0,
 
       // ORDER BY
-      hideLevel1: true
+      hideLevel1: true,
+
+      // SEARCH DATA
+      player : null,
+      date : null,
     };
   },
   components: {
     GlobalOverview,
     PlayerSearch,
     BestWeeklyFame,
-    Pagination
+    Pagination,
+    CalendarSearch,
   },
   methods: {
     playersArray(playerObj) {
@@ -70,14 +84,24 @@ export default {
       console.log(offset);
       this.currentOffset = offset;
     },
-    async fetchCrystals(player) {
+    setPlayer (player) {
+      this.player = player
+      this.fetchCrystals()
+    },
+    setDate (date) {
+      this.date = date
+      this.fetchCrystals()
+    },
+    async fetchCrystals() {
       this.offsetLoading = true;
-      // const url = player ? `http://localhost:5000/crystalLeague/${this.currentOffset}/${player}` : `http://localhost:5000/crystalLeague/${this.currentOffset}`
-      const url = player ? `https://handholdreport.com/api/crystalLeague/${this.currentOffset}/${player}` : `https://handholdreport.com/api/crystalLeague/${this.currentOffset}`
+      // const url = `http://localhost:5000/crystalLeague/${this.currentOffset}`
+      const url = `https://handholdreport.com/api/crystalLeague/${this.currentOffset}`
       await axios
         .get(url, {
           params: {
-            hideLevel1: this.hideLevel1
+            hideLevel1: this.hideLevel1,
+            player : this.player,
+            date : this.date,
           }
         })
         .then(res => {
