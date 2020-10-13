@@ -50,8 +50,7 @@ export default {
             seasonPoints : seasonPoints,
         }
     },
-    components: {
-        
+    components: {        
     },
     methods: {
         readableDate: function (date) {

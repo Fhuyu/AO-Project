@@ -56,27 +56,31 @@
             </div>
         <div v-if="killFameCrystal" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body">
-                <h4>TOP CRYSTAL LEAGUE PLAYER</h4>
+                
+                <iframe width="400" height="280"
+                    src="https://www.youtube.com/embed/Yfw9Bheacw4" frameborder="0" allowfullscreen>
+                </iframe>
+                <!-- <h4>TOP CRYSTAL LEAGUE PLAYER</h4>
                 <table class="uk-table weeklyfame">
                     <thead>
                         <th style="width: 10px;"></th>
                         <th></th>
                         <th> WEEKLY KILLFAME</th>
-                        <!-- <th>DEATHFAME</th> -->
+                        <th>DEATHFAME</th>
                         <th>RATIO</th>
                     </thead>
                     <tr  v-for="(player, index) in killFameCrystal" :key="index" >
                         <td v-if="killFameCrystalmax > index" style="height:40px;">#{{index + 1}}</td>
                         <td v-if="killFameCrystalmax > index"><b>{{player.Name}}</b><br/>{{player.GuildName}}</td>
                         <td v-if="killFameCrystalmax > index">{{formatNumber(player.KillFame)}}</td>
-                        <!-- <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td> -->
+                        <td v-if="killFamePlayermax > index">{{formatNumber(player.DeathFame)}}</td>
                         <td v-if="killFameCrystalmax > index">{{formatNumber(player.FameRatio)}}</td>
                     </tr>
                 </table>
                 <div class="loadmore">
                     <p v-if="killFameCrystalmax < 4" @click="showMore('killFameCrystalmax')">LOAD MORE <span uk-icon="chevron-down"></span></p>
                     <p v-if="killFameCrystalmax > 4" @click="showLess('killFameCrystalmax')">SHOW LESS<span uk-icon="chevron-up"></span></p>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
