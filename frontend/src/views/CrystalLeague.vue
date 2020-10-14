@@ -31,15 +31,16 @@
 		</div>
 		
 
-		<div class="uk-child-width-1-2@m uk-margin-auto" uk-grid>
+		<div class="uk-child-width-1-2@m uk-margin-auto" uk-grid v-if="!player">
 			<div
 			class="uk-card uk-card-default uk-margin-small crystal-detail m-2"
 			v-for="(battle, index) in data"
 			:key="index"
 			>
-			<GlobalOverview :battle="battle"></GlobalOverview>
+        <GlobalOverview :battle="battle"></GlobalOverview>
 			</div>
 		</div>
+    <div v-else><PlayerView :data="data" :player="player"></PlayerView></div>
 		</div>
 	</div>
 </template>
@@ -49,6 +50,7 @@ import CalendarSearch from "@/components/CrystalLeague/Calendar";
 import PlayerSearch from "@/components/CrystalLeague/PlayerSearch";
 import GlobalOverview from "@/components/CrystalLeague/GlobalOverview";
 import BestWeeklyFame from "@/components/CrystalLeague/BestWeeklyFame";
+import PlayerView from "@/components/CrystalLeague/PlayerView";
 
 import Stats from "@/components/CrystalLeague/Statistic";
 
@@ -94,8 +96,8 @@ export default {
     BestWeeklyFame,
     Pagination,
     CalendarSearch,
-
-        Stats,
+    PlayerView,
+    Stats,
 
   },
   methods: {
@@ -117,6 +119,7 @@ export default {
       this.fetchCrystals()
     },
     async fetchCrystals() {
+      console.log(this.$route)
       this.offsetLoading = true;
       // const url = `http://localhost:5000/crystalLeague/${this.currentOffset}`
       const url = `https://handholdreport.com/api/crystalLeague/${this.currentOffset}`
