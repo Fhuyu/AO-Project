@@ -8,7 +8,7 @@
 
 		<div>
 			<h3>STATS</h3>
-			<!-- <Stats :team1Timeline="t1" :team2Timeline="t2"></Stats> -->
+			<Stats :team1Timeline="t1" :team2Timeline="t2"></Stats>
 		</div>
 
 		<div uk-grid>

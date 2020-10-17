@@ -96,6 +96,7 @@
 
   </div>
 </template>
+
 <script async src="https://plugin.tipeee.com/widget.js" charset="utf-8"></script>
 <script>
 import NightMode from "@/components/NightMode"

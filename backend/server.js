@@ -91,13 +91,13 @@ setInterval(async() => {
     })
 }, 1200000); // 20m / 1h : 3600000
 
-// setInterval(setBattleToCrystal.setBattleToCrystal, 30000);
-setInterval(setBattleToCrystal.fetchData, 30000);
+setInterval(setBattleToCrystal.setBattleToCrystal, 300000);
+setInterval(setBattleToCrystal.fetchData, 600000);
 
 let battles = null
 let fetching = false
     // let lastFecthTime = null
-const offset = [0, 50, 100, 150, 200, 250, 300, 1300, 1350, 1400, 1450] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50, 100, 150, 200, 250, 300] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer(battle, player) {
     // console.log('launch playerdead', battle.id, player.id)

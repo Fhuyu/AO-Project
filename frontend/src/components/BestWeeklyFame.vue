@@ -56,10 +56,16 @@
             </div>
         <div v-if="killFameCrystal" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body">
+
                 
-                <iframe width="400" height="280"
+                <!-- <iframe width="400" height="280"
                     src="https://www.youtube.com/embed/Yfw9Bheacw4" frameborder="0" allowfullscreen>
-                </iframe>
+                </iframe> -->
+                <VueTwitchPlayer
+                    :channel="channel"
+                ></VueTwitchPlayer>
+
+
                 <!-- <h4>TOP CRYSTAL LEAGUE PLAYER</h4>
                 <table class="uk-table weeklyfame">
                     <thead>
@@ -87,6 +93,7 @@
 </template>
 
 <script>
+import VueTwitchPlayer from 'vue-twitch-player';
 import axios from 'axios'
 
 export default {
@@ -94,6 +101,7 @@ export default {
     props: [],
     data: function () {
         return {
+            channel : 'derrickuk',
             killFamePlayer : null,
             killFameGuild : null,
             killFameCrystal : null,
@@ -121,6 +129,9 @@ export default {
             this[max] = 3
         },
     },
+    components : {
+        VueTwitchPlayer,
+    }
 }
 </script>
 

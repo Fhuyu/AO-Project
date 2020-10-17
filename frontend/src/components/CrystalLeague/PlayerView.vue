@@ -9,7 +9,9 @@
                     <tr>
                         <td width="180" style="max-width:180px!important;">{{readableDate(battle.startTime)}}<br />
                             <div style="padding-top:8px;"><img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
-                            {{playerSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level)}}</div>
+                            
+                            {{playerSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level, battle)}}</div>
+                            
                         </td>
                         <td><img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="50"></td>
                         <td>K / D / A</td>
@@ -47,7 +49,6 @@
                     </tbody>
                     
                 </table>
-
                 </a>
                 <div class="uk-accordion-content">
                     <div>
@@ -57,7 +58,7 @@
                             <li @click="grade = 3" :class="grade === 3 &&'uk-active'"><a>STATISTICS</a></li>
                         </ul>
                     </div>
-                    <General v-if="grade === 1"></General>
+                    <General :players="battle.players" v-if="grade === 1"></General>
                     <Deaths v-if="grade === 2"></Deaths>
                     <!-- <Stats v-if="grade === 3"></Stats> -->
                 </div>
@@ -90,15 +91,20 @@ export default {
         readableDate: function (date) {
             return `${date.slice(0, 10)} ${date.slice(11, 16)}`
         },
-        playerWon : function (cgvg) {
+        playerTeam1 (cgvg) {
             let player = cgvg.players.find(p => p.Name.toLowerCase() === this.player.toLowerCase())
-            if (player && player.Team === "ATTACKER" && cgvg.team1Tickets || player && player.Team === "DEFENDER" && cgvg.team2Tickets) {
-                return true
-            } else {
-                return false
-            }
+            return player && player.Team === "ATTACKER" ? true : false
         },
-        playerSeasonPoints (myTeamPoint, ennemyPoint, crystalLevel) {
+        playerWon : function (cgvg) {
+            return (this.playerTeam1(cgvg) && cgvg.team1Tickets) || (!this.playerTeam1(cgvg) && cgvg.team2Tickets) ? true : false
+        },
+        playerSeasonPoints (team1, team2, crystalLevel, cgvg) {
+
+            let player = cgvg.players.find(p => p.Name.toLowerCase() === this.player.toLowerCase())
+
+            let myTeamPoint = player && player.Team === "ATTACKER" ? team1 : team2
+            let ennemyPoint = myTeamPoint === team1 ? team2 : team1
+
             if (myTeamPoint > ennemyPoint) {
                 if(crystalLevel === 1) return this.seasonPoints.points[crystalLevel]
                 if (myTeamPoint > 109) return this.seasonPoints.points[crystalLevel]
@@ -119,7 +125,6 @@ export default {
         },
     },
     computed: {
-        
     },
     mounted () {
 
@@ -164,5 +169,9 @@ tr > td {
 }
 .uk-tab {
     margin-left: 0px!important;
+}
+.uk-tab > .uk-active > a  {
+    color: #FF6933!important;
+    border-color: #FF6933!important;
 }
 </style>
