@@ -10,7 +10,7 @@ module.exports = {
     setBattleToCrystal: async function() {
         console.log('fetch crystal aa')
 
-        let crystals = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).sort({ startTime: -1 }).limit(100)
+        let crystals = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).sort({ startTime: -1 }).limit(50)
             // console.log('crystals', crystals.length)
 
         let battles = await Battle.find({ 'battleTotalPlayers': { $eq: 10 } }).sort({ battleID: -1 }).limit(500)

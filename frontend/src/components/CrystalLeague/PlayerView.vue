@@ -13,25 +13,26 @@
                             {{playerSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level, battle)}}</div>
                             
                         </td>
-                        <td><img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="50"></td>
-                        <td>K / D / A</td>
+                        <!-- <td>{{ playerStats(battle) }}</td> -->
+                        <td><img width="60" v-if="playerStats(battle).MainHand" :uk-tooltip="playerStats(battle).MainHand" :src="imageWeaponUri(playerStats(battle).MainHand)"></td>
+
+                        <td>{{ playerStats(battle).Kills }} / {{ playerStats(battle).Deaths }} / A</td>
                         <td>Level {{ battle.level }} <br/>
                             <span class="result" :class="battle.team1Tickets > battle.team2Tickets ? 'win' : 'lose'">{{battle.team1Tickets}}</span> -
                             <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
 
                         </td>
                         <td>
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30"><br/>
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
-                            <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
+                            <img width="40" v-if="playerStats(battle).OffHand" :uk-tooltip="playerStats(battle).OffHand" :src="imageWeaponUri(playerStats(battle).OffHand)">
+                            <img width="40" v-if="playerStats(battle).Head" :uk-tooltip="playerStats(battle).Head" :src="imageWeaponUri(playerStats(battle).Head)">
+                            <img width="40" v-if="playerStats(battle).Armor" :uk-tooltip="playerStats(battle).Armor" :src="imageWeaponUri(playerStats(battle).Armor)"><br/>
+                            <img width="40" v-if="playerStats(battle).Shoes" :uk-tooltip="playerStats(battle).Shoes" :src="imageWeaponUri(playerStats(battle).Shoes)">
+                            <img width="40" v-if="playerStats(battle).Cape" :uk-tooltip="playerStats(battle).Cape" :src="imageWeaponUri(playerStats(battle).Cape)">
+                            <img width="40" v-if="playerStats(battle).Potion" :uk-tooltip="playerStats(battle).Potion" :src="imageWeaponUri(playerStats(battle).Potion)">
                         </td>
                         <td class="players" style="text-align:left;">
                             <li v-for="(player, i) in team1Results(battle)" :key='i' :id="player.PlayerId">
-                                <img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1"/> 
-                                <!-- <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)"> -->
+                                <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
                                 {{player.Name}}
                                 <img style="width:11px;" v-if="battle.team1Leader === player.id" src="../../assets/crown.png" /> 
                             </li>
@@ -40,8 +41,7 @@
                             <li v-for="(player, i) in team2Results(battle)" :key='i'>
                                 <img style="width:11px;" v-if="battle.team2Leader === player.id" src="../../assets/crown.png" /> 
                                 {{player.Name}}
-                                <!-- <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)"> -->
-                                <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
+                                <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
 
                             </li>
                         </td>
@@ -59,7 +59,7 @@
                         </ul>
                     </div>
                     <General :players="battle.players" v-if="grade === 1"></General>
-                    <Deaths v-if="grade === 2"></Deaths>
+                    <Deaths :events="battle.events" v-if="grade === 2"></Deaths>
                     <!-- <Stats v-if="grade === 3"></Stats> -->
                 </div>
             </li>
@@ -81,6 +81,7 @@ export default {
         return {
             seasonPoints : seasonPoints,
             grade : 1,
+            // playerData : this.playerStats(),
         }
     },
     components: {
@@ -88,6 +89,9 @@ export default {
         Deaths,
     },
     methods: {
+        playerStats (battle) {
+            return battle.players.find(p => p.Name === this.player)
+        },
         readableDate: function (date) {
             return `${date.slice(0, 10)} ${date.slice(11, 16)}`
         },
@@ -123,10 +127,51 @@ export default {
         team2Results: function (battle) {
             return battle.players.filter( p => p.Team === "DEFENDER")
         },
+        imageWeaponUri (weaponType) {
+            return `https://render.albiononline.com/v1/item/${weaponType}` // https://gameinfo.albiononline.com/api/gameinfo/items/
+        },
+        setPlayersData (player, e) {
+            // console.log(e)
+            return {...player, 
+                    MainHand : e.MainHand && e.MainHand, 
+                    Armor : e.Armor && e.Armor, 
+                    GuildName : e.GuildName && e.GuildName, 
+                    Itempower : e.Itempower && parseInt(e.Itempower,10), 
+                    OffHand: e.OffHand && e.OffHand, 
+                    Head : e.Head && e.Head, 
+                    Shoes : e.Shoes && e.Shoes, 
+                    Cape : e.Cape && e.Cape, 
+                    Potion : e.Potion && e.Potion
+            } //, KillFame : player.KillFame ? e.Killer.KillFame + player.KillFame : e.Killer.KillFame    
+        }
     },
     computed: {
+        
     },
     mounted () {
+        console.log('hello')
+        setInterval( () => {
+
+            this.data && this.data.forEach( battle => {
+                battle.events.forEach( e => {
+                    //"GuildName":"Black 0rder","GuildId":"noSyqo_MT72CrfPgQedI1A","AllianceName":"","AllianceId":"","AllianceTag":"","KillFame":42357,"Itempower":1441.53333,"MainHand":"T8_2H_DUALSICKLE_UNDEAD@3?quality=2","OffHand":null,"Head":"T8_HEAD_LEATHER_MORGANA@3?quality=2","Armor":"T8_ARMOR_LEATHER_MORGANA@3?quality=2","Shoes":"T8_SHOES_CLOTH_SET2@3?quality=1","Cape":"T5_CAPEITEM_FW_LYMHURST@3?quality=undefined","Potion":"T7_POTION_STONESKIN@1"}
+                    battle.players = battle.players.map( player => {
+                        if (player.id === e.Killer.Id) return this.setPlayersData(player, e.Killer)
+                        if (player.id === e.Victim.Id) return this.setPlayersData(player, e.Victim)
+                        // console.log(e.Participants)
+                        // e.Participants.forEach( p => {
+                        //     console.log (p)
+                        //     if (player.id === p.Id) return this.setPlayersData(player, p)
+                        // })
+                        return {...player}
+                    }) 
+                    // e.Participants.forEach( p => {
+                    //     console.log(p)
+                    // })
+                })
+            })
+        }, 500);
+
 
     },
     watch: {

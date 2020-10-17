@@ -15,12 +15,12 @@ const routes = [{
         component: () =>
             import ( /* webpackChunkName: "battleboard" */ '../views/CrystalLeague.vue')
     },
-    // {
-    //     path: '/crystal-league/:name',
-    //     name: 'CrystalLeaguePlayer',
-    //     component: () =>
-    //         import ( /* webpackChunkName: "battleboard" */ '../views/CrystalLeague.vue')
-    // },
+    {
+        path: '/crystal-league/:name',
+        name: 'CrystalLeaguePlayer',
+        component: () =>
+            import ( /* webpackChunkName: "battleboard" */ '../views/CrystalLeague.vue')
+    },
     {
         path: '/guild/:name',
         name: 'Guild Description',

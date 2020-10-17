@@ -111,6 +111,7 @@ export default {
       this.currentOffset = offset;
     },
     setPlayer (player) {
+      this.$router.push(`/crystal-league/${player}`)
       this.player = player
       this.fetchCrystals()
     },
@@ -119,7 +120,6 @@ export default {
       this.fetchCrystals()
     },
     async fetchCrystals() {
-      console.log(this.$route)
       this.offsetLoading = true;
       // const url = `http://localhost:5000/crystalLeague/${this.currentOffset}`
       const url = `https://handholdreport.com/api/crystalLeague/${this.currentOffset}`
@@ -147,6 +147,8 @@ export default {
     //     },
   },
   mounted() {
+    console.log('riutrhett', this.$route.params.name) 
+    if (this.$route.params.name) this.player = this.$route.params.name
     this.fetchCrystals();
   },
   watch: {
