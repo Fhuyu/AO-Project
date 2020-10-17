@@ -45,6 +45,8 @@ crystalsMiddlewares = require("./middlewares/crystals");
 functions = require("./functions");
 cleanEvent = require("./functions/cleanEvent");
 
+setBattleToCrystal = require("./functions/setBattleToCrystal");
+
 //Body Parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -89,10 +91,13 @@ setInterval(async() => {
     })
 }, 1200000); // 20m / 1h : 3600000
 
+// setInterval(setBattleToCrystal.setBattleToCrystal, 30000);
+setInterval(setBattleToCrystal.fetchData, 30000);
+
 let battles = null
 let fetching = false
     // let lastFecthTime = null
-const offset = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+const offset = [0, 50, 100, 150, 200, 250, 300, 1300, 1350, 1400, 1450] //, 50 , 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
 
 async function deathPlayer(battle, player) {
     // console.log('launch playerdead', battle.id, player.id)
@@ -155,7 +160,7 @@ async function deathPlayer(battle, player) {
 }
 setInterval(async() => {
 
-    const offset = [0, 50, 100, 150, 200, 250]
+    const offset = [0, 50, 100, 150, 200]
 
     offset.forEach((value) => {
         let date = Date.now();
@@ -216,7 +221,7 @@ setInterval(async() => {
     //     console.log('eeror --')
     // }
 
-}, 60000); // 10m 600000
+}, 20000); // 10m 600000
 setInterval(async() => {
 
     let checkBattle = await Battle.find({ 'battleTotalPlayers': { $gt: 19 } }).sort({ battleID: -1 }).limit(100)
