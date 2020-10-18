@@ -132,12 +132,21 @@ export default {
           }
         })
         .then(res => {
-          this.data = res.data;
-          this.offsetLoading = false;
-          // this.data.forEach(battle => {
-          //     battle.team1Results = this.playersArray(battle.team1Results)
-          //     battle.team2Results = this.playersArray(battle.team2Results)
-          // })
+            this.data = res.data;
+            this.offsetLoading = false;
+            this.data.forEach(battle => {
+            console.log('1 battle')
+                battle.events.forEach( e => {
+                    e.Participants.forEach( p => {
+                        console.log('participants', p)
+                        let playerId = battle.players.findIndex( player => player.Name === p.Name)
+                        battle.players[playerId].Assistance = battle.players[playerId].Assistance ? battle.players[playerId].Assistance + 1 : 1
+                        battle.players[playerId].MainHand = battle.players[playerId].MainHand ? battle.players[playerId].MainHand : p.MainHand
+                        battle.players[playerId].Itempower = battle.players[playerId].Itempower ? battle.players[playerId].Itempower : parseInt(p.Itempower,10)
+                        console.log(battle.players.findIndex( player => player.Name === p.Name))
+                    })
+                })
+            })
         });
     }
   },

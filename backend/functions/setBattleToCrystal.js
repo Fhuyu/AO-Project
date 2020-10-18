@@ -11,9 +11,9 @@ module.exports = {
         console.log('fetch crystal aa')
 
         let crystals = await Crystal.find({ battleID: 0, level: { $gt: 1 } }).sort({ startTime: -1 }).limit(50)
-            // console.log('crystals', crystals.length)
+            // console.log('crystals', crystals.length) 
 
-        let battles = await Battle.find({ 'battleTotalPlayers': { $eq: 10 } }).sort({ battleID: -1 }).limit(500)
+        let battles = await Battle.find({ $and: [{ 'battleTotalPlayers': { $gt: 7 } }, { 'battleTotalPlayers': { $lt: 11 } }] }).sort({ battleID: -1 }).limit(5000) // 8 - 9 - 10
         battles = battles.filter(battle => battle.battleData[0].KillArea === "CRYSTAL_LEAGUE")
             // console.log('battles', battles.length)
 
@@ -61,7 +61,6 @@ module.exports = {
                     console.log(eventCleaned, crystal.matchID)
 
                     await Crystal.updateOne({ matchID: crystal.matchID }, {
-                        //     events: eventCleaned
                         $set: { "events": eventCleaned }
                     })
                 })

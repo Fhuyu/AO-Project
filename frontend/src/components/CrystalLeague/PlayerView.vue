@@ -16,7 +16,7 @@
                         <!-- <td>{{ playerStats(battle) }}</td> -->
                         <td><img width="60" v-if="playerStats(battle).MainHand" :uk-tooltip="playerStats(battle).MainHand" :src="imageWeaponUri(playerStats(battle).MainHand)"></td>
 
-                        <td>{{ playerStats(battle).Kills }} / {{ playerStats(battle).Deaths }} / A</td>
+                        <td>{{ playerStats(battle).Kills }} / {{ playerStats(battle).Deaths }} / {{ playerStats(battle).Assistance ? playerStats(battle).Assistance : '-' }}</td>
                         <td>Level {{ battle.level }} <br/>
                             <span class="result" :class="battle.team1Tickets > battle.team2Tickets ? 'win' : 'lose'">{{battle.team1Tickets}}</span> -
                             <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
@@ -143,14 +143,19 @@ export default {
                     Cape : e.Cape && e.Cape, 
                     Potion : e.Potion && e.Potion
             } //, KillFame : player.KillFame ? e.Killer.KillFame + player.KillFame : e.Killer.KillFame    
-        }
+        },
+        getAssistance(participants, name) {
+            let count = 0;
+            participants.forEach(p => (p.Name === name && count++));
+            return count;
+        },
     },
     computed: {
         
     },
     mounted () {
         console.log('hello')
-        setInterval( () => {
+        setTimeout( () => {
 
             this.data && this.data.forEach( battle => {
                 battle.events.forEach( e => {
@@ -165,9 +170,17 @@ export default {
                         // })
                         return {...player}
                     }) 
-                    // e.Participants.forEach( p => {
-                    //     console.log(p)
+                    // battle.players = battle.players.map( player => {
+                    //     player.Assistance = this.getAssistance()
                     // })
+                    e.Participants.forEach( p => {
+                        console.log('participants', p)
+                        let playerId = battle.players.findIndex( player => player.Name === p.Name)
+                        battle.players[playerId].Assistance = battle.players[playerId].Assistance ? battle.players[playerId].Assistance + 1 : 1
+                        battle.players[playerId].MainHand = battle.players[playerId].MainHand ? battle.players[playerId].MainHand : p.MainHand
+                        battle.players[playerId].Itempower = battle.players[playerId].Itempower ? battle.players[playerId].Itempower : parseInt(p.Itempower,10)
+                        console.log(battle.players.findIndex( player => player.Name === p.Name))
+                    })
                 })
             })
         }, 500);
@@ -207,7 +220,6 @@ tr > td {
 .players {
     font-size: 14px;
     width:160px;
-    background:black;
 }
 .players img {
     width: 20px;
