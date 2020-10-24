@@ -26,8 +26,8 @@ module.exports = {
             query['players'] = { $elemMatch: { Name: name } }
         }
 
-        if (req.query.hideLevel1) {
-            query['level'] = { $gt: 1 }
+        if (req.query.minLevel) {
+            query['level'] = { $gt: req.query.minLevel }
         }
         req.setQuery = query
         next();

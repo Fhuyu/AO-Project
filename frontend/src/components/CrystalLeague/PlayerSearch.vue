@@ -1,6 +1,6 @@
 <template>
     <div class="form_global_search uk-text-center uk-width-auto@m m-4">
-            <form class="form_search" @submit.prevent="playerSearch(searchName)">
+            <form class="form_search" @submit.prevent="playerSearch(searchName)" style="float:left;margin-left:1%;">
                 <div class="select_div" uk-form-custom="target: > * > span:first-child">
                     <select v-model="searchType"  class="uk-select">
                         <option value="player">Player</option>
@@ -20,7 +20,7 @@
 
 export default {
     name: 'PlayerSearch',
-    props: [],
+    props: ['player'],
     data: function () {
         return {
             searchType : 'player',
@@ -32,13 +32,7 @@ export default {
     },
     methods: {
         playerSearch: function () {
-            console.log('emit')
             this.$emit('playerSearch', this.searchName)
-            // if (this.searchType === 'guild') this.searchGuildName = this.currentGuildSearch[0]
-            // this.$router.push({ path: `${this.searchGuildName}`, query: { search: this.searchType } })
-            this.currentOffset = 0
-            // this.minBattlePlayers = 0
-            // this.launchNewSearch() // fetch new data
         },
     },
     computed: {
@@ -48,6 +42,9 @@ export default {
 
     },
     watch: {
+        player : function () {
+            this.searchName = this.player
+        }
 
     }
 }

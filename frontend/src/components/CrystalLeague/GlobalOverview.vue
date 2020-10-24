@@ -10,7 +10,7 @@
                 <li v-for="(player, i) in team1Results(battle)" :key='i' :id="player.PlayerId">
                     <!-- <img src="https://render.albiononline.com/v1/item/T6_MAIN_MACE@1"/>  -->
                     <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
-                    {{player.Name}}
+                    <a @click="$emit('playerSearch', player.Name)" style="color: lightgray;padding-left: 5px;">{{player.Name}}</a>
                     <img style="width:11px;" v-if="battle.team1Leader === player.id" src="../../assets/crown.png" /> 
                 </li>
             </td>
@@ -24,13 +24,14 @@
             <td style="position:relative;width:40px;">
                 <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
                 <span style="position:absolute;bottom: 10px;left: 10px;color:#3a85ad;font-weight:bold;">
-                {{teamSeasonPoints(battle.team2Tickets, battle.team1Tickets, battle.level)}}
-                <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC"></span>
+                    {{teamSeasonPoints(battle.team2Tickets, battle.team1Tickets, battle.level)}}
+                    <img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" style="float:right;"></span>
             </td>
             <td class="players" style="text-align:right;">
                 <li v-for="(player, i) in team2Results(battle)" :key='i'>
                     <img style="width:11px;" v-if="battle.team2Leader === player.id" src="../../assets/crown.png" /> 
-                    {{player.Name}}
+
+                    <a @click="$emit('playerSearch', player.Name)" style="color: lightgray;padding-right: 5px;">{{player.Name}}</a>
                     <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
                 </li>
             </td>
@@ -106,12 +107,15 @@ export default {
                     return {...player}
                 }) 
             })
-        }
+        },
     }
 }
 </script>
 
 <style scoped>
+.players a:hover {
+    color: #FF6933!important;
+}
 .night .crystal-league {
     background-color: #05081c;
 }

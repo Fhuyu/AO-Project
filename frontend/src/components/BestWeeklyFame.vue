@@ -55,15 +55,21 @@
                 </div>
             </div>
         <div v-if="killFameCrystal" style="padding-left: 30px;">
-            <div class="uk-card uk-card-default uk-card-body">
+            <div class="uk-card uk-card-default uk-card-body" style=" min-height:300px">
+                <h3>
+                    You'd like to give visibility to your content? <br/>
+                </h3>
+                <h4>Join HHR discord or contact me!</h4>
+                    <i>Video, twitch channel, guild recruitment, creation, event ...</i>
+
 
                 
                 <!-- <iframe width="400" height="280"
                     src="https://www.youtube.com/embed/Yfw9Bheacw4" frameborder="0" allowfullscreen>
                 </iframe> -->
-                <VueTwitchPlayer
+                <!-- <VueTwitchPlayer
                     :channel="channel"
-                ></VueTwitchPlayer>
+                ></VueTwitchPlayer> -->
 
 
                 <!-- <h4>TOP CRYSTAL LEAGUE PLAYER</h4>
@@ -101,7 +107,7 @@ export default {
     props: [],
     data: function () {
         return {
-            channel : 'derrickuk',
+            // channel : 'derrickuk',
             killFamePlayer : null,
             killFameGuild : null,
             killFameCrystal : null,

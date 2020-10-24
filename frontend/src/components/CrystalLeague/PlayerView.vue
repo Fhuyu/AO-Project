@@ -8,18 +8,19 @@
                     <tbody>
                     <tr>
                         <td width="180" style="max-width:180px!important;">{{readableDate(battle.startTime)}}<br />
-                            <div style="padding-top:8px;"><img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
+                            Level {{ battle.level }}
                             
-                            {{playerSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level, battle)}}</div>
                             
                         </td>
                         <!-- <td>{{ playerStats(battle) }}</td> -->
                         <td><img width="60" v-if="playerStats(battle).MainHand" :uk-tooltip="playerStats(battle).MainHand" :src="imageWeaponUri(playerStats(battle).MainHand)"></td>
 
                         <td>{{ playerStats(battle).Kills }} / {{ playerStats(battle).Deaths }} / {{ playerStats(battle).Assistance ? playerStats(battle).Assistance : '-' }}</td>
-                        <td>Level {{ battle.level }} <br/>
+                        <td>
                             <span class="result" :class="battle.team1Tickets > battle.team2Tickets ? 'win' : 'lose'">{{battle.team1Tickets}}</span> -
                             <span class="result" :class="battle.team2Tickets > battle.team1Tickets ? 'win' : 'lose'">{{battle.team2Tickets}}</span><br/>
+                            <div style="padding-top:8px;"><img src="https://render.albiononline.com/v1/item/UNIQUE_GVGTOKEN_GENERIC" width="30">
+                            {{playerSeasonPoints(battle.team1Tickets, battle.team2Tickets, battle.level, battle)}}</div>
 
                         </td>
                         <td>
@@ -33,14 +34,15 @@
                         <td class="players" style="text-align:left;">
                             <li v-for="(player, i) in team1Results(battle)" :key='i' :id="player.PlayerId">
                                 <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
-                                {{player.Name}}
+                                <a @click="$emit('playerSearch', player.Name)" style="color: lightgray;padding-left: 5px;">{{player.Name}}</a>
+
                                 <img style="width:11px;" v-if="battle.team1Leader === player.id" src="../../assets/crown.png" /> 
                             </li>
                         </td>
                         <td class="players" style="text-align:right;">
                             <li v-for="(player, i) in team2Results(battle)" :key='i'>
                                 <img style="width:11px;" v-if="battle.team2Leader === player.id" src="../../assets/crown.png" /> 
-                                {{player.Name}}
+                                <a @click="$emit('playerSearch', player.Name)" style="color: lightgray;padding-right: 5px;">{{player.Name}}</a>
                                 <img v-if="player.MainHand" :uk-tooltip="player.MainHand" :src="imageWeaponUri(player.MainHand)">
 
                             </li>
@@ -73,6 +75,7 @@ import axios from 'axios'
 import seasonPoints from '@/components/CrystalLeague/seasonPoints.js'
 import General from "@/components/CrystalLeague/details/General";
 import Deaths from "@/components/CrystalLeague/details/Deaths";
+import Stats from "@/components/CrystalLeague/details/Stats";
 
 export default {
     name: 'CrystalLeaguePlayer',
@@ -87,6 +90,7 @@ export default {
     components: {
         General,
         Deaths,
+        Stats,
     },
     methods: {
         playerStats (battle) {
@@ -121,6 +125,24 @@ export default {
                 if (40 > ennemyPoint) return this.seasonPoints.points[crystalLevel] * 0.4
             }
         },
+        // teamSeasonPoints (team1, team2, crystalLevel, cgvg) {
+        //     let player = cgvg.players.find(p => p.Name.toLowerCase() === this.player.toLowerCase())
+
+        //     let myTeamPoint = player && player.Team === "ATTACKER" ? team1 : team2
+        //     let ennemyPoint = myTeamPoint === team1 ? team2 : team1
+
+        //     if (myTeamPoint > ennemyPoint) {
+        //         if(crystalLevel === 1) return this.seasonPoints.points[crystalLevel] * 5
+        //         if (myTeamPoint > 109) return this.seasonPoints.points[crystalLevel] * 5
+        //         if (myTeamPoint > 39) return this.seasonPoints.points[crystalLevel] * 0.8 * 5
+        //         if (40 > myTeamPoint) return this.seasonPoints.points[crystalLevel] * 0.6 * 5
+        //     } else {
+        //         if(crystalLevel === 1) return 0
+        //         if (ennemyPoint > 109) return 0
+        //         if (ennemyPoint > 39) return this.seasonPoints.points[crystalLevel] * 0.2 * 5
+        //         if (40 > ennemyPoint) return this.seasonPoints.points[crystalLevel] * 0.4 * 5
+        //     }
+        // },
         team1Results: function (battle) {
             return battle.players.filter( p => p.Team === "ATTACKER")
         },
@@ -194,11 +216,17 @@ export default {
 </script>
 
 <style scoped>
+.players a:hover {
+    color: #FF6933!important;
+}
 .result.win {
-    color:#a7f2a9;
+    color:green;
+    font-weight : bold;
 }
 .result.lose {
     color:red;
+    font-weight : bold;
+
 }
 tr > td {
     vertical-align: middle;

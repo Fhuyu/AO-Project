@@ -56,7 +56,7 @@ import seasonPoints from '@/components/CrystalLeague/seasonPoints.js'
 
 export default {
     name: 'General',
-    props: ['players'],
+    props: ['battle', 'players'],
     data: function () {
         return {
             seasonPoints : seasonPoints,
@@ -73,6 +73,19 @@ export default {
         },
         imageWeaponUri (weaponType) {
             return `https://render.albiononline.com/v1/item/${weaponType}` // https://gameinfo.albiononline.com/api/gameinfo/items/
+        },
+        teamSeasonPoints (myTeamPoint, ennemyPoint, crystalLevel) {
+            if (myTeamPoint > ennemyPoint) {
+                if(crystalLevel === 1) return this.seasonPoints.points[crystalLevel] * 5
+                if (myTeamPoint > 109) return this.seasonPoints.points[crystalLevel] * 5
+                if (myTeamPoint > 39) return this.seasonPoints.points[crystalLevel] * 0.8 * 5
+                if (40 > myTeamPoint) return this.seasonPoints.points[crystalLevel] * 0.6 * 5
+            } else {
+                if(crystalLevel === 1) return 0
+                if (ennemyPoint > 109) return 0
+                if (ennemyPoint > 39) return this.seasonPoints.points[crystalLevel] * 0.2 * 5
+                if (40 > ennemyPoint) return this.seasonPoints.points[crystalLevel] * 0.4 * 5
+            }
         },
     },
     computed: {

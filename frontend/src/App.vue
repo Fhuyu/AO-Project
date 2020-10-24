@@ -7,7 +7,7 @@
 				<router-link to='/' style="text-decoration: none;">
 					<h1><span>HANDHOLD</span><span style="color:#FF6933;">REPORT</span></h1> 
 				</router-link>
-				<p>Version 0.5.3 | 
+				<p>Version 0.5.7 | 
 
 				<button class="uk-button uk-button-text" type="button" uk-toggle="target: #modal-close-default">See changes</button> </p>
 				<div id="modal-close-default" uk-modal>
@@ -44,6 +44,9 @@
                   <li>
                     <router-link to='/attendance' style="text-decoration: none;">ATTENDANCE</router-link>
                   </li>
+                  <!-- <li>
+                    <router-link to='/crystal-league' style="text-decoration: none;">CRYSTAL LEAGUE</router-link>
+                  </li> -->
                   <li>
                     <a uk-toggle="target: #support">SUPPORT THE PROJECT</a>
                   </li>
@@ -92,7 +95,6 @@
 
     </div>
 
-    </div>
 
   </div>
 </template>

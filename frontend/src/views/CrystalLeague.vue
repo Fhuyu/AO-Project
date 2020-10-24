@@ -1,46 +1,50 @@
 <template>
 	<div class="crystal-league">
 		<div class="uk-width-4-5@m uk-margin-auto">
-		<div class="uk-card uk-card-secondary uk-card-body">
-			<h1 style="color:white">THIS PAGE IS STILL UNDER DEVELOPMENT</h1>PLEASE BE AWARE IT MIGHT BUG. THIS IS ONLY FOR THE FIRST FEEDBACK.
-		</div>
+            <div class="uk-card uk-card-secondary uk-card-body">
+                <b>Crystal League Stats - Alpha</b> <br/>
+                <i>Still under development</i>
+            </div>
 		<BestWeeklyFame></BestWeeklyFame>
 
-		<div>
+		<!-- <div>
 			<h3>STATS</h3>
 			<Stats :team1Timeline="t1" :team2Timeline="t2"></Stats>
-		</div>
+		</div> -->
 
-		<div uk-grid>
-			<div class="uk-width-1-2">
-			<PlayerSearch @playerSearch="setPlayer"></PlayerSearch>
-			</div>
-			<div class="uk-width-1-2">
-			<CalendarSearch @dateSearch="setDate"></CalendarSearch>
-			</div>
-		</div>
+            <div uk-grid>
+                <div class="uk-width-1-3">
+                    <CalendarSearch :date="date" @dateSearch="setDate"></CalendarSearch>
+                    <span @click="resetDate" uk-icon="refresh" style="padding: 10px;cursor:pointer;"></span>
+                </div>
+                <div class="uk-width-1-3">
+                    <PlayerSearch :player="player" @playerSearch="setPlayer"></PlayerSearch>
+                    <span @click="resetPlayer" uk-icon="refresh" style="padding: 10px;cursor:pointer;"></span>
+                </div>
+                <div class="uk-width-1-3">
+                    <LevelSearch :level="minLevel" @levelSearch="setLevel"></LevelSearch>
+                </div>
+            </div>
 
-		<Pagination
-			:currentOffset="currentOffset"
-			:offsetLoading="offsetLoading"
-			@changeOffset="onChangeOffset"
-		></Pagination>
 
-		<div class="uk-text-right">
-			<input class="uk-checkbox" type="checkbox" v-model="hideLevel1" /> Hide Crystals Level 1
-		</div>
-		
+            <Pagination
+                :currentOffset="currentOffset"
+                :offsetLoading="offsetLoading"
+                @changeOffset="onChangeOffset"
+            ></Pagination>	
 
-		<div class="uk-child-width-1-2@m uk-margin-auto" uk-grid v-if="!player">
-			<div
-			class="uk-card uk-card-default uk-margin-small crystal-detail m-2"
-			v-for="(battle, index) in data"
-			:key="index"
-			>
-        <GlobalOverview :battle="battle"></GlobalOverview>
-			</div>
-		</div>
-    <div v-else><PlayerView :data="data" :player="player"></PlayerView></div>
+            <div class="uk-child-width-1-2@m uk-margin-auto" uk-grid v-if="!player">
+                <div
+                class="uk-card uk-card-default uk-margin-small crystal-detail m-2"
+                v-for="(battle, index) in data"
+                :key="index"
+                >
+                    <GlobalOverview @playerSearch="setPlayer" :battle="battle"></GlobalOverview>
+                </div>
+            </div>
+            <div v-else>
+                <PlayerView @playerSearch="setPlayer" :data="data" :player="player"></PlayerView>
+            </div>
 		</div>
 	</div>
 </template>
@@ -48,11 +52,11 @@
 <script>
 import CalendarSearch from "@/components/CrystalLeague/Calendar";
 import PlayerSearch from "@/components/CrystalLeague/PlayerSearch";
+import LevelSearch from "@/components/CrystalLeague/LevelSearch";
+
 import GlobalOverview from "@/components/CrystalLeague/GlobalOverview";
 import BestWeeklyFame from "@/components/CrystalLeague/BestWeeklyFame";
 import PlayerView from "@/components/CrystalLeague/PlayerView";
-
-import Stats from "@/components/CrystalLeague/Statistic";
 
 import Pagination from "@/components/BattleboardPagination";
 
@@ -82,22 +86,20 @@ export default {
       offsetLoading: true,
       currentOffset: 0,
 
-      // ORDER BY
-      hideLevel1: true,
-
       // SEARCH DATA
       player : null,
       date : null,
+      minLevel : "1",
     };
   },
   components: {
     GlobalOverview,
     PlayerSearch,
+    LevelSearch,
     BestWeeklyFame,
     Pagination,
     CalendarSearch,
     PlayerView,
-    Stats,
 
   },
   methods: {
@@ -107,16 +109,35 @@ export default {
       return players.map((player, i) => ({ ...player, id: playersID[i] }));
     },
     onChangeOffset(offset) {
-      console.log(offset);
       this.currentOffset = offset;
     },
     setPlayer (player) {
       this.$router.push(`/crystal-league/${player}`)
       this.player = player
+      this.minLevel = '1'
+      this.date = null
+      this.currentOffset = 0
+      this.fetchCrystals()
+    },
+    resetPlayer () {
+      this.player = null
+      this.$router.push(`/crystal-league`)
+      this.currentOffset = 0
       this.fetchCrystals()
     },
     setDate (date) {
       this.date = date
+      this.currentOffset = 0
+      this.fetchCrystals()
+    },
+    resetDate () {
+      this.date = null
+      this.currentOffset = 0
+      this.fetchCrystals()
+    },
+    setLevel (level) {
+      this.minLevel = level
+      this.currentOffset = 0
       this.fetchCrystals()
     },
     async fetchCrystals() {
@@ -126,7 +147,7 @@ export default {
       await axios
         .get(url, {
           params: {
-            hideLevel1: this.hideLevel1,
+            minLevel: this.minLevel,
             player : this.player,
             date : this.date,
           }
@@ -135,15 +156,14 @@ export default {
             this.data = res.data;
             this.offsetLoading = false;
             this.data.forEach(battle => {
-            console.log('1 battle')
                 battle.events.forEach( e => {
                     e.Participants.forEach( p => {
-                        console.log('participants', p)
+                        // console.log('participants', p)
                         let playerId = battle.players.findIndex( player => player.Name === p.Name)
                         battle.players[playerId].Assistance = battle.players[playerId].Assistance ? battle.players[playerId].Assistance + 1 : 1
                         battle.players[playerId].MainHand = battle.players[playerId].MainHand ? battle.players[playerId].MainHand : p.MainHand
                         battle.players[playerId].Itempower = battle.players[playerId].Itempower ? battle.players[playerId].Itempower : parseInt(p.Itempower,10)
-                        console.log(battle.players.findIndex( player => player.Name === p.Name))
+                        // console.log(battle.players.findIndex( player => player.Name === p.Name))
                     })
                 })
             })
@@ -156,17 +176,13 @@ export default {
     //     },
   },
   mounted() {
-    console.log('riutrhett', this.$route.params.name) 
     if (this.$route.params.name) this.player = this.$route.params.name
     this.fetchCrystals();
   },
   watch: {
     currentOffset: function() {
       this.fetchCrystals();
-	},
-	hideLevel1: function() {
-      this.fetchCrystals();
-    }
+    },
   }
 };
 </script>

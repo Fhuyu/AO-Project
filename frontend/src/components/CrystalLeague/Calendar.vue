@@ -1,6 +1,6 @@
 <template>
     <div class="form_global_search uk-text-center uk-width-3 m-4">
-        <DatePicker is-dark color="orange" v-model="dates" class="calendar-crystal"> <!--  mode="multiple"  -->
+        <DatePicker is-dark color="orange" v-model="currentDate" class="calendar-crystal"> <!--  mode="multiple"  -->
         </DatePicker>
     </div>
 </template>
@@ -12,10 +12,10 @@ import DatePicker from 'v-calendar/lib/components/date-picker.umd';
 
 export default {
     name: 'DateSearch',
-    props: [],
+    props: ['date'],
     data: function () {
         return {
-            dates : []
+            currentDate : null,
         }
     },
     components: {
@@ -31,8 +31,11 @@ export default {
 
     },
     watch: {
-        dates : function () {
-            this.$emit('dateSearch', this.dates)
+        currentDate : function () {
+            this.$emit('dateSearch', this.currentDate)
+        },
+        date: function() {
+            this.currentDate = this.date
         }
     }
 }
@@ -40,10 +43,13 @@ export default {
 
 <style>
 .calendar-crystal > input{
+    float:left;
+    padding-left: 30px;
     background: #2e2a42;
     color: white;
     border: none;
     height: 32px;
+    max-width:260px;
     border-radius: 50px;
 }
 </style>
