@@ -44,9 +44,9 @@
                   <li>
                     <router-link to='/attendance' style="text-decoration: none;">ATTENDANCE</router-link>
                   </li>
-                  <!-- <li>
-                    <router-link to='/crystal-league' style="text-decoration: none;">CRYSTAL LEAGUE</router-link>
-                  </li> -->
+                  <li>
+                    <router-link to='/crystal-league' id="crystalLink" style="text-decoration: none;">CRYSTAL LEAGUE</router-link>
+                  </li>
                   <li>
                     <a uk-toggle="target: #support">SUPPORT THE PROJECT</a>
                   </li>
@@ -194,5 +194,16 @@ export default {
 }
 .night .attendance li:nth-child(2n) {
     background: #131218;
+}
+#crystalLink {
+    color: #999;
+    animation-name: example;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+@keyframes example {
+  0%   {color: #999;}
+  50%  {color: rgb(255, 105, 51)}
+  100% {color: #999;}
 }
 </style>

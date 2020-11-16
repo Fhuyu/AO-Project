@@ -56,17 +56,17 @@
             </div>
         <div v-if="killFameCrystal" style="padding-left: 30px;">
             <div class="uk-card uk-card-default uk-card-body" style=" min-height:300px">
-                <h3>
+                <!-- <h3>
                     You'd like to give visibility to your content? <br/>
                 </h3>
                 <h4>Join HHR discord or contact me!</h4>
-                    <i>Video, twitch channel, guild recruitment, creation, event ...</i>
+                    <i>Video, twitch channel, guild recruitment, creation, event ...</i> -->
 
 
                 
-                <!-- <iframe width="400" height="280"
-                    src="https://www.youtube.com/embed/Yfw9Bheacw4" frameborder="0" allowfullscreen>
-                </iframe> -->
+                <iframe width="400" height="280"
+                    src="https://www.youtube.com/embed/Wb1CICu7g1s" frameborder="0" allowfullscreen>
+                </iframe>
                 <!-- <VueTwitchPlayer
                     :channel="channel"
                 ></VueTwitchPlayer> -->
@@ -170,5 +170,6 @@ table.weeklyfame .loadmore {
     text-align: center;
     cursor: pointer;
 }
+
 
 </style>
